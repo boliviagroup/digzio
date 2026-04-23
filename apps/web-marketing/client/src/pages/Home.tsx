@@ -4,7 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   GraduationCap, Building2, University, ArrowRight,
-  CheckCircle, Shield, Zap, TrendingUp, Star, ChevronRight
+  CheckCircle, Shield, Zap, TrendingUp, Star, ChevronRight,
+  AlertTriangle, BarChart3, Users, Home as HomeIcon
 } from "lucide-react";
 
 // Animated counter hook
@@ -360,6 +361,139 @@ export default function Home() {
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{feat.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── MARKET INSIGHTS ── */}
+      <section className="py-24 bg-white">
+        <div className="container">
+          <div className="text-center mb-16">
+            <span className="section-label">Market Insights</span>
+            <h2 className="text-4xl lg:text-5xl font-800 text-gray-900 mb-4" style={{ fontWeight: 800 }}>
+              The opportunity is undeniable.
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              South Africa's student housing crisis is structural — and Digzio is built to solve it.
+              The data below is sourced from IFC/World Bank, DHET, and NSFAS (2025).
+            </p>
+          </div>
+
+          {/* ── 4 Key Stat Cards ── */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              { icon: Users, value: "2.4M", trend: "+4.2% YoY", label: "Tertiary Students", sub: "Universities + TVET + Private HEIs", color: "#1A9BAD" },
+              { icon: HomeIcon, value: "212K", trend: "+3.1% YoY", label: "Beds Available", sub: "PBSA + on-campus combined", color: "#0F2D4A" },
+              { icon: AlertTriangle, value: "500K+", trend: "Growing annually", label: "Bed Shortage", sub: "Projected 781K by 2025", color: "#E74C3C" },
+              { icon: BarChart3, value: "R4.27bn", trend: "2025/2026", label: "NSFAS Disbursement", sub: "Annual allocation to students", color: "#2EC4C4" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="p-6 rounded-2xl"
+                style={{ background: "#F5F7FA", border: "1px solid #E8ECEF" }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `${stat.color}18` }}
+                  >
+                    <stat.icon size={18} style={{ color: stat.color }} />
+                  </div>
+                  <span className="text-xs font-600 px-2 py-1 rounded-full" style={{ background: `${stat.color}15`, color: stat.color, fontWeight: 600 }}>
+                    {stat.trend}
+                  </span>
+                </div>
+                <div className="text-3xl font-800 mb-1" style={{ color: "#0F2D4A", fontWeight: 800 }}>{stat.value}</div>
+                <div className="font-700 text-gray-800 text-sm mb-1" style={{ fontWeight: 700 }}>{stat.label}</div>
+                <div className="text-xs text-gray-400">{stat.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Crisis Banner + Key Indicators ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            {/* Crisis Banner */}
+            <div
+              className="p-8 rounded-2xl flex flex-col justify-between"
+              style={{ background: "linear-gradient(135deg, #0F2D4A 0%, #1A4A6B 100%)", minHeight: "280px" }}
+            >
+              <div>
+                <span
+                  className="inline-block text-xs font-700 uppercase tracking-widest px-3 py-1 rounded-full mb-4"
+                  style={{ background: "rgba(231,76,60,0.2)", color: "#E74C3C", fontWeight: 700 }}
+                >
+                  National Housing Crisis
+                </span>
+                <h3 className="text-3xl font-800 text-white mb-3" style={{ fontWeight: 800 }}>500,000+ Bed Deficit</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  Only 250,000 beds exist for 2.8 million tertiary students. South Africa's on-campus
+                  coverage rate is just 20% — against a global average of 50%. The gap will reach
+                  781,000 beds by 2025 as enrolments grow toward the NDP target of 1.6 million by 2030.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-6">
+                {[
+                  { label: "Beds Available", val: "250K", color: "#2EC4C4" },
+                  { label: "Beds Needed", val: "750K+", color: "#E74C3C" },
+                  { label: "Coverage Rate", val: "20%", color: "#F5A623" },
+                  { label: "Global Average", val: "50%", color: "#2ECC71" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between">
+                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>{item.label}</span>
+                    <span className="text-sm font-700" style={{ color: item.color, fontWeight: 700 }}>{item.val}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Key Market Indicators */}
+            <div
+              className="p-8 rounded-2xl"
+              style={{ background: "#F5F7FA", border: "1px solid #E8ECEF" }}
+            >
+              <h3 className="font-800 text-gray-900 mb-6" style={{ fontWeight: 800 }}>Key Market Indicators</h3>
+              <div className="space-y-4">
+                {[
+                  { label: "On-campus coverage", sub: "Global avg: 50%", val: "20%", color: "#E74C3C" },
+                  { label: "NSFAS-funded students", sub: "811K students (2025)", val: "42%", color: "#1A9BAD" },
+                  { label: "PBSA investment yield", sub: "Gross annual return", val: "15–20%", color: "#2ECC71" },
+                  { label: "NSFAS metro cap", sub: "R4,333/month max", val: "R52K/yr", color: "#0F2D4A" },
+                  { label: "Female students", sub: "Safety is top priority", val: "54.7%", color: "#2EC4C4" },
+                  { label: "Formal PBSA operators", sub: "Top 10 hold 51,844 beds", val: "42", color: "#F5A623" },
+                ].map((ind) => (
+                  <div key={ind.label} className="flex items-center justify-between py-3" style={{ borderBottom: "1px solid #E8ECEF" }}>
+                    <div>
+                      <div className="text-sm font-600 text-gray-800" style={{ fontWeight: 600 }}>{ind.label}</div>
+                      <div className="text-xs text-gray-400">{ind.sub}</div>
+                    </div>
+                    <span className="text-base font-800" style={{ color: ind.color, fontWeight: 800 }}>{ind.val}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Strategic Insight ── */}
+          <div
+            className="p-8 rounded-2xl flex gap-5 items-start"
+            style={{ background: "linear-gradient(135deg, rgba(26,155,173,0.08) 0%, rgba(46,196,196,0.08) 100%)", border: "1px solid rgba(26,155,173,0.2)" }}
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center mt-0.5"
+              style={{ background: "rgba(26,155,173,0.15)" }}
+            >
+              <TrendingUp size={18} style={{ color: "#1A9BAD" }} />
+            </div>
+            <div>
+              <div className="font-800 text-gray-900 mb-2" style={{ fontWeight: 800 }}>Strategic Insight: The Market Is Structurally Broken</div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                South Africa's student housing crisis is not cyclical — it is structural. With 500,000+ beds missing,
+                only 20% on-campus coverage, and enrollment growing toward 1.6 million by 2030, the gap will widen
+                without deliberate intervention. No single platform currently aggregates supply, integrates NSFAS, or
+                provides quality transparency. <strong style={{ color: "#0F2D4A" }}>This is Digzio's core market opportunity.</strong>
+              </p>
+              <p className="text-xs text-gray-400 mt-3">Data: IFC / World Bank (2021), DHET (2023), NSFAS (2025)</p>
+            </div>
           </div>
         </div>
       </section>
