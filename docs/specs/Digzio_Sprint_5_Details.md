@@ -13,7 +13,7 @@ Sprint 5 is the transaction engine of the Digzio platform. It bridges the demand
 Crucially, this sprint introduces the **NSFAS API Integration** — the core differentiator of the platform. By automatically verifying a student's funding status, Digzio removes the manual administrative burden from landlords and ensures students are only placed in properties they can afford.
 
 **Duration:** 2 Weeks (Weeks 9–10)  
-**Primary Deliverables:** Student Application Flow, NSFAS Verification Engine, Provider Application Review Interface, and Twilio SMS Notifications.
+**Primary Deliverables:** Student Application Flow, NSFAS Verification Engine, Provider Application Review Interface, and WhatsApp & Email Notifications.
 
 ---
 
@@ -82,11 +82,11 @@ This service communicates securely with the external NSFAS API.
 
 *Fallback Strategy:* If the NSFAS API is down (a common occurrence), the engine implements an exponential backoff retry queue (using Redis/BullMQ) for up to 24 hours.
 
-### 4.3 Twilio SMS Notifications (`NOT-02`)
+### 4.3 WhatsApp & Email Notifications (`NOT-02`)
 
-Because South African students may not always have active mobile data for push notifications, critical state changes are sent via SMS.
+Because South African students may not always have active mobile data for push notifications, critical state changes are sent via WhatsApp.
 
-**Trigger Events for SMS:**
+**Trigger Events for WhatsApp:**
 - Application reaches `PENDING_REVIEW` ("Great news! Your NSFAS funding is verified. Your application is now with the landlord.")
 - Application reaches `ACCEPTED` ("Congratulations! You got the room at Oak House. Log in to sign your lease.")
 
@@ -99,6 +99,6 @@ By the end of Week 10, the following must be true:
 1. **Transaction Integrity:** A student cannot apply for a property that is full, nor can they apply if their KYC is incomplete.
 2. **NSFAS Shield:** A landlord *never* sees an application in their dashboard unless the NSFAS API has explicitly returned a `FUNDED` status.
 3. **Resilience:** If the external NSFAS API times out, the Digzio backend queues the verification and retries automatically without failing the student's request.
-4. **Communication:** Twilio successfully delivers an SMS to the student's verified phone number when the landlord clicks "Accept".
+4. **Communication:** WhatsApp Business API successfully delivers an WhatsApp to the student's verified phone number when the landlord clicks "Accept".
 
 **Milestone Reached:** The core loop is closed. Supply exists, demand exists, and transactions can be executed securely with automated financial vetting. The platform is functionally complete for the MVP. Sprint 6 will focus purely on hardening, security, and load testing before the public soft launch.

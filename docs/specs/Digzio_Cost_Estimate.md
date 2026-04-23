@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-This document provides a comprehensive monthly operating cost estimate for the Digzio student housing platform. The estimates are based on current 2026 pricing for AWS infrastructure, third-party APIs (Onfido, Stripe, PayU), and communication services (Twilio, SendGrid).
+This document provides a comprehensive monthly operating cost estimate for the Digzio student housing platform. The estimates are based on current 2026 pricing for AWS infrastructure, third-party APIs (Onfido, Stripe, PayU), and communication services (WhatsApp Business API, SendGrid).
 
 To provide a realistic financial roadmap, costs are modelled across three distinct growth stages:
 1. **MVP / Soft Launch:** 1,000 active students, 50 providers, 200 properties.
@@ -48,8 +48,8 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 - **PayU (EFT/Local ZA Payments):** Varies by channel, but standard gateway fees apply (e.g., flat fee of R3.50 or percentage) [9].
 - *Note: NSFAS disbursements do not incur standard credit card gateway fees, but require API integration maintenance.*
 
-### 3.3 Communications (Twilio & SendGrid)
-- **Twilio SMS (South Africa):** $0.1355 per outbound SMS message [10].
+### 3.3 Communications (WhatsApp Business API & SendGrid)
+- **WhatsApp Business API (South Africa):** ~$0.015 per utility message (significantly cheaper than SMS) [10].
 - **SendGrid Email:** Free for first 100/day. Essentials plan (up to 100k emails) is $19.95/month. Pro plan is $89.95/month [11].
 
 ---
@@ -67,7 +67,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 | | AWS API Gateway | < 1M requests | $ 3.50 |
 | | AWS S3 + CDN | 50 GB Storage + 100 GB Egress | $ 10.00 |
 | **Services** | Onfido KYC | 200 verifications/mo | $ 250.00 |
-| | Twilio SMS | 1,000 SMS/mo | $ 135.50 |
+| | WhatsApp API | 1,000 Msgs/mo | $ 15.00 |
 | | SendGrid Email | < 3,000 emails/mo | $ 0.00 (Free) |
 | **Total Estimated Monthly Cost (MVP)** | | | **$ 499.00** |
 
@@ -82,7 +82,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 | | AWS API Gateway | 10M requests | $ 35.00 |
 | | AWS S3 + CDN | 500 GB Storage + 1 TB Egress | $ 95.00 |
 | **Services** | Onfido KYC | 1,000 verifications/mo | $ 1,000.00 |
-| | Twilio SMS | 15,000 SMS/mo | $ 2,032.50 |
+| | WhatsApp API | 15,000 Msgs/mo | $ 225.00 |
 | | SendGrid Email | 50,000 emails/mo | $ 19.95 |
 | **Total Estimated Monthly Cost (Growth)** | | | **$ 3,762.45** |
 
@@ -97,7 +97,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 | | AWS API Gateway | 50M requests | $ 175.00 |
 | | AWS S3 + CDN | 2 TB Storage + 5 TB Egress | $ 470.00 |
 | **Services** | Onfido KYC | 4,000 verifications/mo | $ 3,500.00 |
-| | Twilio SMS | 75,000 SMS/mo | $ 10,162.50 |
+| | WhatsApp API | 75,000 Msgs/mo | $ 1,125.00 |
 | | SendGrid Email | 250,000 emails/mo | $ 89.95 |
 | **Total Estimated Monthly Cost (Scale)** | | | **$ 16,297.45** |
 
@@ -112,7 +112,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 
 ## 6. Strategic Cost Insights
 
-1. **SMS is the Hidden Giant:** Twilio SMS costs in South Africa are relatively high ($0.1355 per message). At scale, SMS notifications become the single largest operational expense. **Recommendation:** Push users heavily toward in-app push notifications or WhatsApp (which has different pricing tiers) to mitigate this.
+1. **WhatsApp is the Hidden Giant:** WhatsApp & Email costs in South Africa are relatively high ($0.1355 per message). At scale, WhatsApp notifications become the single largest operational expense. **Recommendation:** Push users heavily toward in-app push notifications or WhatsApp (which has different pricing tiers) to mitigate this.
 2. **KYC Costs:** Identity verification is expensive but non-negotiable for trust and NSFAS compliance. Bulk enterprise agreements with Onfido will be critical as the platform scales.
 3. **AWS is Highly Efficient Early On:** The cloud infrastructure costs are negligible during the MVP phase (under $120/month) and scale linearly and predictably.
 
@@ -128,5 +128,5 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 [7] Top 10 real estate KYC tools in 2026: https://agorareal.com/compare/top-10-real-estate-kyc-tools-in-2025/
 [8] Stripe Pricing: https://stripe.com/pricing
 [9] PayU Fees by Country: https://corporate.payu.com/payu-fees-by-country/
-[10] Twilio SMS Pricing South Africa: https://www.twilio.com/en-us/sms/pricing/za
+[10] WhatsApp & Email Pricing South Africa: https://www.twilio.com/en-us/whatsapp/pricing/za
 [11] SendGrid Pricing: https://sendgrid.com/en-us/pricing

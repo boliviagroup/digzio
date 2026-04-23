@@ -83,7 +83,7 @@ It breaks down the core deliverables for each sprint and provides an estimated n
 | **Application API** | Backend state machine enforcing KYC, duplicate, and capacity rules | 5 Sessions |
 | **NSFAS Engine** | mTLS REST calls to government API + BullMQ retry queue | 6 Sessions |
 | **Provider Review** | Landlord UI (Kanban) + backend pessimistic locking (`SELECT FOR UPDATE`) | 5 Sessions |
-| **SMS Service** | Twilio integration for critical state changes (`ACCEPTED` / `REVIEW`) | 2 Sessions |
+| **WhatsApp Service** | WhatsApp Business API integration for critical state changes (`ACCEPTED` / `REVIEW`) | 2 Sessions |
 | **Total Sprint 5** | | **22 Sessions** |
 
 ---

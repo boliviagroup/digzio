@@ -64,9 +64,9 @@ Instead of "Sprints" measured in weeks, this plan is measured in **Manus Session
 |---|---|---|
 | **APP-01 & PRV-05** | Application State Machine & Provider Review | Manus writes the complex SQL transactions (pessimistic locking) and API logic in 2-3 sessions. |
 | **NSF-01** | NSFAS Integration Engine | Manus builds the mTLS client and BullMQ retry queue in 2 sessions. |
-| **NOT-02** | Twilio SMS Integration | Manus wires the Twilio SDK in 1 session. |
+| **NOT-02** | WhatsApp & Email Integration | Manus wires the WhatsApp Business API SDK in 1 session. |
 
-**Human Blocker:** You must provide the NSFAS API mTLS certificates and Twilio API keys.
+**Human Blocker:** You must provide the NSFAS API mTLS certificates and WhatsApp Business API API keys.
 
 ---
 
@@ -91,4 +91,4 @@ Instead of "Sprints" measured in weeks, this plan is measured in **Manus Session
 | **Cost Profile** | High (Developer Salaries) | Low (Compute/Token Costs) |
 | **Bottleneck** | Developer velocity | Human feedback & 3rd-party API keys |
 
-By acting as the orchestrator and unblocker, you can guide Manus to build the entire Digzio platform in under a month. The critical path is no longer writing code; it is making fast product decisions and securing external dependencies (AWS, Onfido, Twilio, NSFAS).
+By acting as the orchestrator and unblocker, you can guide Manus to build the entire Digzio platform in under a month. The critical path is no longer writing code; it is making fast product decisions and securing external dependencies (AWS, Onfido, WhatsApp Business API, NSFAS).

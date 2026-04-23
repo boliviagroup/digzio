@@ -13,7 +13,7 @@ Sprint 5 represents the core transaction engine of the Digzio platform. While ea
 This sprint is characterized by complex state machines, external API integrations with strict security requirements (mTLS), and robust error handling to account for the unreliability of government API endpoints.
 
 **Duration:** 2 Weeks (Weeks 9–10)  
-**Primary Deliverables:** Application Engine (State Machine), NSFAS Integration Engine (External API Orchestrator), Provider Review API (Capacity Enforcement), and Twilio Notification Service (Event-Driven SMS).
+**Primary Deliverables:** Application Engine (State Machine), NSFAS Integration Engine (External API Orchestrator), Provider Review API (Capacity Enforcement), and WhatsApp Business API Notification Service (Event-Driven WhatsApp).
 
 ---
 
@@ -86,19 +86,19 @@ When a landlord clicks "Accept" (`POST /api/v1/applications/{id}/accept`), the b
 
 ---
 
-### 2.4 Twilio Notification Service (`NOT-02`)
+### 2.4 WhatsApp Business API Notification Service (`NOT-02`)
 
-An extension of the Notification Service built in Sprint 2. It now listens for application state changes and dispatches SMS messages.
+An extension of the Notification Service built in Sprint 2. It now listens for application state changes and dispatches WhatsApp messages.
 
 **Event-Driven Architecture:**
 1. Application Engine updates status to `ACCEPTED`.
 2. Engine publishes `ApplicationAccepted` event to Redis.
 3. Notification Service consumes event.
 4. Service queries `users.phone_number`.
-5. Service calls Twilio API: `POST https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Messages.json`.
+5. Service calls WhatsApp Business API API: `POST https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Messages.json`.
 
 **Cost Optimization:**
-SMS in South Africa is expensive (~$0.13 per message). The backend implements logic to only send SMS for critical state changes (`PENDING_REVIEW` and `ACCEPTED`). Marketing or non-critical alerts default to email via SendGrid.
+WhatsApp in South Africa is expensive (~$0.13 per message). The backend implements logic to only send WhatsApp for critical state changes (`PENDING_REVIEW` and `ACCEPTED`). Marketing or non-critical alerts default to email via SendGrid.
 
 ---
 

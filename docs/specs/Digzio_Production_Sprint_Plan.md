@@ -86,7 +86,7 @@ The immediate goal is a **Soft Launch MVP (Minimum Viable Product)** featuring a
 | APP-01 | Apply Flow | Build the student application submission flow. | Student can select a room, agree to terms, and submit application. |
 | NSF-01 | NSFAS API | Integrate with the NSFAS funding verification endpoint. | System queries NSFAS API with student ID; updates application with "Funded" or "Unfunded" status. |
 | PRV-05 | App Review | Build the Provider interface to review applications. | Providers see incoming applications, NSFAS status, and can "Accept" or "Reject". |
-| NOT-02 | SMS Alerts | Integrate Twilio for critical SMS notifications. | Student receives SMS when application is accepted by provider. |
+| NOT-02 | WhatsApp Alerts | Integrate WhatsApp Business API for critical WhatsApp notifications. | Student receives WhatsApp when application is accepted by provider. |
 
 ---
 
