@@ -60,6 +60,21 @@ resource "aws_iam_role" "ecs_task" {
   }
 }
 
+# Allow ECS tasks to send emails via SES
+resource "aws_iam_role_policy" "ecs_task_ses" {
+  name = "digzio-ecs-task-ses-policy-prod"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["ses:SendEmail", "ses:SendRawEmail"]
+      Resource = "*"
+    }]
+  })
+}
+
 # Allow ECS tasks to access S3 images bucket
 resource "aws_iam_role_policy" "ecs_task_s3" {
   name = "digzio-ecs-task-s3-policy-prod"

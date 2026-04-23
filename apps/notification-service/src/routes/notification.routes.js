@@ -1,33 +1,46 @@
 const express = require('express');
 const router = express.Router();
-const sgMail = require('@sendgrid/mail');
+const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 const axios = require('axios');
 
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
+// Initialize AWS SES
+const sesClient = new SESClient({ region: process.env.AWS_REGION || 'af-south-1' });
 
 // Send Email Notification
 router.post('/email', async (req, res) => {
   try {
-    const { to, subject, template_id, dynamic_template_data } = req.body;
+    const { to, subject, body_html, body_text } = req.body;
 
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('Mock Email Sent:', { to, subject, template_id });
+    if (!process.env.SES_FROM_EMAIL) {
+      console.log('Mock Email Sent:', { to, subject });
       return res.status(200).json({ message: 'Email sent (mocked)', mock: true });
     }
 
-    const msg = {
-      to,
-      from: process.env.SENDGRID_FROM_EMAIL || 'noreply@digzio.co.za',
-      subject,
-      templateId: template_id,
-      dynamicTemplateData: dynamic_template_data,
+    const params = {
+      Source: process.env.SES_FROM_EMAIL || 'noreply@digzio.co.za',
+      Destination: {
+        ToAddresses: [to],
+      },
+      Message: {
+        Subject: {
+          Data: subject,
+          Charset: 'UTF-8'
+        },
+        Body: {
+          Html: {
+            Data: body_html || '<p>Hello from Digzio!</p>',
+            Charset: 'UTF-8'
+          },
+          Text: {
+            Data: body_text || 'Hello from Digzio!',
+            Charset: 'UTF-8'
+          }
+        }
+      }
     };
 
-    await sgMail.send(msg);
-    res.status(200).json({ message: 'Email sent successfully' });
+    await sesClient.send(new SendEmailCommand(params));
+    res.status(200).json({ message: 'Email sent successfully via SES' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to send email' });
