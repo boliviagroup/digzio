@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "Choosing the Right KYC Stack for Digzio",
+    "created": 1776942959.9060168,
+    "last_updated": 1776943618.3420818,
+    "total_slides": 11
+  },
+  "slides": [
+    {
+      "id": "slide_1",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_2",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_3",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_4",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_5",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_6",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_7",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_8",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_9",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_10",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_11",
+      "state": "edited",
+      "pageNum": 11
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_1",
+      "title": "Choosing the Right KYC Stack for Digzio",
+      "summary": "Title slide introducing the strategic comparison between Onfido and DHA + Smile Identity for Digzio's KYC stack.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_2",
+      "title": "The KYC Problem Digzio Must Solve",
+      "summary": "Outlines the scale and requirements of verifying 10,000+ students monthly without compromising trust or burning cash.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_3",
+      "title": "What Onfido Does — and What It Costs",
+      "summary": "Explains Onfido's OCR-based approach, its $1.50 per check cost, and limitations for the South African context.",
+      "image_plan": "/home/ubuntu/upload/search_images/yAs3eZAy0End.webp - Image 15 visually represents the Onfido process with document scanning and facial recognition.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_4",
+      "title": "What the Two-Layer Stack Does — and What It Costs",
+      "summary": "Details the DHA + Smile Identity approach, direct government validation, and its blended $0.65 per check cost.",
+      "image_plan": "/home/ubuntu/digzio_images/06_large_unit_room.jpg - Image 6 illustrates the two-layer KYC process with DHA validation and liveness check.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_5",
+      "title": "Head-to-Head Feature Comparison",
+      "summary": "A direct comparison table across 8 critical dimensions showing the Two-Layer Stack winning or tying on all fronts.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_6",
+      "title": "The $102,000 Annual Saving — Visualised",
+      "summary": "Highlights the massive $102,000 annual saving at Growth stage volume with a cumulative cost comparison chart.",
+      "image_plan": "/home/ubuntu/digzio/docs/diagrams/digzio_cost_estimate.png - Image 13 is a bar chart showing cost comparison, directly visualizing the $102,000 annual saving.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_7",
+      "title": "The Security Argument — Cheaper AND More Secure",
+      "summary": "Explains how bypassing OCR and directly querying the DHA eliminates the most common forged ID attack vector.",
+      "image_plan": "/home/ubuntu/upload/search_images/E0AI2IW6PJSw.jpg - Image 20, 'Good news as SA's digital ID system gets upgrade', directly relates to the security argument of using the DHA system.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_8",
+      "title": "POPIA Compliance Advantage",
+      "summary": "Details how the Two-Layer Stack dramatically reduces POPIA liability by storing zero ID document images.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_9",
+      "title": "Integration Architecture",
+      "summary": "Outlines the 7-step asynchronous API integration flow for the Two-Layer Stack.",
+      "image_plan": "/home/ubuntu/digzio_images/digzio_architecture.png - Image 11 is a system architecture diagram, which is relevant to the integration architecture of the two-layer stack.",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10",
+      "title": "Recommendation and Decision",
+      "summary": "The final recommendation to adopt the Two-Layer Stack and the immediate next steps for implementation.",
+      "image_plan": "",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11",
+      "title": "Summary — The Case in One Page",
+      "summary": "A concise recap of the three main reasons (Cost, Security, Compliance) the Two-Layer Stack is the superior choice.",
+      "image_plan": "",
+      "slide_template_key": ""
+    }
+  ]
+}

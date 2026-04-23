@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-rect-bg {
+            position: absolute;
+            width: 45%;
+            height: 100%;
+            background-color: rgba(69, 162, 158, 0.05);
+            right: 0;
+            top: 0;
+            z-index: 1;
+            border-left: 2px solid rgba(102, 252, 241, 0.1);
+        }
+        
+        .shape-circle-accent {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 4px solid rgba(102, 252, 241, 0.15);
+            top: -100px;
+            right: 20%;
+            z-index: 2;
+        }
+
+        /* Content Layout */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            width: 100%;
+            /* keep top padding for title consistency */
+            padding: 80px 48px 24px;
+        }
+
+        .left-column {
+            width: 55%;
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-column {
+            width: 45%;
+            padding-left: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 12px; /* reduced spacing */
+            letter-spacing: -0.5px;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        .body-text {
+            color: #C5C6C7;
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        
+        .body-text p {
+            margin-bottom: 8px; /* reduced paragraph spacing */
+        }
+        
+        .bullet-list {
+            list-style: none;
+            margin-top: 12px;
+        }
+        
+        .bullet-item {
+            color: #C5C6C7;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .bullet-icon {
+            color: #66FCF1;
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* Massive Metrics */
+        .metric-block {
+            border-left: 4px solid #45A29E;
+            padding-left: 12px;
+        }
+        
+        .metric-value {
+            color: #FFFFFF;
+            font-size: 84px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value.accent {
+            color: #66FCF1;
+        }
+        
+        .metric-label {
+            color: #C5C6C7;
+            font-size: 18px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Background Shapes -->
+        <div class="shape-rect-bg"></div>
+        <div class="shape-circle-accent"></div>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <div class="left-column">
+                <div class="slide-header">The KYC Problem</div>
+                <h2 class="main-heading">Digzio Must Verify <span class="highlight">10,000+ Students</span> Per Month Without Compromising Trust or Burning Cash</h2>
+                
+                <div class="body-text">
+                    <p>Every student who applies for accommodation on Digzio must be verified before they can submit an application.</p>
+                    <p>The verification must confirm three things: the student is a real person, their SA ID number is valid and active, and they are physically present (not a bot or fraudster).</p>
+                </div>
+
+                <!-- Removed long bullet list to reduce overall height while keeping key messaging -->
+            </div>
+            
+            <div class="right-column">
+                <div class="metric-block">
+                    <div class="metric-value">10,000</div>
+                    <div class="metric-label">KYC checks per month at Growth stage</div>
+                </div>
+                
+                <div class="metric-block">
+                    <div class="metric-value">2</div>
+                    <div class="metric-label">Primary SA ID types (Green Book & Smart ID)</div>
+                </div>
+                
+                <div class="metric-block">
+                    <div class="metric-value accent">R1.8M</div>
+                    <div class="metric-label">Annual cost of the wrong KYC choice at scale</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

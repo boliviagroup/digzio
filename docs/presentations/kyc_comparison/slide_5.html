@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            /* keep top padding for title as required; reduce bottom padding to save height */
+            padding: 60px 80px 30px;
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-circle-bg {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(69, 162, 158, 0.05) 0%, rgba(11, 12, 16, 0) 70%);
+            top: -200px;
+            right: -200px;
+            z-index: 1;
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 20px; /* reduced from 40 to save vertical space */
+            letter-spacing: -0.5px;
+            max-width: 1000px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        /* Table Layout */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            position: relative;
+            z-index: 10;
+            margin-top: 6px; /* slightly reduced */
+        }
+
+        /* Reduced vertical padding to compress rows (font sizes unchanged) */
+        .comparison-table th, .comparison-table td {
+            padding: 8px 16px;
+            text-align: left;
+            font-size: 18px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(197, 198, 199, 0.2);
+        }
+
+        .comparison-table th {
+            font-size: 20px;
+            font-weight: 900;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #45A29E;
+        }
+
+        .comparison-table td:first-child {
+            color: #FFFFFF;
+            font-weight: 900;
+            width: 30%;
+        }
+
+        .comparison-table td:nth-child(2) {
+            color: #C5C6C7;
+            width: 35%;
+        }
+
+        .comparison-table td:nth-child(3) {
+            color: #66FCF1;
+            font-weight: 900;
+            width: 35%;
+            background-color: rgba(102, 252, 241, 0.05);
+        }
+
+        .comparison-table th:nth-child(3) {
+            color: #66FCF1;
+            background-color: rgba(102, 252, 241, 0.1);
+        }
+
+        /* Winner highlight */
+        .winner-icon {
+            display: inline-block;
+            margin-right: 8px;
+            color: #66FCF1;
+        }
+        
+        .loser-icon {
+            display: inline-block;
+            margin-right: 8px;
+            color: #d62728;
+        }
+        
+        .tie-icon {
+            display: inline-block;
+            margin-right: 8px;
+            color: #C5C6C7;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="shape-circle-bg"></div>
+
+        <div class="slide-header">Head-to-Head Feature Comparison</div>
+        <h2 class="main-heading">On Every Dimension That Matters for Digzio, the <span class="highlight">Two-Layer Stack</span> Wins or Ties</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>Onfido</th>
+                    <th>DHA + Smile Identity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cost per check</td>
+                    <td><span class="loser-icon">✕</span> $1.50</td>
+                    <td><span class="winner-icon">✓</span> $0.65</td>
+                </tr>
+                <tr>
+                    <td>SA ID authority</td>
+                    <td><span class="loser-icon">✕</span> Document OCR</td>
+                    <td><span class="winner-icon">✓</span> Direct DHA database</td>
+                </tr>
+                <tr>
+                    <td>Worn/damaged ID handling</td>
+                    <td><span class="loser-icon">✕</span> Can fail</td>
+                    <td><span class="winner-icon">✓</span> Not affected (no scan needed)</td>
+                </tr>
+                <tr>
+                    <td>Liveness detection</td>
+                    <td><span class="tie-icon">＝</span> Yes</td>
+                    <td><span class="tie-icon">＝</span> Yes</td>
+                </tr>
+                <tr>
+                    <td>POPIA data minimisation</td>
+                    <td><span class="loser-icon">✕</span> Stores images</td>
+                    <td><span class="winner-icon">✓</span> Zero image storage on Digzio</td>
+                </tr>
+                <tr>
+                    <td>SA-specific optimisation</td>
+                    <td><span class="loser-icon">✕</span> Generic global</td>
+                    <td><span class="winner-icon">✓</span> Africa-first</td>
+                </tr>
+                <tr>
+                    <td>Forgery resistance</td>
+                    <td><span class="loser-icon">✕</span> OCR-based</td>
+                    <td><span class="winner-icon">✓</span> Government database — unforgeable</td>
+                </tr>
+                <tr>
+                    <td>Integration complexity</td>
+                    <td><span class="tie-icon">＝</span> Medium</td>
+                    <td><span class="tie-icon">＝</span> Medium</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

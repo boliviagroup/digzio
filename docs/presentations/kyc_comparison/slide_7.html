@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            /* keep top padding to preserve title spacing, reduce bottom and sides */
+            padding: 60px 40px 20px 40px;
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-circle-bg {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(69, 162, 158, 0.1) 0%, rgba(11, 12, 16, 0) 70%);
+            right: -100px;
+            top: 50px;
+            z-index: 1;
+        }
+        
+        .shape-rect-accent {
+            position: absolute;
+            width: 200px;
+            height: 400px;
+            border: 2px solid rgba(102, 252, 241, 0.15);
+            right: 60px;
+            bottom: -20px; /* pulled up a bit to avoid extending too far */
+            z-index: 1;
+        }
+
+        /* Content Layout */
+        .left-column {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+            padding-right: 24px; /* reduced side padding */
+        }
+
+        .right-column {
+            width: 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 40px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 18px; /* reduced spacing */
+            letter-spacing: -0.5px;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        .body-text {
+            color: #C5C6C7;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 18px; /* reduced spacing */
+        }
+        
+        .body-text p {
+            margin-bottom: 12px; /* slightly smaller paragraph gap */
+        }
+
+        /* Comparison Boxes */
+        .comparison-container {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px; /* removed auto so boxes don't push to bottom */
+        }
+        
+        .comp-box {
+            flex: 1;
+            padding: 12px; /* reduced inner padding */
+            background-color: rgba(11, 12, 16, 0.8);
+            border-top: 4px solid;
+            position: relative;
+        }
+        
+        .comp-box.onfido {
+            border-color: #C5C6C7;
+            background-color: rgba(197, 198, 199, 0.05);
+        }
+        
+        .comp-box.dha {
+            border-color: #66FCF1;
+            background-color: rgba(102, 252, 241, 0.05);
+        }
+        
+        .comp-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px; /* tightened */
+            color: #FFFFFF;
+        }
+        
+        .comp-desc {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #C5C6C7;
+        }
+        
+        .dha .comp-desc {
+            color: #66FCF1;
+        }
+
+        /* Image Container */
+        .image-wrapper {
+            position: relative;
+            width: 380px; /* slightly narrower */
+            height: 420px; /* reduced height from 500 to pull everything up */
+        }
+        
+        .image-wrapper::before {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #45A29E;
+            z-index: -1;
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%) contrast(110%);
+        }
+        
+        .gold-standard-badge {
+            position: absolute;
+            bottom: -12px; /* pulled up from -20 */
+            right: -12px;
+            background-color: #66FCF1;
+            color: #0B0C10;
+            padding: 12px 20px; /* slightly smaller padding */
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Background Shapes -->
+        <div class="shape-circle-bg"></div>
+        <div class="shape-rect-accent"></div>
+
+        <!-- Content -->
+        <div class="left-column">
+            <div class="slide-header">The Security Argument</div>
+            <h2 class="main-heading">Bypassing OCR and Going Directly to the DHA Eliminates the <span class="highlight">Most Common Attack Vector</span></h2>
+            
+            <div class="body-text">
+                <p>The most common KYC fraud in South Africa involves high-quality forged ID documents. A convincing forgery can pass an OCR-based scanner because the scanner is only checking whether the card <em>looks</em> right.</p>
+                <p>The DHA check is immune to this attack. It validates the ID number directly against the national population register. A forged card with a non-existent ID number will fail immediately.</p>
+            </div>
+            
+            <div class="comparison-container">
+                <div class="comp-box onfido">
+                    <div class="comp-title">Onfido (OCR)</div>
+                    <div class="comp-desc">Checks if the physical card <strong>LOOKS</strong> valid based on visual security features.</div>
+                </div>
+                <div class="comp-box dha">
+                    <div class="comp-title">DHA API</div>
+                    <div class="comp-desc">Checks if the person <strong>IS</strong> registered with the government population register.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <div class="image-wrapper">
+                <div class="image-container">
+                    <img src="/home/ubuntu/upload/search_images/E0AI2IW6PJSw.jpg" alt="SA Digital ID System">
+                </div>
+                <div class="gold-standard-badge">The Gold Standard</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

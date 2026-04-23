@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            /* keep top padding for title, reduce bottom padding to save height */
+            padding: 80px 80px 20px 80px;
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-circle-bg {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(69, 162, 158, 0.08) 0%, rgba(11, 12, 16, 0) 70%);
+            left: -200px;
+            bottom: -300px;
+            z-index: 1;
+        }
+        
+        .shape-rect-accent {
+            position: absolute;
+            width: 150px;
+            height: 100%;
+            background-color: rgba(102, 252, 241, 0.03);
+            right: 10%;
+            top: 0;
+            z-index: 1;
+            border-left: 1px solid rgba(102, 252, 241, 0.1);
+            border-right: 1px solid rgba(102, 252, 241, 0.1);
+        }
+
+        /* Content Layout */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            gap: 60px;
+        }
+
+        .left-column {
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-column {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* reduce vertical gap between comparison blocks */
+            gap: 12px;
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        .body-text {
+            color: #C5C6C7;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .body-text p {
+            margin-bottom: 12px; /* shrink inner paragraph spacing */
+        }
+
+        /* Comparison Blocks */
+        .comparison-block {
+            background-color: rgba(11, 12, 16, 0.8);
+            border: 2px solid;
+            padding: 16px; /* reduced padding to save vertical space */
+            position: relative;
+        }
+        
+        .block-onfido {
+            border-color: rgba(197, 198, 199, 0.3);
+        }
+        
+        .block-dha {
+            border-color: #66FCF1;
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.1);
+        }
+        
+        .block-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .block-onfido .block-title {
+            color: #C5C6C7;
+        }
+        
+        .block-dha .block-title {
+            color: #66FCF1;
+        }
+        
+        .block-content {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .status-icon {
+            font-size: 20px;
+            font-weight: 900;
+        }
+        
+        .icon-negative {
+            color: #d62728;
+        }
+        
+        .icon-positive {
+            color: #2ca02c;
+        }
+        
+        .massive-metric {
+            font-size: 48px;
+            font-weight: 900;
+            color: #66FCF1;
+            line-height: 1;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Background Shapes -->
+        <div class="shape-circle-bg"></div>
+        <div class="shape-rect-accent"></div>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <div class="left-column">
+                <div class="slide-header">POPIA Compliance Advantage</div>
+                <h2 class="main-heading">The Two-Layer Stack Dramatically Reduces Digzio's POPIA Liability by Storing <span class="highlight">Zero ID Images</span></h2>
+                
+                <div class="body-text">
+                    <p>The Protection of Personal Information Act (POPIA) requires organisations to minimise the personal information they collect and store.</p>
+                    <!-- removed one explanatory paragraph to reduce height while keeping primary points -->
+                    <p>The Two-Layer Stack eliminates this risk entirely. Because no ID card image is ever captured or transmitted, Digzio never holds this sensitive data. Only the DHA check result (valid/invalid) and the Smile Identity liveness result (passed/failed) are stored.</p>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="comparison-block block-onfido">
+                    <div class="block-title">Onfido Approach</div>
+                    <div class="block-content">
+                        <div class="status-row">
+                            <span class="status-icon icon-negative">✕</span>
+                            <span>ID images stored on Onfido servers</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-icon icon-negative">✕</span>
+                            <span>Digzio has data processor obligations</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-icon icon-negative">✕</span>
+                            <span>High regulatory risk exposure</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-block block-dha">
+                    <div class="block-title">DHA + Smile Identity</div>
+                    <div class="block-content">
+                        <div class="status-row">
+                            <span class="status-icon icon-positive">✓</span>
+                            <span>No images stored anywhere</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-icon icon-positive">✓</span>
+                            <span>Zero POPIA image liability</span>
+                        </div>
+                        <div class="massive-metric">0%</div>
+                        <div>Image Storage Risk</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

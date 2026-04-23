@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 80px 36px 80px; /* keep top padding, reduce bottom to save height */
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-rect-bg {
+            position: absolute;
+            width: 600px;
+            height: 150%;
+            background-color: rgba(69, 162, 158, 0.05);
+            right: -100px;
+            top: -20%;
+            transform: rotate(-15deg);
+            z-index: 1;
+            border-left: 2px solid rgba(102, 252, 241, 0.1);
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 12px; /* reduced from 40 to save vertical space */
+            letter-spacing: -0.5px;
+            max-width: 1000px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        /* Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px; /* reduced horizontal gap */
+            position: relative;
+            z-index: 10;
+            flex-grow: 1;
+        }
+
+        /* Left Column: The Decision */
+        .col-decision {
+            display: flex;
+            flex-direction: column;
+            gap: 16px; /* reduced */
+        }
+        
+        .decision-statement {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1.4;
+            border-left: 4px solid #66FCF1;
+            padding-left: 20px;
+        }
+        
+        .rationale-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* reduced from 20 */
+        }
+        
+        .rationale-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .rationale-icon {
+            color: #66FCF1;
+            font-size: 24px;
+            font-weight: 900;
+            line-height: 1;
+            margin-top: 2px;
+        }
+        
+        .rationale-text {
+            color: #C5C6C7;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        
+        .rationale-text strong {
+            color: #FFFFFF;
+            font-weight: 900;
+        }
+
+        /* Right Column: Next Steps */
+        .col-next-steps {
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(11, 12, 16, 0.8);
+            border: 2px solid #45A29E;
+            padding: 20px; /* reduced from 40 */
+        }
+        
+        .section-title {
+            color: #66FCF1;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 12px; /* reduced from 30 */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .steps-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* reduced from 24 */
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .step-number {
+            background-color: #45A29E;
+            color: #0B0C10;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .step-title {
+            color: #FFFFFF;
+            font-size: 20px;
+            font-weight: 900;
+        }
+        
+        .step-desc {
+            color: #C5C6C7;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Background Shapes -->
+        <div class="shape-rect-bg"></div>
+
+        <!-- Header -->
+        <div class="slide-header">Recommendation & Next Steps</div>
+        <h2 class="main-heading">Adopt the <span class="highlight">Two-Layer Stack</span> as the Primary KYC Engine</h2>
+        
+        <!-- Content Grid -->
+        <div class="content-grid">
+            
+            <!-- Left Column: The Decision -->
+            <div class="col-decision">
+                <div class="decision-statement">
+                    We recommend replacing Onfido with the DHA + Smile Identity Two-Layer Stack for all student KYC verifications on Digzio.
+                </div>
+                
+                <ul class="rationale-list">
+                    <li class="rationale-item">
+                        <span class="rationale-icon">✓</span>
+                        <span class="rationale-text"><strong>Cost Efficiency:</strong> Saves $102,000 annually at scale, effectively funding a full engineering hire.</span>
+                    </li>
+                    <li class="rationale-item">
+                        <span class="rationale-icon">✓</span>
+                        <span class="rationale-text"><strong>Superior Security:</strong> Eliminates OCR forgery risks by validating directly against the government population register.</span>
+                    </li>
+                    <li class="rationale-item">
+                        <span class="rationale-icon">✓</span>
+                        <span class="rationale-text"><strong>POPIA Compliance:</strong> Achieves 100% compliance regarding image storage by retaining zero ID document photos.</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Right Column: Next Steps -->
+            <div class="col-next-steps">
+                <div class="section-title">Implementation Plan</div>
+                
+                <ul class="steps-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Update Sprint 4 Backend</div>
+                            <div class="step-desc">Replace Onfido SDK integration with Smile Identity Web SDK and DHA API endpoints.</div>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Provision API Access</div>
+                            <div class="step-desc">Register for DHA aggregator access and configure Smile Identity production keys.</div>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Update Database Schema</div>
+                            <div class="step-desc">Ensure the users table stores `dha_check_id` and `smile_job_id` instead of Onfido references.</div>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Update Privacy Policy</div>
+                            <div class="step-desc">Reflect the zero-image-storage policy in the student terms and conditions.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>

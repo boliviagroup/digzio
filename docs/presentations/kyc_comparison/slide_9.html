@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        /* Calculations:
+           content-grid original top = 186
+           Original content-grid height = 609 (bottom 795)
+           We reduce each of 7 steps by 8px (step-item padding 10->6) = 56px
+           Reduce step-content padding-top 4->2 = 2px *7 = 14px
+           Reduce gaps between steps from 12->6: 6 gaps *6 = 36px
+           Total reduction approx = 106px -> new content-grid height ~= 503, bottom ~= 689
+           Reduce image-container height 450->380 -> image bottom 645
+           Final content-grid bottom = max(689,645) = 689
+           slide-container bottom = content-grid bottom + padding-bottom 20 = 709 (<720)
+        */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0B0C10;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 80px 20px 80px;
+        }
+        
+        /* Background Geometric Shapes */
+        .shape-rect-bg {
+            position: absolute;
+            width: 400px;
+            height: 120%;
+            background-color: rgba(69, 162, 158, 0.05);
+            right: 10%;
+            transform: skewX(-15deg);
+            top: -10%;
+            z-index: 1;
+        }
+
+        /* Typography */
+        .slide-header {
+            color: #45A29E;
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .slide-header::before {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: #66FCF1;
+        }
+
+        .main-heading {
+            color: #FFFFFF;
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .highlight {
+            color: #66FCF1;
+        }
+
+        /* Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            gap: 40px;
+            position: relative;
+            z-index: 10;
+            flex-grow: 1;
+        }
+
+        /* Left Column: Steps */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* reduced from 12px */
+            position: relative;
+        }
+        
+        /* Vertical line connecting steps */
+        .steps-container::before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background-color: rgba(69, 162, 158, 0.3);
+            z-index: -1;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background-color: rgba(11, 12, 16, 0.8);
+            padding: 6px 0; /* reduced from 10px 0 */
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background-color: #0B0C10;
+            border: 2px solid #66FCF1;
+            color: #66FCF1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-top: 2px; /* reduced from 4px */
+        }
+        
+        .step-title {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .step-desc {
+            color: #C5C6C7;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* Right Column: Image */
+        .image-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* removed height:100% to avoid forcing column height */
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 380px; /* reduced from 450px */
+            border: 2px solid rgba(102, 252, 241, 0.2);
+            background-color: #FFFFFF;
+            padding: 10px;
+            position: relative;
+        }
+        
+        .image-container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 40px;
+            height: 40px;
+            border-top: 4px solid #66FCF1;
+            border-left: 4px solid #66FCF1;
+        }
+        
+        .image-container::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            border-bottom: 4px solid #66FCF1;
+            border-right: 4px solid #66FCF1;
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="shape-rect-bg"></div>
+
+        <div class="slide-header">Integration Architecture</div>
+        <h2 class="main-heading">The 7-Step <span class="highlight">Asynchronous API Flow</span></h2>
+        
+        <div class="content-grid">
+            <div class="steps-container">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Data Entry</div>
+                        <div class="step-desc">Student submits SA ID number and name.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">DHA API Request</div>
+                        <div class="step-desc">Digzio Backend queries the DHA population register.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">DHA Response</div>
+                        <div class="step-desc">Returns valid, alive, and name match confirmation.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Smile SDK Capture</div>
+                        <div class="step-desc">Browser launches SDK for a 3-second liveness selfie.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Liveness Job</div>
+                        <div class="step-desc">Digzio Backend submits the liveness job to Smile Identity.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Webhook Callback</div>
+                        <div class="step-desc">Smile Identity asynchronously returns the liveness result.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <div class="step-title">DB & WebSocket Push</div>
+                        <div class="step-desc">Database updated to VERIFIED; real-time push to student app.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-wrapper">
+                <div class="image-container">
+                    <img src="/home/ubuntu/digzio_images/digzio_architecture.png" alt="System Architecture Diagram">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
