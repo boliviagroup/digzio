@@ -49,7 +49,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 - *Note: NSFAS disbursements do not incur standard credit card gateway fees, but require API integration maintenance.*
 
 ### 3.3 Communications (WhatsApp Business API & SendGrid)
-- **WhatsApp Business API (South Africa):** ~$0.015 per utility message (significantly cheaper than SMS) [10].
+- **WhatsApp Business API (South Africa):** ~$0.015 per utility message (significantly cheaper than WhatsApp) [10].
 - **SendGrid Email:** Free for first 100/day. Essentials plan (up to 100k emails) is $19.95/month. Pro plan is $89.95/month [11].
 
 ---
