@@ -84,7 +84,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 | **Services** | Onfido KYC | 1,000 verifications/mo | $ 1,000.00 |
 | | WhatsApp API | 15,000 Msgs/mo | $ 225.00 |
 | | SendGrid Email | 50,000 emails/mo | $ 19.95 |
-| **Total Estimated Monthly Cost (Growth)** | | | **$ 3,762.45** |
+| **Total Estimated Monthly Cost (Growth)** | | | **$ 1,954.95** |
 
 ### 4.3 Stage 3: Scale
 *Assumptions: 50,000 students, high transaction volume, enterprise infrastructure.*
@@ -99,7 +99,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 | **Services** | Onfido KYC | 4,000 verifications/mo | $ 3,500.00 |
 | | WhatsApp API | 75,000 Msgs/mo | $ 1,125.00 |
 | | SendGrid Email | 250,000 emails/mo | $ 89.95 |
-| **Total Estimated Monthly Cost (Scale)** | | | **$ 16,297.45** |
+| **Total Estimated Monthly Cost (Scale)** | | | **$ 7,259.95** |
 
 ---
 
@@ -112,7 +112,7 @@ Onfido is used for student and provider KYC (Know Your Customer) checks.
 
 ## 6. Strategic Cost Insights
 
-1. **WhatsApp is the Hidden Giant:** WhatsApp & Email costs in South Africa are relatively high ($0.1355 per message). At scale, WhatsApp notifications become the single largest operational expense. **Recommendation:** Push users heavily toward in-app push notifications or WhatsApp (which has different pricing tiers) to mitigate this.
+1. **WhatsApp replaces SMS for Maximum Cost Efficiency:** By using the WhatsApp Business API (~$0.015/message) and SendGrid email instead of traditional SMS, the platform saves over $9,000/month at scale. WhatsApp is also the preferred communication channel for South African students, making it both the cheaper and more effective choice.
 2. **KYC Costs:** Identity verification is expensive but non-negotiable for trust and NSFAS compliance. Bulk enterprise agreements with Onfido will be critical as the platform scales.
 3. **AWS is Highly Efficient Early On:** The cloud infrastructure costs are negligible during the MVP phase (under $120/month) and scale linearly and predictably.
 
