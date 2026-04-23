@@ -17,7 +17,7 @@ router.post('/email', async (req, res) => {
     }
 
     const params = {
-      Source: process.env.SES_FROM_EMAIL || 'noreply@digzio.co.za',
+      Source: process.env.SES_FROM_EMAIL || 'siphiwe@digzio.co.za',
       Destination: {
         ToAddresses: [to],
       },
