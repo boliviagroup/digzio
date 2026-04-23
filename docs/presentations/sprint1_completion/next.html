@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px;
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            padding-top: 60px;
+            padding-left: 60px;
+            padding-right: 60px;
+            gap: 60px;
+        }
+
+        .left-col {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            background: rgba(26, 155, 173, 0.1);
+            border: 1px solid rgba(26, 155, 173, 0.3);
+            padding: 15px 20px;
+        }
+
+        .task-icon {
+            font-size: 24px;
+            color: #2EC4C4;
+            width: 40px;
+            text-align: center;
+            margin-right: 15px;
+        }
+
+        .task-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .task-subtext {
+            font-size: 14px;
+            color: #CBD5E1;
+            margin-left: 10px;
+            font-weight: 400;
+        }
+
+        .action-box {
+            border: 2px solid #2EC4C4;
+            background: rgba(46, 196, 196, 0.1);
+            padding: 40px;
+            position: relative;
+        }
+
+        .action-box::before {
+            content: 'ACTION REQUIRED';
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: #0F2D4A;
+            padding: 0 15px;
+            color: #2EC4C4;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .action-item {
+            margin-bottom: 30px;
+        }
+
+        .action-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .action-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-desc {
+            font-size: 16px;
+            color: #CBD5E1;
+            line-height: 1.5;
+            padding-left: 34px;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #1A9BAD;
+            padding: 10px;
+            font-family: monospace;
+            color: #2EC4C4;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>07 // Next Steps</h1>
+        </div>
+
+        <div class="main-content">
+            <div class="left-col">
+                <h2>Sprint 2: Backend Microservices</h2>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-box"></i></div>
+                        <div class="task-text">ECR Repository <span class="task-subtext">Docker image registry for API services</span></div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="task-text">Auth Service <span class="task-subtext">JWT + Refresh Token + RBAC on ECS Fargate</span></div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-building"></i></div>
+                        <div class="task-text">Property API <span class="task-subtext">CRUD endpoints for property listings</span></div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-images"></i></div>
+                        <div class="task-text">Image API <span class="task-subtext">S3 upload, resize, and serve via CloudFront</span></div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-bell"></i></div>
+                        <div class="task-text">Notification Service <span class="task-subtext">WhatsApp Business API + SendGrid</span></div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-network-wired"></i></div>
+                        <div class="task-text">API Gateway & ALB <span class="task-subtext">Public-facing API routing with WAF rules</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-col">
+                <div class="action-box">
+                    <div class="action-item">
+                        <div class="action-title"><i class="fab fa-github"></i> 1. GitHub Repository</div>
+                        <div class="action-desc">
+                            Create a GitHub repository for the Digzio monorepo and share the URL to activate CI/CD pipelines.
+                        </div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-title"><i class="fas fa-key"></i> 2. GitHub Secrets</div>
+                        <div class="action-desc">
+                            Add the following secrets under Settings → Secrets and variables → Actions:
+                            <div class="code-block">
+                                AWS_ACCESS_KEY_ID<br>
+                                AWS_SECRET_ACCESS_KEY
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

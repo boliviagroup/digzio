@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px; /* keep title top padding unchanged */
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 60px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 40px; /* reduced from 60 to save vertical space */
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 20px; /* reduced from 40 */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Layout refreshed: use three columns so items occupy 2 rows instead of 3 */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 20px; /* reduced from 30 */
+        }
+
+        .security-item {
+            border: 1px solid #1A9BAD;
+            background: rgba(15, 45, 74, 0.5);
+            padding: 18px; /* reduced from 25 */
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+        }
+
+        .security-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #2EC4C4;
+        }
+
+        .icon-container {
+            font-size: 32px;
+            color: #2EC4C4;
+            width: 50px;
+            text-align: center;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px; /* slightly reduced */
+        }
+
+        .item-desc {
+            font-size: 16px;
+            color: #CBD5E1;
+            line-height: 1.5;
+        }
+
+        .code-snippet {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            color: #2EC4C4;
+            border: 1px solid rgba(46, 196, 196, 0.3);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 18px; /* adjusted to fit with reduced padding */
+            right: 18px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2EC4C4;
+            border: 1px solid #2EC4C4;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(46, 196, 196, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>04 // Security</h1>
+            <h1 style="color: #1A9BAD; font-size: 20px;">STATUS: SECURE</h1>
+        </div>
+
+        <div class="main-content">
+            <h2><i class="fas fa-shield-alt" style="color: #2EC4C4;"></i> Security Posture: Zero Public Exposure</h2>
+            
+            <div class="security-grid">
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-database"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">RDS Public Access Disabled</div>
+                        <div class="item-desc">Database is explicitly configured with <span class="code-snippet">PubliclyAccessible=false</span>, preventing any direct internet connections.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-network-wired"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">Private Subnet Isolation</div>
+                        <div class="item-desc">All data layer resources (RDS, Redis) are deployed exclusively within private subnets with no public routing.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-key"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">Secrets Management</div>
+                        <div class="item-desc">Database master password is automatically generated and securely stored in AWS Secrets Manager.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-lock"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">S3 Public Access Blocked</div>
+                        <div class="item-desc">Account-level and bucket-level <span class="code-snippet">BlockPublicAccess</span> is enabled for all provisioned S3 buckets.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-fire-wall"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">Strict Security Groups</div>
+                        <div class="item-desc">RDS security group restricts inbound traffic on <span class="code-snippet">port 5432</span> strictly to the VPC CIDR block.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+
+                <div class="security-item">
+                    <div class="icon-container"><i class="fas fa-ghost"></i></div>
+                    <div class="item-content">
+                        <div class="item-title">Ephemeral Bastion Host</div>
+                        <div class="item-desc">The temporary EC2 bastion host used for the initial SQL migration was immediately terminated post-deployment.</div>
+                    </div>
+                    <div class="status-badge"><i class="fas fa-check"></i> Verified</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

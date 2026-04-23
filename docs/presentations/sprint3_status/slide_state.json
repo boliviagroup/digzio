@@ -1,0 +1,120 @@
+{
+  "project_info": {
+    "title": "Digzio Platform — Sprint 3 Complete",
+    "created": 1776978297.1014295,
+    "last_updated": 1776979144.1532166,
+    "total_slides": 9
+  },
+  "slides": [
+    {
+      "id": "title",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "platform_overview",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "sprint3_services",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "workflow_student",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "workflow_provider",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "workflow_institution",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "infrastructure",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "test_credentials",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "sprint4_roadmap",
+      "state": "edited",
+      "pageNum": 9
+    }
+  ],
+  "outline": [
+    {
+      "id": "title",
+      "title": "Digzio Platform — Sprint 3 Complete",
+      "summary": "Title slide: Sprint 3 complete, soft launch ready. Subtitle: KYC, Applications, Leases & Institutions live in AWS af-south-1.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "platform_overview",
+      "title": "Full Platform Now Live — 3 Sprints, 8 Microservices",
+      "summary": "High-level overview of the complete platform: 3 sprints delivered, 8 microservices running on ECS Fargate in Cape Town, PostgreSQL + Redis + CloudFront all active.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "sprint3_services",
+      "title": "Sprint 3 Delivered 4 New Microservices",
+      "summary": "KYC Service (port 3005), Application Service (3006), Lease Service (3007), Institution API (3008) — each with their key endpoints and responsibilities.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "workflow_student",
+      "title": "Student Rental Journey — End-to-End in 6 Steps",
+      "summary": "Full student workflow: Register → KYC → Search Properties → Apply → Lease Generated → Sign. Each step maps to a live API endpoint.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "workflow_provider",
+      "title": "Provider Workflow — List, Review, Approve, Lease",
+      "summary": "Provider workflow: Register → List Property → Receive Applications → Approve Tenant → Generate Lease PDF → Track Active Leases.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "workflow_institution",
+      "title": "Institution Workflow — Verify Students, Accredit Properties",
+      "summary": "Institution workflow: Register → Link Students → Verify Enrollment → Accredit Properties → Monitor Occupancy.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "infrastructure",
+      "title": "AWS Infrastructure — All Services Live in af-south-1",
+      "summary": "Full infrastructure summary: VPC, RDS PostgreSQL 15, ElastiCache Redis 7, ECS Fargate cluster, ALB, CloudFront CDN, 8 ECR repos, AWS SES email — all in Cape Town.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "test_credentials",
+      "title": "Ready to Test — Seed Data & Postman Collection Included",
+      "summary": "4 dummy accounts pre-loaded (student, provider, admin, institution), 2 sample properties, 1 pending application. Postman collection with all workflows ready to import and run.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "sprint4_roadmap",
+      "title": "Sprint 4 — Payment Module When Ready",
+      "summary": "What Sprint 4 will deliver: PayFast integration for ZAR rent collection, payment history, deposit tracking, receipt generation via SES. Parked until soft launch validation complete.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

@@ -5,6 +5,7 @@ const { rateLimit } = require('express-rate-limit');
 const propertyRoutes = require('./routes/property.routes');
 
 const app = express();
+app.set('trust proxy', 1); // Trust ALB proxy
 const PORT = process.env.PORT || 3002;
 
 // Middleware

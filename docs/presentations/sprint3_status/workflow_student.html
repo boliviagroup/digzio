@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 60px 80px 20px;
+            display: flex;
+            flex-direction: column;
+            color: #CBD5E1;
+        }
+        .header {
+            margin-bottom: 60px;
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background-color: #00D4B4;
+            margin-bottom: 12px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            color: #3B82F6;
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 8px;
+        }
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            flex: 1;
+            padding-top: 40px;
+        }
+        /* Connecting line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 70px; /* aligns with icon center */
+            left: 40px;
+            right: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 160px;
+        }
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #0F1117;
+            border: 2px solid #00D4B4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #00D4B4;
+            margin-bottom: 20px;
+        }
+        .step.alt .step-icon {
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+        .step-number {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .step-title {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        .step-desc {
+            font-size: 14px;
+            color: #CBD5E1;
+            line-height: 1.4;
+        }
+        .api-badge {
+            margin-top: 12px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #A1A1AA;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="accent-line"></div>
+            <h1 class="title">Student Rental Journey</h1>
+            <div class="subtitle">End-to-End in 6 Steps (All APIs Live)</div>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="step-number">01</div>
+                <div class="step-title">Register</div>
+                <div class="step-desc">Create account as student role</div>
+                <div class="api-badge">Auth API</div>
+            </div>
+            
+            <div class="step alt">
+                <div class="step-icon"><i class="fas fa-id-card"></i></div>
+                <div class="step-number">02</div>
+                <div class="step-title">KYC Upload</div>
+                <div class="step-desc">Upload ID for verification</div>
+                <div class="api-badge">KYC API</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-search"></i></div>
+                <div class="step-number">03</div>
+                <div class="step-title">Search</div>
+                <div class="step-desc">Find accredited properties</div>
+                <div class="api-badge">Property API</div>
+            </div>
+            
+            <div class="step alt">
+                <div class="step-icon"><i class="fas fa-paper-plane"></i></div>
+                <div class="step-number">04</div>
+                <div class="step-title">Apply</div>
+                <div class="step-desc">Submit application to landlord</div>
+                <div class="api-badge">App API</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="step-number">05</div>
+                <div class="step-title">Lease Gen</div>
+                <div class="step-desc">Auto-generate PDF lease</div>
+                <div class="api-badge">Lease API</div>
+            </div>
+            
+            <div class="step alt">
+                <div class="step-icon"><i class="fas fa-signature"></i></div>
+                <div class="step-number">06</div>
+                <div class="step-title">Sign</div>
+                <div class="step-desc">Digitally accept terms</div>
+                <div class="api-badge">Lease API</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

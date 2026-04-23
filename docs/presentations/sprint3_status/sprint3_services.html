@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 60px 80px 10px; /* reduced bottom padding */
+            display: flex;
+            flex-direction: column;
+            color: #CBD5E1;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background-color: #00D4B4;
+            margin-bottom: 8px; /* tightened */
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            color: #3B82F6;
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 8px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px; /* reduced gap */
+            flex: 1;
+        }
+        .service-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00D4B4;
+            padding: 12px; /* reduced padding */
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card.alt {
+            border-top: 3px solid #3B82F6;
+        }
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px; /* tightened */
+        }
+        .service-title {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .service-port {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .service-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* tightened */
+        }
+        .service-list li {
+            font-size: 16px;
+            line-height: 1.5;
+            position: relative;
+            padding-left: 18px;
+        }
+        .service-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #00D4B4;
+            font-weight: bold;
+        }
+        .service-card.alt .service-list li::before {
+            color: #3B82F6;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="accent-line"></div>
+            <h1 class="title">Sprint 3 Delivered 4 New Microservices</h1>
+            <div class="subtitle">KYC, Applications, Leases, and Institutions APIs are now live</div>
+        </div>
+        
+        <div class="grid-container">
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">KYC Service</div>
+                    <div class="service-port">PORT 3005</div>
+                </div>
+                <ul class="service-list">
+                    <li>Secure ID upload via S3 presigned URLs</li>
+                    <li>Verification status tracking (pending/approved/rejected)</li>
+                    <li>Admin approval workflow</li>
+                    <li>Integrates with user profiles to unlock features</li>
+                </ul>
+            </div>
+            
+            <div class="service-card alt">
+                <div class="service-header">
+                    <div class="service-title">Application Service</div>
+                    <div class="service-port">PORT 3006</div>
+                </div>
+                <ul class="service-list">
+                    <li>Student application submission with move-in dates</li>
+                    <li>Provider dashboard to review applicants & KYC</li>
+                    <li>Approve/reject workflow with status updates</li>
+                    <li>AWS SES for real-time email notifications</li>
+                </ul>
+            </div>
+            
+            <div class="service-card alt">
+                <div class="service-header">
+                    <div class="service-title">Lease Service</div>
+                    <div class="service-port">PORT 3007</div>
+                </div>
+                <ul class="service-list">
+                    <li>Automated PDF lease generation</li>
+                    <li>S3 storage & CloudFront delivery</li>
+                    <li>Digital signing workflow</li>
+                    <li>Track active / pending / expired leases</li>
+                </ul>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-title">Institution API</div>
+                    <div class="service-port">PORT 3008</div>
+                </div>
+                <ul class="service-list">
+                    <li>Institution registration & profiles</li>
+                    <li>Link students to institutions</li>
+                    <li>Property accreditation workflow</li>
+                    <li>Dashboard endpoints for occupancy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

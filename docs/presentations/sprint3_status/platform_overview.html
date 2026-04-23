@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            font-family: 'Space Grotesk', sans-serif;
+            /* keep top padding to preserve title spacing, reduce bottom padding */
+            padding: 60px 80px 20px;
+            display: flex;
+            flex-direction: column;
+            color: #CBD5E1;
+        }
+        .header {
+            /* reduce space after header to save vertical space */
+            margin-bottom: 20px;
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background-color: #00D4B4;
+            margin-bottom: 12px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            color: #3B82F6;
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 8px;
+        }
+        .content-area {
+            display: flex;
+            gap: 40px;
+            flex: 1;
+        }
+        .text-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            /* shrink inner gaps between blocks */
+            gap: 12px;
+            justify-content: center;
+        }
+        .text-block {
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-left: 20px;
+        }
+        .text-block h3 {
+            color: #FFFFFF;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .text-block p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .stats-column {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            /* reduce gaps between stat boxes */
+            gap: 12px;
+            align-content: center;
+        }
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* shrink padding to reduce box heights, keep font sizes */
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-number {
+            color: #00D4B4;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-desc {
+            font-size: 14px;
+            margin-top: 6px;
+            color: rgba(203, 213, 225, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="accent-line"></div>
+            <h1 class="title">Full Platform Architecture Live</h1>
+            <div class="subtitle">The backend engine is complete and ready for frontend integration</div>
+        </div>
+        
+        <div class="content-area">
+            <div class="text-column">
+                <div class="text-block">
+                    <h3>AWS Cape Town Hosting</h3>
+                    <p>Entire infrastructure deployed to af-south-1 region, ensuring minimal latency for South African users and compliance with local data residency requirements.</p>
+                </div>
+                <div class="text-block">
+                    <h3>Scalable Microservices</h3>
+                    <p>Architecture split across independent services running on ECS Fargate, allowing individual components (like property search or image uploads) to scale based on demand.</p>
+                </div>
+                <div class="text-block">
+                    <h3>Robust Data Layer</h3>
+                    <p>Relational data secured in RDS PostgreSQL 15, with ElastiCache Redis 7 handling high-speed caching for rapid property retrieval.</p>
+                </div>
+            </div>
+            
+            <div class="stats-column">
+                <div class="stat-box">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Sprints</div>
+                    <div class="stat-desc">Infrastructure, Core APIs, and Rental Workflows</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Microservices</div>
+                    <div class="stat-desc">Auth, Property, Image, Notification, KYC, App, Lease, Inst</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Automated</div>
+                    <div class="stat-desc">Zero-downtime CI/CD via GitHub Actions</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Manual Steps</div>
+                    <div class="stat-desc">Infrastructure fully defined in Terraform</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

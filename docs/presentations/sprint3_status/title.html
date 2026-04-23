@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* reduced gap */
+        }
+        .accent-line {
+            width: 120px;
+            height: 8px;
+            background-color: #00D4B4;
+            margin-bottom: 12px; /* reduced */
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .subtitle {
+            color: #CBD5E1;
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.4;
+            max-width: 800px;
+            margin: 0; /* remove default paragraph margins to save space */
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3B82F6;
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: #3B82F6;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 16px; /* reduced */
+            align-self: flex-start;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00D4B4;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00D4B4;
+        }
+        .decorative-box {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 300px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 180, 0.05));
+            border-left: 1px solid rgba(0, 212, 180, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="decorative-box"></div>
+        <div class="content-wrapper">
+            <div class="accent-line"></div>
+            <h1 class="title">Digzio Platform<br><span style="color: #00D4B4;">Sprint 3 Complete</span></h1>
+            <p class="subtitle">KYC, Applications, Leases &amp; Institutions live in AWS af-south-1. Soft launch ready.</p>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                ALL SYSTEMS OPERATIONAL
+            </div>
+        </div>
+    </div>
+</body>
+</html>

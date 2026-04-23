@@ -1,0 +1,108 @@
+{
+  "project_info": {
+    "title": "Digzio Sprint 1 Complete",
+    "created": 1776969626.3337336,
+    "last_updated": 1776969956.5678818,
+    "total_slides": 8
+  },
+  "slides": [
+    {
+      "id": "title",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "overview",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "infra_map",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "database",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "security",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "cicd",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "acceptance",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "next",
+      "state": "edited",
+      "pageNum": 8
+    }
+  ],
+  "outline": [
+    {
+      "id": "title",
+      "title": "Digzio Sprint 1 Complete",
+      "summary": "Title slide: Sprint 1 AWS Infrastructure Provisioning is complete. Region af-south-1 Cape Town. POPIA-compliant. Date 23 April 2026.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "overview",
+      "title": "Sprint 1 at a Glance",
+      "summary": "High-level summary: 44 AWS resources provisioned, 11 database tables live, 9 ENUMs, PostGIS spatial search enabled, 2 CI/CD pipelines created. All acceptance criteria passed.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "infra_map",
+      "title": "Infrastructure Architecture Deployed",
+      "summary": "Visual breakdown of the deployed AWS stack: VPC with 3 public + 3 private subnets across 3 AZs, NAT Gateway, RDS PostgreSQL 15, ElastiCache Redis 7, ECS Fargate Cluster, 2 S3 buckets.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "database",
+      "title": "Production Database Schema is Live",
+      "summary": "Migration applied: 11 tables (users, properties, applications, leases, payments, KYC, notifications, etc.), 9 ENUMs, PostGIS + uuid-ossp extensions, 27 indexes including spatial index on properties.location.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "security",
+      "title": "Security Posture: Zero Public Exposure",
+      "summary": "RDS PubliclyAccessible=false, database in private subnet, password stored in AWS Secrets Manager, S3 public access blocked, security groups restrict port 5432 to VPC CIDR only, bastion host terminated after migration.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "cicd",
+      "title": "CI/CD Pipelines Ready to Activate",
+      "summary": "Two GitHub Actions workflows created: Frontend (Vite build → S3 deploy) and Backend (Docker build → ECR push → ECS deploy). Triggered on push to main. Awaiting GitHub repo URL and secrets.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "acceptance",
+      "title": "All Acceptance Criteria Passed",
+      "summary": "Checklist of all 8 Sprint 1 acceptance criteria — all green: VPC, RDS private, Redis, ECS, S3, SQL migration, CI/CD, resource tagging.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "next",
+      "title": "Sprint 2 Begins: Backend Microservices",
+      "summary": "Next sprint covers: ECR repo, Auth Service (JWT + RBAC), Property API, Image API, Notification Service (WhatsApp + SendGrid), Application Load Balancer, API Gateway + WAF. Two items needed from user: GitHub repo URL and GitHub Secrets.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px; /* keep as required */
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 96px; /* reduced from 120px */
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px; /* DO NOT change */
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 60px;
+            height: 80px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 20px; /* reduced */
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 12px; /* reduced */
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 20px; /* slightly reduced */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px; /* reduced from 40px */
+            flex: 1;
+        }
+
+        .schema-box {
+            border: 1px solid #1A9BAD;
+            background: rgba(15, 45, 74, 0.3);
+            padding: 12px; /* reduced from 30px */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .schema-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid #2EC4C4;
+            border-left: 2px solid #2EC4C4;
+        }
+
+        .box-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px; /* reduced */
+            border-bottom: 1px solid rgba(26, 155, 173, 0.3);
+            padding-bottom: 8px; /* reduced */
+        }
+
+        .box-icon {
+            font-size: 28px;
+            color: #2EC4C4;
+        }
+
+        .box-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .box-count {
+            margin-left: auto;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A9BAD;
+            font-family: monospace;
+        }
+
+        .item-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* reduced */
+        }
+
+        .item-list li {
+            font-size: 16px;
+            color: #CBD5E1;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .item-list li::before {
+            content: '>';
+            color: #2EC4C4;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .code-text {
+            font-family: monospace;
+            color: #2EC4C4;
+            background: rgba(46, 196, 196, 0.1);
+            padding: 2px 6px;
+            border: 1px solid rgba(46, 196, 196, 0.2);
+        }
+
+        .highlight-box {
+            margin-top: 12px; /* reduced */
+            background: rgba(26, 155, 173, 0.1);
+            border-left: 4px solid #2EC4C4;
+            padding: 10px; /* slightly reduced */
+            font-size: 15px;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>03 // Data Estate</h1>
+            <h1 style="color: #1A9BAD; font-size: 20px;">MIGRATION: digzio_001_initial_schema.sql</h1>
+        </div>
+
+        <div class="main-content">
+            <h2>Production Database Schema is Live</h2>
+            
+            <div class="grid-container">
+                <!-- Left Column -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="schema-box">
+                        <div class="box-header">
+                            <i class="fas fa-table box-icon"></i>
+                            <div class="box-title">Core Tables</div>
+                            <div class="box-count">11</div>
+                        </div>
+                        <ul class="item-list">
+                            <li><span class="code-text">users</span>, <span class="code-text">student_profiles</span>, <span class="code-text">institutions</span></li>
+                            <li><span class="code-text">properties</span>, <span class="code-text">property_images</span></li>
+                            <li><span class="code-text">applications</span>, <span class="code-text">leases</span>, <span class="code-text">payments</span></li>
+                            <li><span class="code-text">compliance_documents</span>, <span class="code-text">notifications</span></li>
+                            <li><span class="code-text">maintenance_tickets</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="schema-box" style="flex: 1;">
+                        <div class="box-header">
+                            <i class="fas fa-list-ul box-icon"></i>
+                            <div class="box-title">Custom ENUMs</div>
+                            <div class="box-count">09</div>
+                        </div>
+                        <ul class="item-list">
+                            <li>Domain-specific types enforcing data integrity</li>
+                            <li><span class="code-text">user_role_enum</span>, <span class="code-text">kyc_status_enum</span></li>
+                            <li><span class="code-text">property_status_enum</span>, <span class="code-text">payment_status_enum</span></li>
+                            <li><span class="code-text">application_status_enum</span>, <span class="code-text">ticket_severity_enum</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="schema-box">
+                        <div class="box-header">
+                            <i class="fas fa-puzzle-piece box-icon"></i>
+                            <div class="box-title">Extensions</div>
+                            <div class="box-count">02</div>
+                        </div>
+                        <ul class="item-list">
+                            <li><span class="code-text">postgis</span>: Enables advanced spatial queries and geographic data storage for property search.</li>
+                            <li><span class="code-text">uuid-ossp</span>: Generates secure, universally unique identifiers for all primary keys.</li>
+                        </ul>
+                        <div class="highlight-box">
+                            <i class="fas fa-map-marked-alt" style="color: #2EC4C4; margin-right: 10px;"></i>
+                            PostGIS is critical for the "Find accommodation near my campus" feature.
+                        </div>
+                    </div>
+
+                    <div class="schema-box" style="flex: 1;">
+                        <div class="box-header">
+                            <i class="fas fa-bolt box-icon"></i>
+                            <div class="box-title">Performance Indexes</div>
+                            <div class="box-count">27</div>
+                        </div>
+                        <ul class="item-list">
+                            <li>Optimized for high-read marketplace workloads</li>
+                            <li>B-Tree indexes on foreign keys and lookup fields (e.g., <span class="code-text">idx_users_email</span>)</li>
+                            <li>GIST spatial index on <span class="code-text">properties.location</span></li>
+                            <li>Composite indexes for complex queries (e.g., <span class="code-text">idx_applications_student</span>)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

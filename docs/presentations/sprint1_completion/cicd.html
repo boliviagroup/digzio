@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px; /* do not change (title top padding must stay) */
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 40px;
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 20px; /* reduced from 40 */
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 20px; /* reduced from 30 */
+        }
+
+        .pipelines-wrapper {
+            display: flex;
+            gap: 24px; /* reduced from 40 */
+            margin-bottom: 20px; /* reduced from 40 */
+        }
+
+        .pipeline-col {
+            flex: 1;
+            border: 1px solid #1A9BAD;
+            background: rgba(15, 45, 74, 0.3);
+            padding: 16px; /* reduced from 30 */
+            position: relative;
+        }
+
+        .pipeline-col::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid #2EC4C4;
+            border-left: 2px solid #2EC4C4;
+        }
+
+        .pipeline-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2EC4C4;
+            margin-bottom: 12px; /* reduced from 20 */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .trigger-badge {
+            display: inline-block;
+            background: rgba(26, 155, 173, 0.2);
+            border: 1px solid #1A9BAD;
+            padding: 5px 10px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #CBD5E1;
+            margin-bottom: 12px; /* reduced from 25 */
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(26, 155, 173, 0.1);
+            border: 1px solid rgba(26, 155, 173, 0.5);
+            padding: 10px 12px; /* reduced from 15 */
+            margin-bottom: 10px; /* reduced from 15 */
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-icon {
+            font-size: 24px;
+            color: #2EC4C4;
+            width: 30px;
+            text-align: center;
+        }
+
+        .step-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .step-subtext {
+            font-size: 14px;
+            color: #CBD5E1;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #1A9BAD;
+            font-size: 20px;
+            margin-bottom: 8px; /* reduced from 15 */
+        }
+
+        .action-box {
+            border: 1px dashed #E05A4E;
+            background: rgba(224, 90, 78, 0.05);
+            padding: 14px 18px; /* reduced from 25/30 */
+            display: flex;
+            align-items: center;
+            gap: 20px; /* reduced from 30 */
+        }
+
+        .action-icon {
+            font-size: 40px;
+            color: #E05A4E;
+        }
+
+        .action-content h3 {
+            font-size: 22px;
+            color: #E05A4E;
+            margin-bottom: 8px; /* reduced from 10 */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-content p {
+            font-size: 16px;
+            color: #CBD5E1;
+            line-height: 1.5;
+        }
+
+        .code-snippet {
+            font-family: monospace;
+            color: #2EC4C4;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>05 // Deployment</h1>
+        </div>
+
+        <div class="main-content">
+            <h2>CI/CD Pipelines Ready to Activate</h2>
+            
+            <div class="pipelines-wrapper">
+                <!-- Frontend Pipeline -->
+                <div class="pipeline-col">
+                    <div class="pipeline-title">
+                        <i class="fab fa-react"></i> Frontend Workflow
+                    </div>
+                    <div class="trigger-badge">on: push (paths: apps/web-marketing/**)</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-icon"><i class="fas fa-box-open"></i></div>
+                        <div>
+                            <div class="step-text">Build Application</div>
+                            <div class="step-subtext">pnpm install &amp; vite build</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    
+                    <div class="flow-step">
+                        <div class="step-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <div>
+                            <div class="step-text">Deploy to AWS S3</div>
+                            <div class="step-subtext">aws s3 sync ./dist s3://digzio-frontend-prod</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Pipeline -->
+                <div class="pipeline-col">
+                    <div class="pipeline-title">
+                        <i class="fab fa-node-js"></i> Backend Workflow
+                    </div>
+                    <div class="trigger-badge">on: push (paths: apps/api/**)</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-icon"><i class="fab fa-docker"></i></div>
+                        <div>
+                            <div class="step-text">Build Docker Image</div>
+                            <div class="step-subtext">docker build -t digzio-api</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    
+                    <div class="flow-step">
+                        <div class="step-icon"><i class="fas fa-server"></i></div>
+                        <div>
+                            <div class="step-text">Push &amp; Deploy</div>
+                            <div class="step-subtext">Amazon ECR &rarr; ECS Fargate Cluster</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Required Box -->
+            <div class="action-box">
+                <div class="action-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Awaiting Activation</h3>
+                    <p>To activate these pipelines, please provide the <strong>GitHub Repository URL</strong> and add the following secrets to the repository settings: <span class="code-snippet">AWS_ACCESS_KEY_ID</span> and <span class="code-snippet">AWS_SECRET_ACCESS_KEY</span>.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

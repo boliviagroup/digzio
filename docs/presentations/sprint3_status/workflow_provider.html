@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 60px 80px 20px; /* keep top padding intact */
+            display: flex;
+            flex-direction: column;
+            color: #CBD5E1;
+        }
+        .header {
+            margin-bottom: 20px; /* reduced to save vertical space */
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background-color: #3B82F6; /* switch to blue for provider */
+            margin-bottom: 12px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            color: #00D4B4;
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 8px;
+        }
+        .content-area {
+            display: flex;
+            gap: 40px; /* slightly reduced horizontal gap */
+            flex: 1;
+        }
+        .timeline-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* changed from space-between to stack items */
+            gap: 18px; /* explicit smaller gaps between steps */
+            padding: 6px 0; /* reduced vertical padding */
+            position: relative;
+        }
+        /* Vertical connecting line */
+        .timeline-col::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            bottom: 18px;
+            left: 23px; /* Center of the icon */
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px; /* reduced spacing between icon and text */
+            position: relative;
+            z-index: 2;
+        }
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #0F1117;
+            border: 2px solid #3B82F6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #3B82F6;
+            flex-shrink: 0;
+        }
+        .step.alt .step-icon {
+            border-color: #00D4B4;
+            color: #00D4B4;
+        }
+        .step-content {
+            padding-top: 4px;
+        }
+        .step-title {
+            color: #FFFFFF;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .step-desc {
+            font-size: 15px;
+            color: #CBD5E1;
+            line-height: 1.4;
+        }
+        .code-col {
+            flex: 1;
+            background-color: #1A1D24;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #3B82F6;
+            padding: 20px; /* reduced padding to save vertical space */
+            display: flex;
+            flex-direction: column;
+            font-family: 'Fira Code', monospace;
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px; /* reduced */
+            margin-bottom: 12px; /* reduced */
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .code-title {
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .code-badge {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #3B82F6;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .code-block {
+            color: #A1A1AA;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre;
+            overflow-x: hidden;
+        }
+        .code-key { color: #3B82F6; }
+        .code-string { color: #00D4B4; }
+        .code-number { color: #F59E0B; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="accent-line"></div>
+            <h1 class="title">Provider Workflow</h1>
+            <div class="subtitle">List, Review, Approve, Lease</div>
+        </div>
+        
+        <div class="content-area">
+            <div class="timeline-col">
+                <div class="step">
+                    <div class="step-icon"><i class="fas fa-building"></i></div>
+                    <div class="step-content">
+                        <div class="step-title">1. List Property</div>
+                        <div class="step-desc">Upload details, images to S3, set rent amount</div>
+                    </div>
+                </div>
+                
+                <div class="step alt">
+                    <div class="step-icon"><i class="fas fa-inbox"></i></div>
+                    <div class="step-content">
+                        <div class="step-title">2. Receive Applications</div>
+                        <div class="step-desc">Review student profiles and KYC verification status</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="step-content">
+                        <div class="step-title">3. Approve Tenant</div>
+                        <div class="step-desc">Triggers automated SES email notification to student</div>
+                    </div>
+                </div>
+                
+                <div class="step alt">
+                    <div class="step-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div class="step-content">
+                        <div class="step-title">4. Generate Lease</div>
+                        <div class="step-desc">System auto-fills PDF with property & tenant data</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="step-content">
+                        <div class="step-title">5. Track Active Leases</div>
+                        <div class="step-desc">Monitor signed documents and occupancy rates</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-col">
+                <div class="code-header">
+                    <div class="code-title">API Response: Application Approval</div>
+                    <div class="code-badge">PATCH /api/v1/applications/:id</div>
+                </div>
+                <div class="code-block">{
+  <span class="code-key">"status"</span>: <span class="code-string">"success"</span>,
+  <span class="code-key">"message"</span>: <span class="code-string">"Application approved and lease generated"</span>,
+  <span class="code-key">"data"</span>: {
+    <span class="code-key">"application_id"</span>: <span class="code-string">"app_8f7d9e2a"</span>,
+    <span class="code-key">"tenant_name"</span>: <span class="code-string">"John Doe"</span>,
+    <span class="code-key">"property_id"</span>: <span class="code-string">"prop_3b1c4d5"</span>,
+    <span class="code-key">"new_status"</span>: <span class="code-string">"approved"</span>,
+    <span class="code-key">"lease_document"</span>: {
+      <span class="code-key">"id"</span>: <span class="code-string">"lease_9a8b7c6"</span>,
+      <span class="code-key">"url"</span>: <span class="code-string">"https://d1t2pdt9c1syrh.cloudfront.net/leases/..."</span>,
+      <span class="code-key">"status"</span>: <span class="code-string">"pending_signature"</span>
+    },
+    <span class="code-key">"notifications_sent"</span>: <span class="code-number">1</span>
+  }
+}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

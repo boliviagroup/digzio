@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Circuit Motif */
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px;
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            padding-top: 80px;
+            padding-left: 60px;
+            padding-right: 60px;
+            gap: 60px;
+        }
+
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right-col {
+            flex: 1.2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 30px;
+            align-content: center;
+        }
+
+        h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 20px;
+            color: #CBD5E1;
+            line-height: 1.6;
+        }
+
+        .data-readout {
+            border: 1px solid #1A9BAD;
+            background: rgba(15, 45, 74, 0.5);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .data-readout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid #2EC4C4;
+            border-left: 2px solid #2EC4C4;
+        }
+
+        .readout-value {
+            font-size: 64px;
+            font-weight: 700;
+            color: #2EC4C4;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .readout-label {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .readout-detail {
+            font-size: 15px;
+            color: #1A9BAD;
+        }
+        
+        .icon-overlay {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 32px;
+            color: rgba(26, 155, 173, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>01 // Executive Summary</h1>
+        </div>
+
+        <div class="main-content">
+            <div class="left-col">
+                <h2>Sprint 1 at a Glance</h2>
+                <p>The foundation of the Digzio platform is now operational. We have successfully transitioned from architecture planning to live infrastructure in the Cape Town region, ensuring strict adherence to POPIA data residency requirements. The data estate is fully provisioned, secured, and ready to support the backend microservices development in Sprint 2.</p>
+            </div>
+            
+            <div class="right-col">
+                <div class="data-readout">
+                    <i class="fas fa-server icon-overlay"></i>
+                    <div class="readout-value">44</div>
+                    <div class="readout-label">AWS Resources</div>
+                    <div class="readout-detail">Provisioned via Terraform</div>
+                </div>
+                
+                <div class="data-readout">
+                    <i class="fas fa-database icon-overlay"></i>
+                    <div class="readout-value">11</div>
+                    <div class="readout-label">Database Tables</div>
+                    <div class="readout-detail">With 9 ENUMs & PostGIS</div>
+                </div>
+                
+                <div class="data-readout">
+                    <i class="fas fa-code-branch icon-overlay"></i>
+                    <div class="readout-value">02</div>
+                    <div class="readout-label">CI/CD Pipelines</div>
+                    <div class="readout-detail">Frontend & Backend Actions</div>
+                </div>
+                
+                <div class="data-readout">
+                    <i class="fas fa-check-double icon-overlay"></i>
+                    <div class="readout-value">100%</div>
+                    <div class="readout-label">Criteria Passed</div>
+                    <div class="readout-detail">Zero deployment errors</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

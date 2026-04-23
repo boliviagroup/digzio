@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        html, body { height: 100%; margin: 0; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            box-sizing: border-box;
+            background-color: #0F1117;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 60px 80px 20px;
+            display: flex;
+            flex-direction: column;
+            color: #CBD5E1;
+        }
+        .header {
+            margin-bottom: 12px; /* reduced from 50 to save height */
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background-color: #00D4B4;
+            margin-bottom: 12px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            color: #3B82F6;
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: 8px;
+        }
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* reduced from 24 to tighten the rows */
+            flex: 1;
+        }
+        .step-row {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid #00D4B4;
+            padding: 24px 30px;
+        }
+        .step-row.alt { border-left-color: #3B82F6; }
+        .step-row.orange { border-left-color: #F59E0B; }
+        .step-row.white { border-left-color: #FFFFFF; }
+        
+        .step-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.1);
+            margin-right: 30px;
+            width: 60px;
+            text-align: center;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .step-title {
+            color: #FFFFFF;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .step-title i {
+            font-size: 20px;
+        }
+        .step-row .step-title i { color: #00D4B4; }
+        .step-row.alt .step-title i { color: #3B82F6; }
+        .step-row.orange .step-title i { color: #F59E0B; }
+        .step-row.white .step-title i { color: #FFFFFF; }
+        
+        .step-desc {
+            font-size: 16px;
+            color: #A1A1AA;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="accent-line"></div>
+            <h1 class="title">The Launch Strategy</h1>
+            <div class="subtitle">Agreed path from Backend Completion to Full Platform</div>
+        </div>
+        
+        <div class="steps-container">
+            <div class="step-row">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <div class="step-title"><i class="fas fa-laptop-code"></i> Connect the Website</div>
+                    <div class="step-desc">Frontend team updates <strong>digzio.co.za</strong> to use the new AWS ALB endpoint and live APIs.</div>
+                </div>
+            </div>
+            
+            <div class="step-row alt">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <div class="step-title"><i class="fas fa-vial"></i> Soft Launch Testing</div>
+                    <div class="step-desc">Run through the full student and provider workflows on the live website to validate the UX.</div>
+                </div>
+            </div>
+            
+            <div class="step-row orange">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <div class="step-title"><i class="fas fa-credit-card"></i> Sprint 4: Payments</div>
+                    <div class="step-desc">Once the core rental loop is proven, integrate PayFast for secure rent collection and deposits.</div>
+                </div>
+            </div>
+            
+            <div class="step-row white">
+                <div class="step-number">04</div>
+                <div class="step-content">
+                    <div class="step-title"><i class="fas fa-mobile-alt"></i> Mobile App Development</div>
+                    <div class="step-desc">Build the React Native iOS/Android app using the exact same, fully-tested backend APIs.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

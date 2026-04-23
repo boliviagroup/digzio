@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #0F2D4A;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            border-bottom: 2px solid #1A9BAD;
+            background: linear-gradient(90deg, rgba(26, 155, 173, 0.1) 0%, transparent 100%);
+        }
+        
+        .header-content {
+            padding-top: 40px;
+            padding-left: 60px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 60px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4C4;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 60px;
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 30px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 45, 74, 0.5);
+            border: 1px solid rgba(26, 155, 173, 0.3);
+            padding: 20px;
+            position: relative;
+        }
+
+        .checklist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #2EC4C4;
+        }
+
+        .status-badge {
+            background-color: rgba(46, 196, 196, 0.15);
+            color: #2EC4C4;
+            padding: 5px 10px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 16px;
+            margin-right: 20px;
+            border: 1px solid #2EC4C4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-text {
+            font-size: 18px;
+            color: #CBD5E1;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header-circuit"></div>
+        <div class="header-content">
+            <h1>06 // Acceptance</h1>
+            <h1 style="color: #1A9BAD; font-size: 20px;">STATUS: VERIFIED</h1>
+        </div>
+
+        <div class="main-content">
+            <h2>All Acceptance Criteria Passed</h2>
+            
+            <div class="checklist-grid">
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">VPC</span> with public/private subnets in af-south-1</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">RDS PostgreSQL</span> not publicly accessible</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">Redis ElastiCache</span> available in private subnet</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">ECS Fargate</span> cluster active</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">S3 buckets</span> created with versioning</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">SQL schema migration</span> applied (11 tables, 9 ENUMs, PostGIS)</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text"><span class="highlight">GitHub Actions</span> CI/CD workflows created</div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="status-badge"><i class="fas fa-check"></i> PASS</div>
+                    <div class="item-text">All resources tagged <span class="highlight">Project=Digzio</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
