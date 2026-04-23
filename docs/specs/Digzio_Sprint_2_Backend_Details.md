@@ -23,7 +23,7 @@ This service handles user registration, login, and secure session management usi
 
 **Key Technical Decisions:**
 - **Password Hashing:** Argon2id (industry standard for password hashing, superior to bcrypt).
-- **Token Strategy:** Short-lived Access Token (15 minutes) + HTTP-only, secure, SameSite Refresh Token (7 days).
+- **Token Strategy:** Short-lived Access Token (15 minutes) + HTTP-only, secure, SameSite Refresh Token (7 days, Domain=.digzio.co.za for cross-subdomain sharing).
 - **Session Revocation:** Redis is used to maintain a "blacklist" of revoked refresh tokens for immediate logout or account suspension.
 
 **Core API Contracts:**
