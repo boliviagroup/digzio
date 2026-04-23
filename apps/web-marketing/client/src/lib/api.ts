@@ -3,7 +3,9 @@
  * Connects the marketing website to the AWS ALB backend in af-south-1
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://digzio-alb-prod-1867460850.af-south-1.elb.amazonaws.com";
+// Use a relative path so all API calls go through the Express proxy on the same origin.
+// This avoids mixed-content (HTTPS page → HTTP ALB) browser blocks.
+const API_BASE = import.meta.env.VITE_API_URL || "";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
