@@ -126,3 +126,55 @@ resource "aws_ecr_lifecycle_policy" "notification_service" {
     }]
   })
 }
+
+# ============================================================
+# ECR Repositories — Sprint 3
+# ============================================================
+
+resource "aws_ecr_repository" "kyc_service" {
+  name                 = "digzio/kyc-service"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration { scan_on_push = true }
+  tags = { Project = "Digzio", Environment = "prod", Service = "kyc-service" }
+}
+
+resource "aws_ecr_repository" "application_service" {
+  name                 = "digzio/application-service"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration { scan_on_push = true }
+  tags = { Project = "Digzio", Environment = "prod", Service = "application-service" }
+}
+
+resource "aws_ecr_repository" "lease_service" {
+  name                 = "digzio/lease-service"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration { scan_on_push = true }
+  tags = { Project = "Digzio", Environment = "prod", Service = "lease-service" }
+}
+
+resource "aws_ecr_repository" "institution_api" {
+  name                 = "digzio/institution-api"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration { scan_on_push = true }
+  tags = { Project = "Digzio", Environment = "prod", Service = "institution-api" }
+}
+
+resource "aws_ecr_lifecycle_policy" "kyc_service" {
+  repository = aws_ecr_repository.kyc_service.name
+  policy = jsonencode({ rules = [{ rulePriority = 1, description = "Keep last 10 images", selection = { tagStatus = "any", countType = "imageCountMoreThan", countNumber = 10 }, action = { type = "expire" } }] })
+}
+
+resource "aws_ecr_lifecycle_policy" "application_service" {
+  repository = aws_ecr_repository.application_service.name
+  policy = jsonencode({ rules = [{ rulePriority = 1, description = "Keep last 10 images", selection = { tagStatus = "any", countType = "imageCountMoreThan", countNumber = 10 }, action = { type = "expire" } }] })
+}
+
+resource "aws_ecr_lifecycle_policy" "lease_service" {
+  repository = aws_ecr_repository.lease_service.name
+  policy = jsonencode({ rules = [{ rulePriority = 1, description = "Keep last 10 images", selection = { tagStatus = "any", countType = "imageCountMoreThan", countNumber = 10 }, action = { type = "expire" } }] })
+}
+
+resource "aws_ecr_lifecycle_policy" "institution_api" {
+  repository = aws_ecr_repository.institution_api.name
+  policy = jsonencode({ rules = [{ rulePriority = 1, description = "Keep last 10 images", selection = { tagStatus = "any", countType = "imageCountMoreThan", countNumber = 10 }, action = { type = "expire" } }] })
+}

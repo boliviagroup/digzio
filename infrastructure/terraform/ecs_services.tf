@@ -387,3 +387,196 @@ resource "aws_ecs_service" "notification_service" {
     Service     = "notification-service"
   }
 }
+
+# ============================================================
+# Sprint 3 ECS Task Definitions and Services
+# ============================================================
+
+# --- KYC Service ---
+resource "aws_ecs_task_definition" "kyc_service" {
+  family                   = "digzio-kyc-service-prod"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+  container_definitions = jsonencode([{
+    name  = "kyc-service"
+    image = "${aws_ecr_repository.kyc_service.repository_url}:latest"
+    portMappings = [{ containerPort = 3005, protocol = "tcp" }]
+    environment = [
+      { name = "NODE_ENV", value = "production" },
+      { name = "PORT", value = "3005" },
+      { name = "DB_HOST", value = module.db.db_instance_address },
+      { name = "DB_PORT", value = "5432" },
+      { name = "DB_NAME", value = "digzio" },
+      { name = "S3_BUCKET", value = module.s3_images.s3_bucket_id },
+      { name = "AWS_REGION", value = "af-south-1" }
+    ]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/digzio-prod"
+        "awslogs-region"        = "af-south-1"
+        "awslogs-stream-prefix" = "kyc-service"
+      }
+    }
+  }])
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+resource "aws_ecs_service" "kyc_service" {
+  name            = "digzio-kyc-service-prod"
+  cluster         = module.ecs.cluster_id
+  task_definition = aws_ecs_task_definition.kyc_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+# --- Application Service ---
+resource "aws_ecs_task_definition" "application_service" {
+  family                   = "digzio-application-service-prod"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+  container_definitions = jsonencode([{
+    name  = "application-service"
+    image = "${aws_ecr_repository.application_service.repository_url}:latest"
+    portMappings = [{ containerPort = 3006, protocol = "tcp" }]
+    environment = [
+      { name = "NODE_ENV", value = "production" },
+      { name = "PORT", value = "3006" },
+      { name = "DB_HOST", value = module.db.db_instance_address },
+      { name = "DB_PORT", value = "5432" },
+      { name = "DB_NAME", value = "digzio" }
+    ]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/digzio-prod"
+        "awslogs-region"        = "af-south-1"
+        "awslogs-stream-prefix" = "application-service"
+      }
+    }
+  }])
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+resource "aws_ecs_service" "application_service" {
+  name            = "digzio-application-service-prod"
+  cluster         = module.ecs.cluster_id
+  task_definition = aws_ecs_task_definition.application_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+# --- Lease Service ---
+resource "aws_ecs_task_definition" "lease_service" {
+  family                   = "digzio-lease-service-prod"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+  container_definitions = jsonencode([{
+    name  = "lease-service"
+    image = "${aws_ecr_repository.lease_service.repository_url}:latest"
+    portMappings = [{ containerPort = 3007, protocol = "tcp" }]
+    environment = [
+      { name = "NODE_ENV", value = "production" },
+      { name = "PORT", value = "3007" },
+      { name = "DB_HOST", value = module.db.db_instance_address },
+      { name = "DB_PORT", value = "5432" },
+      { name = "DB_NAME", value = "digzio" },
+      { name = "S3_BUCKET", value = module.s3_images.s3_bucket_id },
+      { name = "AWS_REGION", value = "af-south-1" },
+      { name = "CLOUDFRONT_DOMAIN", value = aws_cloudfront_distribution.images.domain_name }
+    ]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/digzio-prod"
+        "awslogs-region"        = "af-south-1"
+        "awslogs-stream-prefix" = "lease-service"
+      }
+    }
+  }])
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+resource "aws_ecs_service" "lease_service" {
+  name            = "digzio-lease-service-prod"
+  cluster         = module.ecs.cluster_id
+  task_definition = aws_ecs_task_definition.lease_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+# --- Institution API ---
+resource "aws_ecs_task_definition" "institution_api" {
+  family                   = "digzio-institution-api-prod"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+  container_definitions = jsonencode([{
+    name  = "institution-api"
+    image = "${aws_ecr_repository.institution_api.repository_url}:latest"
+    portMappings = [{ containerPort = 3008, protocol = "tcp" }]
+    environment = [
+      { name = "NODE_ENV", value = "production" },
+      { name = "PORT", value = "3008" },
+      { name = "DB_HOST", value = module.db.db_instance_address },
+      { name = "DB_PORT", value = "5432" },
+      { name = "DB_NAME", value = "digzio" }
+    ]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = "/ecs/digzio-prod"
+        "awslogs-region"        = "af-south-1"
+        "awslogs-stream-prefix" = "institution-api"
+      }
+    }
+  }])
+  tags = { Project = "Digzio", Environment = "prod" }
+}
+
+resource "aws_ecs_service" "institution_api" {
+  name            = "digzio-institution-api-prod"
+  cluster         = module.ecs.cluster_id
+  task_definition = aws_ecs_task_definition.institution_api.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+  tags = { Project = "Digzio", Environment = "prod" }
+}
