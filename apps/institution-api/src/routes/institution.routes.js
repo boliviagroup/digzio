@@ -144,15 +144,15 @@ router.get('/:id/properties', async (req, res) => {
     const radius_km = parseFloat(req.query.radius_km) || 5;
     const result = await pool.query(
       `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
-              p.nsfas_accredited, p.total_beds, p.status,
+              p.is_nsfas_accredited, p.total_beds, p.status,
               ROUND(ST_Distance(
                 i.campus_location::geography,
-                ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography
+                p.location::geography
               ) / 1000, 2) AS distance_km
        FROM institutions i
        JOIN properties p ON ST_DWithin(
          i.campus_location::geography,
-         ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography,
+         p.location::geography,
          $2 * 1000
        )
        WHERE i.institution_id = $1 AND p.status = 'ACTIVE'
