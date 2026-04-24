@@ -1,6 +1,70 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../utils/db');
+const crypto = require('crypto');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-production';
+
+function verifyJWT(token, secret) {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token format');
+  const [h, p, s] = parts;
+  const sig = Buffer.from(s, 'base64url');
+  const expected = crypto.createHmac('sha256', secret).update(`${h}.${p}`).digest();
+  if (!crypto.timingSafeEqual(sig, expected)) throw new Error('Invalid signature');
+  const payload = JSON.parse(Buffer.from(p, 'base64url').toString());
+  if (payload.exp && Date.now() / 1000 > payload.exp) throw new Error('Token expired');
+  return payload;
+}
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization token required' });
+  }
+  try {
+    req.user = verifyJWT(authHeader.split(' ')[1], JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
+// GET /api/v1/properties/my — Get properties owned by the authenticated provider
+router.get('/my', authenticate, async (req, res) => {
+  try {
+    const provider_id = req.user.user_id;
+    const result = await db.query(
+      `SELECT 
+        p.property_id, p.title, p.description,
+        p.address_line_1, p.address_line_2,
+        p.city, p.province, p.postal_code,
+        p.property_type, p.total_beds, p.available_beds,
+        p.base_price_monthly, p.is_nsfas_accredited,
+        p.status, p.created_at, p.updated_at,
+        (
+          SELECT json_agg(json_build_object(
+            'image_id', pi.image_id,
+            'image_url', pi.image_url,
+            'is_primary', pi.is_primary
+          ) ORDER BY pi.display_order ASC)
+          FROM property_images pi
+          WHERE pi.property_id = p.property_id
+        ) as images,
+        (
+          SELECT COUNT(*) FROM applications a WHERE a.property_id = p.property_id
+        ) as application_count
+       FROM properties p
+       WHERE p.provider_id = $1
+       ORDER BY p.created_at DESC`,
+      [provider_id]
+    );
+    res.json({ properties: result.rows, total: result.rows.length });
+  } catch (err) {
+    console.error('My properties error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
 
 // GET /api/v1/properties - List properties with optional filters
 router.get('/', async (req, res) => {
@@ -180,9 +244,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/v1/properties - Create property
-router.post('/', async (req, res) => {
+// POST /api/v1/properties - Create property (provider only)
+router.post('/', authenticate, async (req, res) => {
   try {
+    const provider_id = req.user.user_id;
+
     const {
       title, description,
       address_line_1, address_line_2,
@@ -192,40 +258,146 @@ router.post('/', async (req, res) => {
       total_beds, available_beds,
       base_price_monthly,
       is_nsfas_accredited = false,
-      provider_id,
     } = req.body;
 
-    if (!title || !description || !address_line_1 || !city || !province || !postal_code || !lat || !lng || !property_type || !total_beds || !base_price_monthly || !provider_id) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!title || !description || !address_line_1 || !city || !province || !postal_code || !property_type || !total_beds || !base_price_monthly) {
+      return res.status(400).json({ error: 'Missing required fields: title, description, address_line_1, city, province, postal_code, property_type, total_beds, base_price_monthly' });
     }
 
-    const result = await db.query(`
-      INSERT INTO properties (
-        provider_id, title, description,
-        address_line_1, address_line_2,
-        city, province, postal_code,
-        location,
-        property_type, total_beds, available_beds,
-        base_price_monthly, is_nsfas_accredited,
-        status
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8,
-        ST_SetSRID(ST_MakePoint($9, $10), 4326),
-        $11, $12, $13, $14, $15, 'AVAILABLE'
-      )
-      RETURNING property_id, title, status, created_at
-    `, [
+    // lat/lng are optional — use NULL location if not provided
+    let locationExpr, locationParams;
+    if (lat && lng) {
+      locationExpr = `ST_SetSRID(ST_MakePoint($9, $10), 4326)`;
+      locationParams = [parseFloat(lng), parseFloat(lat)];
+    } else {
+      // Default to Johannesburg coordinates if not provided
+      locationExpr = `ST_SetSRID(ST_MakePoint(28.0473, -26.2041), 4326)`;
+      locationParams = [];
+    }
+
+    const baseParams = [
       provider_id, title, description,
       address_line_1, address_line_2 || null,
       city, province, postal_code,
-      parseFloat(lng), parseFloat(lat),
-      property_type, parseInt(total_beds), parseInt(available_beds || total_beds),
-      parseFloat(base_price_monthly), is_nsfas_accredited,
-    ]);
+    ];
 
+    let query, queryParams;
+    if (lat && lng) {
+      query = `
+        INSERT INTO properties (
+          provider_id, title, description,
+          address_line_1, address_line_2,
+          city, province, postal_code,
+          location,
+          property_type, total_beds, available_beds,
+          base_price_monthly, is_nsfas_accredited,
+          status
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          ST_SetSRID(ST_MakePoint($9, $10), 4326),
+          $11, $12, $13, $14, $15, 'DRAFT'
+        )
+        RETURNING property_id, title, status, created_at
+      `;
+      queryParams = [
+        ...baseParams,
+        parseFloat(lng), parseFloat(lat),
+        property_type.toUpperCase(), parseInt(total_beds), parseInt(available_beds || total_beds),
+        parseFloat(base_price_monthly), is_nsfas_accredited,
+      ];
+    } else {
+      query = `
+        INSERT INTO properties (
+          provider_id, title, description,
+          address_line_1, address_line_2,
+          city, province, postal_code,
+          location,
+          property_type, total_beds, available_beds,
+          base_price_monthly, is_nsfas_accredited,
+          status
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          ST_SetSRID(ST_MakePoint(28.0473, -26.2041), 4326),
+          $9, $10, $11, $12, $13, 'DRAFT'
+        )
+        RETURNING property_id, title, status, created_at
+      `;
+      queryParams = [
+        ...baseParams,
+        property_type.toUpperCase(), parseInt(total_beds), parseInt(available_beds || total_beds),
+        parseFloat(base_price_monthly), is_nsfas_accredited,
+      ];
+    }
+
+    const result = await db.query(query, queryParams);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Property create error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// PATCH /api/v1/properties/:id - Update property (provider only, must own it)
+router.patch('/:id', authenticate, async (req, res) => {
+  try {
+    const provider_id = req.user.user_id;
+    const { id } = req.params;
+
+    // Verify ownership
+    const ownerCheck = await db.query(
+      `SELECT property_id FROM properties WHERE property_id = $1 AND provider_id = $2`,
+      [id, provider_id]
+    );
+    if (ownerCheck.rows.length === 0) {
+      return res.status(403).json({ error: 'Property not found or access denied' });
+    }
+
+    const allowedFields = ['title', 'description', 'address_line_1', 'address_line_2',
+      'city', 'province', 'postal_code', 'property_type', 'total_beds', 'available_beds',
+      'base_price_monthly', 'is_nsfas_accredited', 'status'];
+
+    const updates = [];
+    const params = [];
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        params.push(req.body[field]);
+        updates.push(`${field} = $${params.length}`);
+      }
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
+
+    params.push(id);
+    const result = await db.query(
+      `UPDATE properties SET ${updates.join(', ')}, updated_at = NOW() WHERE property_id = $${params.length} RETURNING property_id, title, status, updated_at`,
+      params
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Property update error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// DELETE /api/v1/properties/:id - Delete property (provider only)
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    const provider_id = req.user.user_id;
+    const { id } = req.params;
+
+    const result = await db.query(
+      `DELETE FROM properties WHERE property_id = $1 AND provider_id = $2 RETURNING property_id`,
+      [id, provider_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(403).json({ error: 'Property not found or access denied' });
+    }
+    res.json({ message: 'Property deleted', property_id: id });
+  } catch (err) {
+    console.error('Property delete error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });

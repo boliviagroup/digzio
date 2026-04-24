@@ -41,7 +41,7 @@ const authenticate = (req, res, next) => {
 
 router.get('/health', (req, res) => res.json({ status: 'ok', service: 'application-service' }));
 
-// POST /api/v1/applications — Submit application
+// POST /api/v1/applications — Submit application (student)
 router.post('/', authenticate, async (req, res) => {
   try {
     const { property_id } = req.body;
@@ -77,12 +77,12 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// GET /api/v1/applications/my — Get my applications
+// GET /api/v1/applications/my — Get student's own applications
 router.get('/my', authenticate, async (req, res) => {
   try {
     const student_id = req.user.user_id;
     const result = await pool.query(
-      `SELECT a.application_id, a.property_id, a.status, a.applied_at, a.updated_at,
+      `SELECT a.application_id, a.property_id, a.status, a.applied_at, a.updated_at, a.provider_notes,
               p.title AS property_title, p.city, p.province, p.base_price_monthly, p.address_line_1
        FROM applications a
        JOIN properties p ON a.property_id = p.property_id
@@ -97,13 +97,55 @@ router.get('/my', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/v1/applications/provider — Get all applications for provider's properties
+router.get('/provider', authenticate, async (req, res) => {
+  try {
+    const provider_id = req.user.user_id;
+    const { status, property_id } = req.query;
+
+    const params = [provider_id];
+    const whereClauses = ['p.provider_id = $1'];
+
+    if (status) {
+      params.push(status.toUpperCase());
+      whereClauses.push(`a.status = $${params.length}`);
+    }
+    if (property_id) {
+      params.push(property_id);
+      whereClauses.push(`a.property_id = $${params.length}`);
+    }
+
+    const whereStr = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
+
+    const result = await pool.query(
+      `SELECT 
+        a.application_id, a.status, a.applied_at, a.updated_at, a.provider_notes,
+        p.property_id, p.title AS property_title, p.city, p.province,
+        u.user_id AS student_id, u.first_name, u.last_name, u.email AS student_email,
+        u.phone_number AS student_phone, u.kyc_status
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       JOIN users u ON a.student_id = u.user_id
+       ${whereStr}
+       ORDER BY a.applied_at DESC`,
+      params
+    );
+    res.json({ applications: result.rows, total: result.rows.length });
+  } catch (err) {
+    console.error('Get provider applications error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch applications', detail: err.message });
+  }
+});
+
 // GET /api/v1/applications/:id — Get single application
 router.get('/:id', authenticate, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly
+      `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly,
+              u.first_name, u.last_name, u.email AS student_email, u.kyc_status
        FROM applications a
        JOIN properties p ON a.property_id = p.property_id
+       JOIN users u ON a.student_id = u.user_id
        WHERE a.application_id = $1`,
       [req.params.id]
     );
@@ -115,17 +157,47 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 });
 
-// PATCH /api/v1/applications/:id/status — Update application status
+// PATCH /api/v1/applications/:id/status — Update application status (provider only)
 router.patch('/:id/status', authenticate, async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, provider_notes } = req.body;
+    const provider_id = req.user.user_id;
+
     const valid = ['SUBMITTED', 'PENDING_NSFAS', 'APPROVED', 'REJECTED', 'LEASE_SIGNED'];
     if (!valid.includes(status)) {
       return res.status(400).json({ error: `Status must be one of: ${valid.join(', ')}` });
     }
+
+    // Verify the provider owns the property this application is for
+    const ownerCheck = await pool.query(
+      `SELECT a.application_id FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       WHERE a.application_id = $1 AND p.provider_id = $2`,
+      [req.params.id, provider_id]
+    );
+
+    // Allow if provider owns it, or if user is the student (for LEASE_SIGNED)
+    const studentCheck = await pool.query(
+      `SELECT application_id FROM applications WHERE application_id = $1 AND student_id = $2`,
+      [req.params.id, provider_id]
+    );
+
+    if (ownerCheck.rows.length === 0 && studentCheck.rows.length === 0) {
+      return res.status(403).json({ error: 'Access denied: you do not own this application or property' });
+    }
+
+    const updates = ['status = $1', 'updated_at = NOW()'];
+    const params = [status];
+
+    if (provider_notes !== undefined) {
+      params.push(provider_notes);
+      updates.push(`provider_notes = $${params.length}`);
+    }
+
+    params.push(req.params.id);
     const result = await pool.query(
-      `UPDATE applications SET status = $1, updated_at = NOW() WHERE application_id = $2 RETURNING *`,
-      [status, req.params.id]
+      `UPDATE applications SET ${updates.join(', ')} WHERE application_id = $${params.length} RETURNING *`,
+      params
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Application not found' });
     res.json(result.rows[0]);
