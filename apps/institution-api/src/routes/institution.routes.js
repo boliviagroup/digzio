@@ -12,12 +12,12 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// JWT verification using native crypto (no jsonwebtoken dependency)
+// JWT verification using native crypto
 function verifyJWT(token) {
   const parts = token.split('.');
   if (parts.length !== 3) throw new Error('Invalid token');
   const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
-  const secret = process.env.JWT_SECRET || 'digzio-secret-key';
+  const secret = process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-production';
   const sig = crypto.createHmac('sha256', secret)
     .update(parts[0] + '.' + parts[1]).digest('base64url');
   if (sig !== parts[2]) throw new Error('Invalid signature');
@@ -45,33 +45,36 @@ function requireInstitution(req, res, next) {
   next();
 }
 
-// Helper: get institution_id for the current user
+// Helper: get institution id (column is "id" in actual schema)
 async function getInstitutionId(userId) {
   const r = await pool.query(
-    `SELECT institution_id FROM institutions WHERE user_id = $1`, [userId]
+    `SELECT id FROM institutions WHERE user_id = $1`, [userId]
   );
-  return r.rows.length > 0 ? r.rows[0].institution_id : null;
+  return r.rows.length > 0 ? r.rows[0].id : null;
 }
 
 // ─── 1. Create institution profile ──────────────────────────────────────────
 router.post('/register', authenticate, requireInstitution, async (req, res) => {
   try {
-    const { name, address_line_1, city, province, postal_code, contact_email, contact_phone, website_url } = req.body;
-    if (!name || !city || !province) {
-      return res.status(400).json({ error: 'Missing required fields: name, city, province' });
+    const { name, location, contact_email } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'Missing required field: name' });
     }
     // Check if already registered
     const existing = await pool.query(
-      `SELECT institution_id FROM institutions WHERE user_id = $1`, [req.user.user_id]
+      `SELECT id FROM institutions WHERE user_id = $1`, [req.user.user_id]
     );
     if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'Institution profile already exists', institution_id: existing.rows[0].institution_id });
+      return res.status(409).json({
+        error: 'Institution profile already exists',
+        institution_id: existing.rows[0].id
+      });
     }
     const result = await pool.query(
-      `INSERT INTO institutions (user_id, name, address_line_1, city, province, postal_code, contact_email, contact_phone, website_url, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
-       RETURNING institution_id, name, city, province, contact_email, created_at`,
-      [req.user.user_id, name, address_line_1, city, province, postal_code, contact_email, contact_phone, website_url]
+      `INSERT INTO institutions (user_id, name, location, contact_email, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, NOW(), NOW())
+       RETURNING id, name, location, contact_email, created_at`,
+      [req.user.user_id, name, location || '', contact_email || req.user.email]
     );
     res.status(201).json({ institution: result.rows[0] });
   } catch (err) {
@@ -84,13 +87,14 @@ router.post('/register', authenticate, requireInstitution, async (req, res) => {
 router.get('/profile', authenticate, requireInstitution, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT institution_id, name, address_line_1, city, province, postal_code,
-              contact_email, contact_phone, website_url, created_at
+      `SELECT id, name, location, contact_email, created_at
        FROM institutions WHERE user_id = $1`,
       [req.user.user_id]
     );
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Institution profile not found. Please register your institution first via POST /api/v1/institutions/register' });
+      return res.status(404).json({
+        error: 'Institution profile not found. Please register via POST /api/v1/institutions/register'
+      });
     }
     res.json({ institution: result.rows[0] });
   } catch (err) {
@@ -122,25 +126,24 @@ router.get('/students', authenticate, requireInstitution, async (req, res) => {
   }
 });
 
-// ─── 4. Link student to institution (student self-registers) ─────────────────
+// ─── 4. Link student to institution ─────────────────────────────────────────
 router.post('/students/link', authenticate, async (req, res) => {
   try {
     const { institution_id, student_number } = req.body;
     if (!institution_id || !student_number) {
       return res.status(400).json({ error: 'Missing required fields: institution_id, student_number' });
     }
-    // Check institution exists
     const instCheck = await pool.query(
-      `SELECT institution_id FROM institutions WHERE institution_id = $1`, [institution_id]
+      `SELECT id FROM institutions WHERE id = $1`, [institution_id]
     );
     if (instCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Institution not found' });
     }
-    // Link student
     const result = await pool.query(
       `INSERT INTO student_institutions (student_id, institution_id, student_number, verification_status, created_at, updated_at)
        VALUES ($1, $2, $3, 'PENDING', NOW(), NOW())
-       ON CONFLICT (student_id, institution_id) DO UPDATE SET student_number = $3, updated_at = NOW()
+       ON CONFLICT (student_id, institution_id) DO UPDATE
+         SET student_number = $3, updated_at = NOW()
        RETURNING *`,
       [req.user.user_id, institution_id, student_number]
     );
@@ -155,7 +158,7 @@ router.post('/students/link', authenticate, async (req, res) => {
 router.patch('/students/:student_id/verify', authenticate, requireInstitution, async (req, res) => {
   try {
     const { student_id } = req.params;
-    const { status } = req.body; // 'VERIFIED' or 'REJECTED'
+    const { status } = req.body;
     if (!['VERIFIED', 'REJECTED', 'PENDING'].includes(status)) {
       return res.status(400).json({ error: 'status must be VERIFIED, REJECTED, or PENDING' });
     }
@@ -212,7 +215,6 @@ router.post('/accreditations', authenticate, requireInstitution, async (req, res
     const institutionId = await getInstitutionId(req.user.user_id);
     if (!institutionId) return res.status(404).json({ error: 'Institution not found' });
 
-    // Check property exists
     const propCheck = await pool.query(
       `SELECT property_id FROM properties WHERE property_id = $1`, [property_id]
     );
@@ -237,7 +239,7 @@ router.post('/accreditations', authenticate, requireInstitution, async (req, res
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT institution_id, name, city, province, contact_email, website_url, created_at
+      `SELECT id, name, location, contact_email, created_at
        FROM institutions ORDER BY name ASC`
     );
     res.json({ institutions: result.rows, count: result.rowCount });
