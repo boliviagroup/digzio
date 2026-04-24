@@ -1,162 +1,137 @@
 const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
-const axios = require('axios');
+const crypto = require('crypto');
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: process.env.DB_PORT || 5432,
   user: process.env.DB_USER || 'digzio_admin',
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  database: process.env.DB_NAME || 'digzio',
   ssl: { rejectUnauthorized: false }
 });
 
-const NOTIFICATION_URL = process.env.NOTIFICATION_URL || 'http://digzio-notification-service-prod:3004/api/v1/notifications/email';
+const JWT_SECRET = process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-production';
 
-const mockAuth = (req, res, next) => {
-  req.user = { id: req.headers['x-user-id'] || '1', role: req.headers['x-user-role'] || 'student' };
-  next();
+function verifyJWT(token, secret) {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token format');
+  const [h, p, s] = parts;
+  const sig = Buffer.from(s, 'base64url');
+  const expected = crypto.createHmac('sha256', secret).update(`${h}.${p}`).digest();
+  if (!crypto.timingSafeEqual(sig, expected)) throw new Error('Invalid signature');
+  const payload = JSON.parse(Buffer.from(p, 'base64url').toString());
+  if (payload.exp && Date.now() / 1000 > payload.exp) throw new Error('Token expired');
+  return payload;
+}
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization token required' });
+  }
+  try {
+    req.user = verifyJWT(authHeader.split(' ')[1], JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 };
 
-// 1. Apply for a property
-router.post('/', mockAuth, async (req, res) => {
+router.get('/health', (req, res) => res.json({ status: 'ok', service: 'application-service' }));
+
+// POST /api/v1/applications — Submit application
+router.post('/', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'student') return res.status(403).json({ error: 'Only students can apply' });
+    const { property_id } = req.body;
+    const student_id = req.user.user_id;
+    if (!property_id) return res.status(400).json({ error: 'property_id is required' });
 
-    const { property_id, desired_move_in_date, lease_term_months } = req.body;
+    const propCheck = await pool.query(
+      `SELECT property_id, provider_id, title FROM properties WHERE property_id = $1 AND status = 'ACTIVE'`,
+      [property_id]
+    );
+    if (propCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found or not available' });
+    }
 
-    // Check if already applied
     const existing = await pool.query(
-      `SELECT id FROM applications WHERE property_id = $1 AND tenant_id = $2`,
-      [property_id, req.user.id]
+      `SELECT application_id FROM applications WHERE property_id = $1 AND student_id = $2`,
+      [property_id, student_id]
     );
-    
-    if (existing.rows.length > 0) return res.status(400).json({ error: 'Already applied for this property' });
-
-    // Create application
-    const result = await pool.query(
-      `INSERT INTO applications (property_id, tenant_id, status, desired_move_in_date, lease_term_months)
-       VALUES ($1, $2, 'pending', $3, $4)
-       RETURNING *`,
-      [property_id, req.user.id, desired_move_in_date, lease_term_months]
-    );
-
-    // Notify provider (mocked via internal call)
-    try {
-      const providerQuery = await pool.query(
-        `SELECT u.email FROM users u JOIN properties p ON p.provider_id = u.id WHERE p.id = $1`,
-        [property_id]
-      );
-      
-      if (providerQuery.rows.length > 0) {
-        await axios.post(NOTIFICATION_URL, {
-          to: providerQuery.rows[0].email,
-          subject: 'New Property Application',
-          body_html: '<p>You have a new application for your property on Digzio.</p>',
-          body_text: 'You have a new application for your property on Digzio.'
-        });
-      }
-    } catch (err) {
-      console.error('Failed to send notification', err.message);
+    if (existing.rows.length > 0) {
+      return res.status(400).json({ error: 'You have already applied for this property' });
     }
 
-    res.status(201).json(result.rows[0]);
+    const result = await pool.query(
+      `INSERT INTO applications (property_id, student_id, status)
+       VALUES ($1, $2, 'SUBMITTED')
+       RETURNING application_id, property_id, student_id, status, applied_at`,
+      [property_id, student_id]
+    );
+    res.status(201).json({ ...result.rows[0], property_title: propCheck.rows[0].title });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to submit application' });
+    console.error('Submit application error:', err.message);
+    res.status(500).json({ error: 'Failed to submit application', detail: err.message });
   }
 });
 
-// 2. Get my applications (Student)
-router.get('/my', mockAuth, async (req, res) => {
+// GET /api/v1/applications/my — Get my applications
+router.get('/my', authenticate, async (req, res) => {
   try {
+    const student_id = req.user.user_id;
     const result = await pool.query(
-      `SELECT a.*, p.title, p.location 
-       FROM applications a 
-       JOIN properties p ON a.property_id = p.id 
-       WHERE a.tenant_id = $1`,
-      [req.user.id]
+      `SELECT a.application_id, a.property_id, a.status, a.applied_at, a.updated_at,
+              p.title AS property_title, p.city, p.province, p.base_price_monthly, p.address_line_1
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       WHERE a.student_id = $1
+       ORDER BY a.applied_at DESC`,
+      [student_id]
     );
-    res.json(result.rows);
+    res.json({ applications: result.rows, total: result.rows.length });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch applications' });
+    console.error('Get applications error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch applications', detail: err.message });
   }
 });
 
-// 3. Get property applications (Provider)
-router.get('/property/:property_id', mockAuth, async (req, res) => {
+// GET /api/v1/applications/:id — Get single application
+router.get('/:id', authenticate, async (req, res) => {
   try {
-    const { property_id } = req.params;
-    
-    // Verify ownership
-    const ownerCheck = await pool.query(
-      `SELECT provider_id FROM properties WHERE id = $1`,
-      [property_id]
-    );
-    
-    if (ownerCheck.rows.length === 0 || ownerCheck.rows[0].provider_id !== req.user.id) {
-      return res.status(403).json({ error: 'Not authorized to view these applications' });
-    }
-
     const result = await pool.query(
-      `SELECT a.*, u.first_name, u.last_name, u.email, u.kyc_status 
-       FROM applications a 
-       JOIN users u ON a.tenant_id = u.id 
-       WHERE a.property_id = $1`,
-      [property_id]
+      `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       WHERE a.application_id = $1`,
+      [req.params.id]
     );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch applications' });
-  }
-});
-
-// 4. Update application status (Provider)
-router.patch('/:id/status', mockAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body; // 'approved' or 'rejected'
-
-    // Verify ownership
-    const ownerCheck = await pool.query(
-      `SELECT p.provider_id, a.tenant_id 
-       FROM applications a 
-       JOIN properties p ON a.property_id = p.id 
-       WHERE a.id = $1`,
-      [id]
-    );
-    
-    if (ownerCheck.rows.length === 0 || ownerCheck.rows[0].provider_id !== req.user.id) {
-      return res.status(403).json({ error: 'Not authorized to update this application' });
-    }
-
-    const result = await pool.query(
-      `UPDATE applications SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-      [status, id]
-    );
-
-    // Notify student
-    try {
-      const studentQuery = await pool.query(`SELECT email FROM users WHERE id = $1`, [ownerCheck.rows[0].tenant_id]);
-      if (studentQuery.rows.length > 0) {
-        await axios.post(NOTIFICATION_URL, {
-          to: studentQuery.rows[0].email,
-          subject: `Application ${status}`,
-          body_html: `<p>Your application has been ${status}.</p>`,
-          body_text: `Your application has been ${status}.`
-        });
-      }
-    } catch (err) {
-      console.error('Failed to send notification', err.message);
-    }
-
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Application not found' });
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update application' });
+    console.error('Get application error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch application', detail: err.message });
+  }
+});
+
+// PATCH /api/v1/applications/:id/status — Update application status
+router.patch('/:id/status', authenticate, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const valid = ['SUBMITTED', 'PENDING_NSFAS', 'APPROVED', 'REJECTED', 'LEASE_SIGNED'];
+    if (!valid.includes(status)) {
+      return res.status(400).json({ error: `Status must be one of: ${valid.join(', ')}` });
+    }
+    const result = await pool.query(
+      `UPDATE applications SET status = $1, updated_at = NOW() WHERE application_id = $2 RETURNING *`,
+      [status, req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Application not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Update status error:', err.message);
+    res.status(500).json({ error: 'Failed to update application', detail: err.message });
   }
 });
 

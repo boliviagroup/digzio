@@ -1,123 +1,96 @@
 const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: process.env.DB_PORT || 5432,
   user: process.env.DB_USER || 'digzio_admin',
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  database: process.env.DB_NAME || 'digzio',
   ssl: { rejectUnauthorized: false }
 });
 
-const s3Client = new S3Client({ region: process.env.AWS_REGION || 'af-south-1' });
-const BUCKET_NAME = process.env.S3_BUCKET;
+const JWT_SECRET = process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-production';
 
-// Middleware to mock auth for now (will be replaced by API Gateway/ALB JWT validation)
-const mockAuth = (req, res, next) => {
-  req.user = { id: req.headers['x-user-id'] || '1', role: req.headers['x-user-role'] || 'student' };
-  next();
+function verifyJWT(token, secret) {
+  const parts = token.split('.');
+  if (parts.length !== 3) throw new Error('Invalid token format');
+  const [h, p, s] = parts;
+  const sig = Buffer.from(s, 'base64url');
+  const expected = crypto.createHmac('sha256', secret).update(`${h}.${p}`).digest();
+  if (!crypto.timingSafeEqual(sig, expected)) throw new Error('Invalid signature');
+  const payload = JSON.parse(Buffer.from(p, 'base64url').toString());
+  if (payload.exp && Date.now() / 1000 > payload.exp) throw new Error('Token expired');
+  return payload;
+}
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization token required' });
+  }
+  try {
+    req.user = verifyJWT(authHeader.split(' ')[1], JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 };
 
-// 1. Submit KYC Application
-router.post('/submit', mockAuth, async (req, res) => {
+router.get('/health', (req, res) => res.json({ status: 'ok', service: 'kyc-service' }));
+
+// POST /api/v1/kyc/submit — Submit KYC (sets kyc_status to PENDING on users table)
+router.post('/submit', authenticate, async (req, res) => {
   try {
-    const { document_type, document_number } = req.body;
-    
-    // In a real app, this would check if one already exists
-    const result = await pool.query(
-      `INSERT INTO kyc_documents (user_id, document_type, document_number, verification_status, uploaded_at)
-       VALUES ($1, $2, $3, 'pending', NOW())
-       RETURNING *`,
-      [req.user.id, document_type, document_number]
-    );
-
-    // Update user status
-    await pool.query(
-      `UPDATE users SET kyc_status = 'pending' WHERE id = $1`,
-      [req.user.id]
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to submit KYC' });
-  }
-});
-
-// 2. Get Presigned URL for Document Upload
-router.post('/upload-url', mockAuth, async (req, res) => {
-  try {
-    const { filename, contentType } = req.body;
-    const fileId = uuidv4();
-    const extension = filename.split('.').pop();
-    const key = `kyc/${req.user.id}/${fileId}.${extension}`;
-
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
-      ContentType: contentType
-    });
-
-    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-
-    res.json({
-      uploadUrl: signedUrl,
-      fileKey: key
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to generate upload URL' });
-  }
-});
-
-// 3. Get User's KYC Status
-router.get('/status', mockAuth, async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT kyc_status FROM users WHERE id = $1`,
-      [req.user.id]
-    );
-    
-    if (result.rows.length === 0) return res.status(404).json({ error: 'User not found' });
-    
-    res.json({ status: result.rows[0].kyc_status });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to get KYC status' });
-  }
-});
-
-// 4. Admin Approve/Reject KYC
-router.patch('/:id/status', mockAuth, async (req, res) => {
-  try {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
-
-    const { id } = req.params;
-    const { status, notes } = req.body; // status: 'approved' or 'rejected'
-
-    const kycResult = await pool.query(
-      `UPDATE kyc_documents 
-       SET verification_status = $1, verified_at = NOW(), verification_notes = $2
-       WHERE id = $3 RETURNING user_id`,
-      [status, notes, id]
-    );
-
-    if (kycResult.rows.length > 0) {
-      await pool.query(
-        `UPDATE users SET kyc_status = $1 WHERE id = $2`,
-        [status, kycResult.rows[0].user_id]
-      );
+    const user_id = req.user.user_id;
+    const { id_number, id_type } = req.body;
+    if (!id_number || !id_type) {
+      return res.status(400).json({ error: 'id_number and id_type are required' });
     }
-
-    res.json({ message: `KYC ${status} successfully` });
+    // Update user kyc_status to PENDING
+    const result = await pool.query(
+      `UPDATE users SET kyc_status = 'PENDING', updated_at = NOW()
+       WHERE user_id = $1
+       RETURNING user_id, email, kyc_status, updated_at`,
+      [user_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(201).json({
+      message: 'KYC submitted successfully. Your documents are under review.',
+      user_id: result.rows[0].user_id,
+      kyc_status: result.rows[0].kyc_status,
+      submitted_at: result.rows[0].updated_at
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update KYC status' });
+    console.error('KYC submit error:', err.message);
+    res.status(500).json({ error: 'Failed to submit KYC', detail: err.message });
+  }
+});
+
+// GET /api/v1/kyc/status — Get KYC status
+router.get('/status', authenticate, async (req, res) => {
+  try {
+    const user_id = req.user.user_id;
+    const result = await pool.query(
+      `SELECT user_id, email, first_name, last_name, kyc_status, updated_at
+       FROM users WHERE user_id = $1`,
+      [user_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({
+      kyc_status: result.rows[0].kyc_status,
+      user_id: result.rows[0].user_id,
+      email: result.rows[0].email
+    });
+  } catch (err) {
+    console.error('KYC status error:', err.message);
+    res.status(500).json({ error: 'Failed to get KYC status', detail: err.message });
   }
 });
 

@@ -33,7 +33,13 @@ router.post('/register', async (req, res) => {
     const refresh_token = jwt.sign({ user_id: user.user_id }, REFRESH_SECRET, { expiresIn: '30d' });
     res.status(201).json({ token, refresh_token, user: { user_id: user.user_id, email: user.email, first_name: user.first_name, last_name: user.last_name, role: user.role, kyc_status: user.kyc_status } });
   } catch (err) {
-    console.error('Register error:', err.message);
+    console.error("Register error:", err.message);
+    if (err.code === "23505") {
+      if (err.constraint && err.constraint.includes("phone_number")) {
+        return res.status(400).json({ error: "Phone number already in use" });
+      }
+      return res.status(400).json({ error: "User already exists" });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 });
