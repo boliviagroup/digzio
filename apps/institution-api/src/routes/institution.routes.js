@@ -45,36 +45,32 @@ function requireInstitution(req, res, next) {
   next();
 }
 
-// Helper: get institution id (column is "id" in actual schema)
-async function getInstitutionId(userId) {
-  const r = await pool.query(
-    `SELECT id FROM institutions WHERE user_id = $1`, [userId]
-  );
-  return r.rows.length > 0 ? r.rows[0].id : null;
-}
-
-// ─── 1. Create institution profile ──────────────────────────────────────────
+// ─── 1. Create institution record ────────────────────────────────────────────
+// POST /api/v1/institutions/register
 router.post('/register', authenticate, requireInstitution, async (req, res) => {
   try {
-    const { name, location, contact_email } = req.body;
-    if (!name) {
-      return res.status(400).json({ error: 'Missing required field: name' });
+    const { name, contact_email, lat, lng } = req.body;
+    if (!name || !contact_email) {
+      return res.status(400).json({ error: 'Missing required fields: name, contact_email' });
     }
-    // Check if already registered
+    // Check if institution with this name already exists
     const existing = await pool.query(
-      `SELECT id FROM institutions WHERE user_id = $1`, [req.user.user_id]
+      `SELECT institution_id, name FROM institutions WHERE name = $1`, [name]
     );
     if (existing.rows.length > 0) {
-      return res.status(409).json({
-        error: 'Institution profile already exists',
-        institution_id: existing.rows[0].id
+      return res.status(200).json({
+        message: 'Institution already exists',
+        institution: existing.rows[0]
       });
     }
+    // campus_location is required geometry - use provided lat/lng or default to Cape Town
+    const latitude = lat || -33.9249;
+    const longitude = lng || 18.4241;
     const result = await pool.query(
-      `INSERT INTO institutions (user_id, name, location, contact_email, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, NOW(), NOW())
-       RETURNING id, name, location, contact_email, created_at`,
-      [req.user.user_id, name, location || '', contact_email || req.user.email]
+      `INSERT INTO institutions (name, campus_location, contact_email, is_active, created_at)
+       VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4, TRUE, NOW())
+       RETURNING institution_id, name, contact_email, is_active, created_at`,
+      [name, longitude, latitude, contact_email]
     );
     res.status(201).json({ institution: result.rows[0] });
   } catch (err) {
@@ -83,41 +79,56 @@ router.post('/register', authenticate, requireInstitution, async (req, res) => {
   }
 });
 
-// ─── 2. Get institution profile ──────────────────────────────────────────────
-router.get('/profile', authenticate, requireInstitution, async (req, res) => {
+// ─── 2. List all institutions (public) ───────────────────────────────────────
+// GET /api/v1/institutions/
+router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, name, location, contact_email, created_at
-       FROM institutions WHERE user_id = $1`,
-      [req.user.user_id]
+      `SELECT institution_id, name, contact_email, is_active, created_at,
+              ST_X(campus_location::geometry) AS longitude,
+              ST_Y(campus_location::geometry) AS latitude
+       FROM institutions WHERE is_active = TRUE ORDER BY name ASC`
     );
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        error: 'Institution profile not found. Please register via POST /api/v1/institutions/register'
-      });
-    }
-    res.json({ institution: result.rows[0] });
+    res.json({ institutions: result.rows, count: result.rowCount });
   } catch (err) {
-    console.error('Get institution profile error:', err.message);
+    console.error('List institutions error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
 
-// ─── 3. Get students linked to institution ───────────────────────────────────
-router.get('/students', authenticate, requireInstitution, async (req, res) => {
+// ─── 3. Get institution by ID (public) ───────────────────────────────────────
+// GET /api/v1/institutions/:id
+router.get('/:id', async (req, res) => {
   try {
-    const institutionId = await getInstitutionId(req.user.user_id);
-    if (!institutionId) {
-      return res.status(404).json({ error: 'Institution profile not found' });
+    const result = await pool.query(
+      `SELECT institution_id, name, contact_email, is_active, created_at,
+              ST_X(campus_location::geometry) AS longitude,
+              ST_Y(campus_location::geometry) AS latitude
+       FROM institutions WHERE institution_id = $1`,
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Institution not found' });
     }
+    res.json({ institution: result.rows[0] });
+  } catch (err) {
+    console.error('Get institution error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// ─── 4. Get students linked to an institution ─────────────────────────────────
+// GET /api/v1/institutions/:id/students
+router.get('/:id/students', authenticate, requireInstitution, async (req, res) => {
+  try {
     const students = await pool.query(
       `SELECT u.user_id, u.first_name, u.last_name, u.email, u.kyc_status,
-              si.student_number, si.verification_status, si.created_at AS linked_at
-       FROM student_institutions si
-       JOIN users u ON si.student_id = u.user_id
-       WHERE si.institution_id = $1
-       ORDER BY si.created_at DESC`,
-      [institutionId]
+              sp.student_number, sp.nsfas_status, sp.institution_id
+       FROM student_profiles sp
+       JOIN users u ON sp.student_id = u.user_id
+       WHERE sp.institution_id = $1
+       ORDER BY u.last_name ASC`,
+      [req.params.id]
     );
     res.json({ students: students.rows, count: students.rowCount });
   } catch (err) {
@@ -126,125 +137,85 @@ router.get('/students', authenticate, requireInstitution, async (req, res) => {
   }
 });
 
-// ─── 4. Link student to institution ─────────────────────────────────────────
+// ─── 5. Get properties near institution ──────────────────────────────────────
+// GET /api/v1/institutions/:id/properties?radius_km=5
+router.get('/:id/properties', async (req, res) => {
+  try {
+    const radius_km = parseFloat(req.query.radius_km) || 5;
+    const result = await pool.query(
+      `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
+              p.nsfas_accredited, p.total_beds, p.status,
+              ROUND(ST_Distance(
+                i.campus_location::geography,
+                ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography
+              ) / 1000, 2) AS distance_km
+       FROM institutions i
+       JOIN properties p ON ST_DWithin(
+         i.campus_location::geography,
+         ST_SetSRID(ST_MakePoint(p.longitude, p.latitude), 4326)::geography,
+         $2 * 1000
+       )
+       WHERE i.institution_id = $1 AND p.status = 'ACTIVE'
+       ORDER BY distance_km ASC
+       LIMIT 20`,
+      [req.params.id, radius_km]
+    );
+    res.json({ properties: result.rows, count: result.rowCount, radius_km });
+  } catch (err) {
+    console.error('Get nearby properties error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// ─── 6. Link student to institution (student self-service) ───────────────────
+// POST /api/v1/institutions/students/link
 router.post('/students/link', authenticate, async (req, res) => {
   try {
-    const { institution_id, student_number } = req.body;
+    const { institution_id, student_number, id_number, date_of_birth } = req.body;
     if (!institution_id || !student_number) {
       return res.status(400).json({ error: 'Missing required fields: institution_id, student_number' });
     }
+    // Verify institution exists
     const instCheck = await pool.query(
-      `SELECT id FROM institutions WHERE id = $1`, [institution_id]
+      `SELECT institution_id FROM institutions WHERE institution_id = $1`, [institution_id]
     );
     if (instCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Institution not found' });
     }
+    // Upsert student profile
     const result = await pool.query(
-      `INSERT INTO student_institutions (student_id, institution_id, student_number, verification_status, created_at, updated_at)
-       VALUES ($1, $2, $3, 'PENDING', NOW(), NOW())
-       ON CONFLICT (student_id, institution_id) DO UPDATE
-         SET student_number = $3, updated_at = NOW()
-       RETURNING *`,
-      [req.user.user_id, institution_id, student_number]
+      `INSERT INTO student_profiles (student_id, institution_id, student_number, id_number, date_of_birth)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (student_id) DO UPDATE
+         SET institution_id = $2, student_number = $3
+       RETURNING student_id, institution_id, student_number, nsfas_status`,
+      [req.user.user_id, institution_id, student_number, id_number || '0000000000000', date_of_birth || '2000-01-01']
     );
-    res.status(201).json({ link: result.rows[0] });
+    res.status(201).json({ profile: result.rows[0] });
   } catch (err) {
     console.error('Link student error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
 
-// ─── 5. Verify student enrollment ────────────────────────────────────────────
-router.patch('/students/:student_id/verify', authenticate, requireInstitution, async (req, res) => {
+// ─── 7. Get my student profile ────────────────────────────────────────────────
+// GET /api/v1/institutions/students/me
+router.get('/students/me', authenticate, async (req, res) => {
   try {
-    const { student_id } = req.params;
-    const { status } = req.body;
-    if (!['VERIFIED', 'REJECTED', 'PENDING'].includes(status)) {
-      return res.status(400).json({ error: 'status must be VERIFIED, REJECTED, or PENDING' });
-    }
-    const institutionId = await getInstitutionId(req.user.user_id);
-    if (!institutionId) return res.status(404).json({ error: 'Institution not found' });
-
     const result = await pool.query(
-      `UPDATE student_institutions
-       SET verification_status = $1, updated_at = NOW()
-       WHERE student_id = $2 AND institution_id = $3
-       RETURNING *`,
-      [status, student_id, institutionId]
+      `SELECT sp.student_id, sp.student_number, sp.nsfas_status, sp.institution_id,
+              i.name AS institution_name, i.contact_email AS institution_email
+       FROM student_profiles sp
+       JOIN institutions i ON sp.institution_id = i.institution_id
+       WHERE sp.student_id = $1`,
+      [req.user.user_id]
     );
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Student linkage not found' });
+      return res.status(404).json({ error: 'Student profile not found' });
     }
-    res.json({ link: result.rows[0] });
+    res.json({ profile: result.rows[0] });
   } catch (err) {
-    console.error('Verify student error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 6. Get accredited properties ────────────────────────────────────────────
-router.get('/accreditations', authenticate, requireInstitution, async (req, res) => {
-  try {
-    const institutionId = await getInstitutionId(req.user.user_id);
-    if (!institutionId) return res.status(404).json({ error: 'Institution not found' });
-
-    const properties = await pool.query(
-      `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
-              p.nsfas_accredited, p.status,
-              ip.accreditation_status, ip.accredited_at
-       FROM institution_properties ip
-       JOIN properties p ON ip.property_id = p.property_id
-       WHERE ip.institution_id = $1
-       ORDER BY ip.accredited_at DESC`,
-      [institutionId]
-    );
-    res.json({ accreditations: properties.rows, count: properties.rowCount });
-  } catch (err) {
-    console.error('Get accreditations error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 7. Accredit a property ───────────────────────────────────────────────────
-router.post('/accreditations', authenticate, requireInstitution, async (req, res) => {
-  try {
-    const { property_id, accreditation_status } = req.body;
-    if (!property_id) return res.status(400).json({ error: 'Missing required field: property_id' });
-
-    const status = accreditation_status || 'PENDING';
-    const institutionId = await getInstitutionId(req.user.user_id);
-    if (!institutionId) return res.status(404).json({ error: 'Institution not found' });
-
-    const propCheck = await pool.query(
-      `SELECT property_id FROM properties WHERE property_id = $1`, [property_id]
-    );
-    if (propCheck.rows.length === 0) return res.status(404).json({ error: 'Property not found' });
-
-    const result = await pool.query(
-      `INSERT INTO institution_properties (institution_id, property_id, accreditation_status, accredited_at, created_at, updated_at)
-       VALUES ($1, $2, $3, NOW(), NOW(), NOW())
-       ON CONFLICT (institution_id, property_id) DO UPDATE
-         SET accreditation_status = $3, accredited_at = NOW(), updated_at = NOW()
-       RETURNING *`,
-      [institutionId, property_id, status]
-    );
-    res.status(201).json({ accreditation: result.rows[0] });
-  } catch (err) {
-    console.error('Accredit property error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 8. List all institutions (public) ───────────────────────────────────────
-router.get('/', async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT id, name, location, contact_email, created_at
-       FROM institutions ORDER BY name ASC`
-    );
-    res.json({ institutions: result.rows, count: result.rowCount });
-  } catch (err) {
-    console.error('List institutions error:', err.message);
+    console.error('Get student profile error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
