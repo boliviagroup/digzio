@@ -13,6 +13,10 @@ import HowItWorks from "./pages/HowItWorks";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Search from "./pages/Search";
+import StudentDashboard from "./pages/StudentDashboard";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import ListProperty from "./pages/ListProperty";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   return (
@@ -25,6 +29,10 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/search" component={Search} />
+      <Route path="/dashboard/student" component={StudentDashboard} />
+      <Route path="/dashboard/provider" component={ProviderDashboard} />
+      <Route path="/list-property" component={ListProperty} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

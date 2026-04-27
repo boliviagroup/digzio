@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, LayoutDashboard, BarChart3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModal from "@/components/AuthModal";
 
@@ -16,6 +16,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [location] = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
 
@@ -101,6 +102,22 @@ export default function Navbar() {
                       {user.first_name}
                     </span>
                   </div>
+                  <Link href={user.role === "PROVIDER" ? "/dashboard/provider" : "/dashboard/student"}>
+                    <button
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-600 transition-all btn-primary"
+                      style={{ padding: "0.5rem 1rem", fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      <LayoutDashboard size={15} /> My Dashboard
+                    </button>
+                  </Link>
+                  <Link href="/admin">
+                    <button
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-600 transition-all"
+                      style={{ padding: "0.5rem 1rem", fontFamily: "'Space Grotesk', sans-serif", background: "rgba(15,45,74,0.08)", color: "#0F2D4A" }}
+                    >
+                      <BarChart3 size={15} /> Admin
+                    </button>
+                  </Link>
                   <button
                     onClick={logout}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"
@@ -112,7 +129,7 @@ export default function Navbar() {
               ) : (
                 <>
                   <button
-                    onClick={() => setAuthOpen(true)}
+                    onClick={() => { setAuthTab("login"); setAuthOpen(true); }}
                     className="text-sm font-500 transition-colors"
                     style={{
                       fontFamily: "'Space Grotesk', sans-serif",
@@ -122,7 +139,7 @@ export default function Navbar() {
                     Sign In
                   </button>
                   <button
-                    onClick={() => setAuthOpen(true)}
+                    onClick={() => { setAuthTab("register"); setAuthOpen(true); }}
                     className="btn-primary text-sm"
                     style={{ padding: "0.6rem 1.5rem" }}
                   >
@@ -161,12 +178,19 @@ export default function Navbar() {
               ))}
               <div className="pt-3 border-t border-gray-100 mt-2">
                 {isAuthenticated && user ? (
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <span className="text-sm font-600" style={{ color: "#0F2D4A" }}>{user.first_name} {user.last_name}</span>
-                    <button onClick={logout} className="text-sm" style={{ color: "#6B7280" }}>Sign out</button>
+                  <div className="flex flex-col gap-2 px-2 py-2">
+                    <div className="flex items-center justify-between px-2 py-1">
+                      <span className="text-sm font-600" style={{ color: "#0F2D4A" }}>{user.first_name} {user.last_name}</span>
+                      <button onClick={logout} className="text-sm" style={{ color: "#6B7280" }}>Sign out</button>
+                    </div>
+                    <Link href={user.role === "PROVIDER" ? "/dashboard/provider" : "/dashboard/student"}>
+                      <button onClick={() => setMenuOpen(false)} className="btn-primary w-full justify-center text-sm">
+                        <LayoutDashboard size={15} /> My Dashboard
+                      </button>
+                    </Link>
                   </div>
                 ) : (
-                  <button onClick={() => { setMenuOpen(false); setAuthOpen(true); }} className="btn-primary w-full justify-center">
+                  <button onClick={() => { setMenuOpen(false); setAuthTab("register"); setAuthOpen(true); }} className="btn-primary w-full justify-center">
                     Get Started
                   </button>
                 )}
@@ -176,7 +200,7 @@ export default function Navbar() {
         )}
       </nav>
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} defaultTab={authTab} />
     </>
   );
 }

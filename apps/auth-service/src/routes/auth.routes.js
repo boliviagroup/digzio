@@ -119,4 +119,51 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// GET /api/v1/auth/admin/stats
+router.get('/admin/stats', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'No token provided' });
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, JWT_SECRET);
+    const stats = await db.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE role = 'STUDENT') AS students,
+        COUNT(*) FILTER (WHERE role = 'PROVIDER') AS providers,
+        COUNT(*) FILTER (WHERE role = 'INSTITUTION') AS institutions,
+        COUNT(*) AS total_users,
+        COUNT(*) FILTER (WHERE kyc_status = 'VERIFIED') AS kyc_verified,
+        COUNT(*) FILTER (WHERE kyc_status = 'PENDING') AS kyc_pending,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS new_this_week,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') AS new_this_month
+      FROM users
+    `);
+    res.json(stats.rows[0]);
+  } catch (err) {
+    console.error('Admin stats error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// GET /api/v1/auth/admin/users
+router.get('/admin/users', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'No token provided' });
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, JWT_SECRET);
+    const { role, limit = 50, offset = 0 } = req.query;
+    let query = 'SELECT user_id, email, role, first_name, last_name, kyc_status, is_active, created_at FROM users';
+    const params = [];
+    if (role) { query += ' WHERE role = $1'; params.push(role.toUpperCase()); }
+    query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(parseInt(limit), parseInt(offset));
+    const result = await db.query(query, params);
+    res.json({ users: result.rows, count: result.rows.length });
+  } catch (err) {
+    console.error('Admin users error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 module.exports = router;
