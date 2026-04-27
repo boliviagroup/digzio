@@ -235,6 +235,21 @@ router.patch('/posa/:property_id', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/v1/properties/posa/debug-schema - Debug: show leases table columns
+router.get('/posa/debug-schema', authenticate, async (req, res) => {
+  try {
+    const r = await db.query(`
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = 'leases' 
+      ORDER BY ordinal_position
+    `);
+    res.json({ columns: r.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/v1/properties/posa/students - Get students for POSA occupancy list
 router.get('/posa/students', authenticate, async (req, res) => {
   try {
@@ -256,6 +271,17 @@ router.get('/posa/students', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Property not found' });
     }
     const property = propResult.rows[0];
+    // Detect tenant column name dynamically
+    const colCheck = await db.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'leases' AND column_name IN ('tenant_id', 'student_id', 'user_id')
+    `);
+    const tenantCol = colCheck.rows.length > 0 ? colCheck.rows[0].column_name : 'tenant_id';
+    // Ensure tenant_id column exists (add if missing)
+    if (tenantCol === 'tenant_id') {
+      await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS tenant_id UUID`);
+    }
+    await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
     // Get active leases for this property with student profiles
     const leaseResult = await db.query(
       `SELECT
@@ -264,7 +290,7 @@ router.get('/posa/students', authenticate, async (req, res) => {
         sp.student_number, sp.year_of_study, sp.qualification,
         sp.campus, sp.type_of_funding, sp.gender, sp.next_of_kin_phone
        FROM leases l
-       JOIN users u ON l.tenant_id = u.user_id
+       JOIN users u ON l.${tenantCol} = u.user_id
        LEFT JOIN student_profiles sp ON sp.user_id = u.user_id
        WHERE l.property_id = $1
          AND l.status IN ('ACTIVE', 'SIGNED', 'active', 'signed')
