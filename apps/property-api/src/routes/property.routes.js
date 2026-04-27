@@ -484,8 +484,6 @@ router.delete('/:id', authenticate, async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // POST /api/v1/properties/posa/seed-leases - Seed leases for demo (PROVIDER only)
 router.post('/posa/seed-leases', authenticate, async (req, res) => {
   try {
@@ -501,14 +499,32 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
     if (check.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found or access denied' });
     }
-    // Ensure leases table has monthly_rent column
+    // Ensure leases table exists with all required columns
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS leases (
+        lease_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        property_id UUID NOT NULL,
+        tenant_id UUID NOT NULL,
+        application_id UUID,
+        start_date DATE,
+        end_date DATE,
+        monthly_rent NUMERIC(10,2),
+        rent_amount NUMERIC(10,2),
+        deposit_amount NUMERIC(10,2),
+        document_url TEXT,
+        status VARCHAR(50) DEFAULT 'ACTIVE',
+        room_number VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS room_number VARCHAR(20)`);
     const results = [];
     for (const lease of leases) {
       // Check if lease already exists for this tenant+property
       const existing = await db.query(
-        'SELECT lease_id FROM leases WHERE property_id = $1 AND tenant_id = $2 AND status IN (\'ACTIVE\', \'active\', \'SIGNED\', \'signed\')',
+        `SELECT lease_id FROM leases WHERE property_id = $1 AND tenant_id = $2 AND status IN ('ACTIVE', 'active', 'SIGNED', 'signed')`,
         [property_id, lease.tenant_id]
       );
       if (existing.rows.length > 0) {
@@ -530,3 +546,5 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
+
+module.exports = router;
