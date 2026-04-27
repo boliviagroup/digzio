@@ -193,8 +193,8 @@ export default function ProviderDashboard() {
 
   // Redirect if not authenticated or not provider
   useEffect(() => {
-    if (!isAuthenticated) { navigate("/login"); return; }
-    if (user && user.role !== "provider") { navigate("/dashboard"); return; }
+    if (!isAuthenticated) { navigate("/"); return; }
+    if (user && user.role !== "PROVIDER") { navigate("/"); return; }
   }, [isAuthenticated, user, navigate]);
 
   // Fetch properties and students
