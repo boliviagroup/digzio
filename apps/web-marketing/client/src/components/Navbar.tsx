@@ -110,14 +110,16 @@ export default function Navbar() {
                       <LayoutDashboard size={15} /> My Dashboard
                     </button>
                   </Link>
-                  <Link href="/admin">
-                    <button
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-600 transition-all"
-                      style={{ padding: "0.5rem 1rem", fontFamily: "'Space Grotesk', sans-serif", background: "rgba(15,45,74,0.08)", color: "#0F2D4A" }}
-                    >
-                      <BarChart3 size={15} /> Admin
-                    </button>
-                  </Link>
+                  {user.role === "ADMIN" && (
+                    <Link href="/admin">
+                      <button
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-600 transition-all"
+                        style={{ padding: "0.5rem 1rem", fontFamily: "'Space Grotesk', sans-serif", background: "rgba(15,45,74,0.08)", color: "#0F2D4A" }}
+                      >
+                        <BarChart3 size={15} /> Admin
+                      </button>
+                    </Link>
+                  )}
                   <button
                     onClick={logout}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"

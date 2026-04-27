@@ -1,10 +1,10 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import ForStudents from "./pages/ForStudents";
 import ForProviders from "./pages/ForProviders";
@@ -17,6 +17,22 @@ import StudentDashboard from "./pages/StudentDashboard";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import ListProperty from "./pages/ListProperty";
 import AdminDashboard from "./pages/AdminDashboard";
+
+// Guard component: only renders children if user has ADMIN role
+function AdminRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated, user } = useAuth();
+  const [, navigate] = useLocation();
+
+  if (!isAuthenticated || !user) {
+    navigate("/");
+    return null;
+  }
+  if (user.role !== "ADMIN") {
+    navigate("/");
+    return null;
+  }
+  return <Component />;
+}
 
 function Router() {
   return (
@@ -32,7 +48,7 @@ function Router() {
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/provider" component={ProviderDashboard} />
       <Route path="/list-property" component={ListProperty} />
-      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin">{() => <AdminRoute component={AdminDashboard} />}</Route>
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

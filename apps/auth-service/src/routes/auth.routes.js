@@ -8,6 +8,26 @@ const JWT_SECRET = process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-p
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const REFRESH_SECRET = process.env.REFRESH_SECRET || 'digzio-refresh-secret-2024';
 
+// Helper: verify token and require ADMIN role
+function requireAdmin(req, res) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'No token provided' });
+    return null;
+  }
+  try {
+    const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+    if (decoded.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Forbidden: Admin access only' });
+      return null;
+    }
+    return decoded;
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid or expired token' });
+    return null;
+  }
+}
+
 // POST /api/v1/auth/register
 router.post('/register', async (req, res) => {
   try {
@@ -21,7 +41,8 @@ router.post('/register', async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
-    const normalizedRole = role.toUpperCase();
+    // Prevent self-registration as ADMIN
+    const normalizedRole = role.toUpperCase() === 'ADMIN' ? 'STUDENT' : role.toUpperCase();
     const result = await db.query(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone_number)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -119,13 +140,10 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// GET /api/v1/auth/admin/stats
+// GET /api/v1/auth/admin/stats  — ADMIN only
 router.get('/admin/stats', async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'No token provided' });
-    const token = authHeader.split(' ')[1];
-    jwt.verify(token, JWT_SECRET);
+    if (!requireAdmin(req, res)) return;
     const stats = await db.query(`
       SELECT
         COUNT(*) FILTER (WHERE role = 'STUDENT') AS students,
@@ -145,13 +163,10 @@ router.get('/admin/stats', async (req, res) => {
   }
 });
 
-// GET /api/v1/auth/admin/users
+// GET /api/v1/auth/admin/users  — ADMIN only
 router.get('/admin/users', async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'No token provided' });
-    const token = authHeader.split(' ')[1];
-    jwt.verify(token, JWT_SECRET);
+    if (!requireAdmin(req, res)) return;
     const { role, limit = 50, offset = 0 } = req.query;
     let query = 'SELECT user_id, email, role, first_name, last_name, kyc_status, is_active, created_at FROM users';
     const params = [];
