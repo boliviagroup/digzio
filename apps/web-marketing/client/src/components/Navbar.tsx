@@ -92,6 +92,23 @@ export default function Navbar() {
               ))}
             </div>
 
+            {/* Ntumu Button */}
+            <a
+              href="https://roomzapay-yssjb3a9.manus.space/submission"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
+              style={{
+                background: "linear-gradient(135deg, #7C3AED, #A855F7)",
+                color: "white",
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              Ntumu
+            </a>
+
             {/* CTA */}
             <div className="hidden lg:flex items-center gap-3">
               {isAuthenticated && user ? (
@@ -178,6 +195,21 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <a
+                href="https://roomzapay-yssjb3a9.manus.space/submission"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-3 rounded-md text-sm font-medium flex items-center gap-2"
+                style={{
+                  background: "linear-gradient(135deg, #7C3AED, #A855F7)",
+                  color: "white",
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                Ntumu
+              </a>
               <div className="pt-3 border-t border-gray-100 mt-2">
                 {isAuthenticated && user ? (
                   <div className="flex flex-col gap-2 px-2 py-2">
