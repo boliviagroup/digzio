@@ -485,3 +485,48 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+
+// POST /api/v1/properties/posa/seed-leases - Seed leases for demo (PROVIDER only)
+router.post('/posa/seed-leases', authenticate, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role.toUpperCase() !== 'PROVIDER') {
+      return res.status(403).json({ error: 'Only providers can seed leases' });
+    }
+    const { property_id, leases } = req.body;
+    // Verify property belongs to provider
+    const check = await db.query(
+      'SELECT property_id FROM properties WHERE property_id = $1 AND provider_id = $2',
+      [property_id, req.user.user_id]
+    );
+    if (check.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found or access denied' });
+    }
+    // Ensure leases table has monthly_rent column
+    await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
+    await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS room_number VARCHAR(20)`);
+    const results = [];
+    for (const lease of leases) {
+      // Check if lease already exists for this tenant+property
+      const existing = await db.query(
+        'SELECT lease_id FROM leases WHERE property_id = $1 AND tenant_id = $2 AND status IN (\'ACTIVE\', \'active\', \'SIGNED\', \'signed\')',
+        [property_id, lease.tenant_id]
+      );
+      if (existing.rows.length > 0) {
+        results.push({ tenant_id: lease.tenant_id, status: 'already_exists', lease_id: existing.rows[0].lease_id });
+        continue;
+      }
+      const r = await db.query(
+        `INSERT INTO leases (property_id, tenant_id, start_date, end_date, monthly_rent, rent_amount, deposit_amount, status, room_number)
+         VALUES ($1, $2, $3, $4, $5, $5, $6, 'ACTIVE', $7)
+         RETURNING lease_id, tenant_id, status`,
+        [property_id, lease.tenant_id, lease.start_date || '2026-02-01', lease.end_date || '2026-11-30',
+         lease.monthly_rent || 5200, lease.deposit || 5200, lease.room || null]
+      );
+      results.push({ ...r.rows[0], status: 'created' });
+    }
+    res.json({ success: true, results });
+  } catch (err) {
+    console.error('Seed leases error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
