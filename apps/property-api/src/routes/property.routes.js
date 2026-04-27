@@ -518,9 +518,10 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
     if (check.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found or access denied' });
     }
-    // Ensure extra columns exist on the leases table
+    // Ensure extra columns exist and drop NOT NULL on application_id for seeding
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS room_number VARCHAR(20)`);
+    await db.query(`ALTER TABLE leases ALTER COLUMN application_id DROP NOT NULL`).catch(() => {});
     const results = [];
     for (const lease of leases) {
       // Check if lease already exists for this student+property
