@@ -284,7 +284,7 @@ router.get('/posa/students', authenticate, async (req, res) => {
         sp.campus, sp.type_of_funding, sp.gender, sp.next_of_kin_phone
        FROM leases l
        JOIN users u ON l.student_id = u.user_id
-       LEFT JOIN student_profiles sp ON sp.user_id = u.user_id
+       LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
        WHERE l.property_id = $1
          AND (l.is_active = true OR l.monthly_rent IS NOT NULL)
        ORDER BY u.last_name, u.first_name`,
