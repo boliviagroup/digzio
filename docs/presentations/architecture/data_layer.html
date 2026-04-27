@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* must not change */
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 12px; /* tightened to pull content up */
+        }
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: #3B82F6;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 24px; /* reduced horizontal gap */
+            flex: 1;
+            align-items: flex-start; /* ensure columns align at top */
+        }
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* tightened vertical spacing */
+        }
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .point {
+            margin-bottom: 6px; /* reduced */
+        }
+        .point-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3B82F6;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .point-title i {
+            color: #10B981;
+            font-size: 28px;
+        }
+        .point-desc {
+            font-size: 20px; /* must not change font size */
+            line-height: 1.2; /* tightened to reduce height */
+            color: #94A3B8;
+            font-weight: 300;
+            padding-left: 16px; /* reduced to tighten layout */
+            max-width: 520px; /* avoid long wraps increasing height */
+        }
+        .code-window {
+            background: #0F172A;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 560px;
+        }
+        .code-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px; /* slightly reduced */
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #EF4444; }
+        .dot-yellow { background: #F59E0B; }
+        .dot-green { background: #10B981; }
+        .code-title {
+            margin-left: 8px;
+            font-family: monospace;
+            color: #94A3B8;
+            font-size: 14px;
+        }
+        .code-content {
+            padding: 8px; /* reduced */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #E2E8F0;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 260px; /* keep code compact */
+        }
+        .keyword { color: #3B82F6; font-weight: bold; }
+        .function { color: #10B981; }
+        .string { color: #F59E0B; }
+        .comment { color: #64748B; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="header">
+            <h1 class="title">Data Layer: PostgreSQL &amp; PostGIS</h1>
+            <div class="divider"></div>
+        </div>
+        <div class="content">
+            <div class="left-col">
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-database"></i> Amazon RDS PostgreSQL 15</div>
+                    <div class="point-desc">Fully managed, highly available relational DB.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-project-diagram"></i> Single Source of Truth</div>
+                    <div class="point-desc">Eight microservices share a single schema for consistency.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-globe-africa"></i> PostGIS Geospatial Extension</div>
+                    <div class="point-desc">Spatial types like <span style="font-family:monospace;color:#10B981;">GEOMETRY(Point, 4326)</span> enable native location queries.</div>
+                </div>
+            </div>
+            <div class="right-col">
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-dot dot-red"></div>
+                        <div class="code-dot dot-yellow"></div>
+                        <div class="code-dot dot-green"></div>
+                        <div class="code-title">institution.routes.js - Geospatial Query</div>
+                    </div>
+                    <div class="code-content"><span class="comment">/* Find properties near an institution */</span>
+<span class="keyword">SELECT</span> p.property_id, p.title,
+       <span class="function">ROUND</span>(<span class="keyword">CAST</span>(<span class="function">ST_Distance</span>(i.campus_location::geography, p.location::geography) / 1000 <span class="keyword">AS</span> numeric), 2) <span class="keyword">AS</span> distance_km
+<span class="keyword">FROM</span> institutions i
+<span class="keyword">JOIN</span> properties p <span class="keyword">ON</span> <span class="function">ST_DWithin</span>(i.campus_location::geography, p.location::geography, $2 * 1000) <span class="comment">-- radius in meters</span>
+<span class="keyword">WHERE</span> i.institution_id = $1 <span class="keyword">AND</span> p.status = <span class="string">'ACTIVE'</span>
+<span class="keyword">ORDER BY</span> distance_km <span class="keyword">ASC</span>;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

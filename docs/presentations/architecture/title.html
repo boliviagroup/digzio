@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .title {
+            font-size: 80px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            color: #FFFFFF;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .title span {
+            color: #3B82F6;
+        }
+        .subtitle {
+            font-size: 36px;
+            font-weight: 300;
+            color: #10B981;
+            margin-bottom: 40px;
+        }
+        .divider {
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, #3B82F6, #10B981);
+            margin: 0 auto 40px auto;
+        }
+        .icon-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            color: #3B82F6;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="content">
+            <h1 class="title">Digzio <span>Architecture</span></h1>
+            <div class="divider"></div>
+            <h2 class="subtitle">End-to-End Technical Overview</h2>
+            <div class="icon-container">
+                <div class="icon-box"><i class="fab fa-react"></i></div>
+                <div class="icon-box"><i class="fab fa-node-js"></i></div>
+                <div class="icon-box"><i class="fab fa-aws"></i></div>
+                <div class="icon-box"><i class="fas fa-database"></i></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

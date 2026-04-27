@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 8px; /* reduced from 30 to save vertical space */
+        }
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: #3B82F6;
+        }
+        .subtitle {
+            font-size: 20px;
+            color: #94A3B8;
+            margin-top: 15px;
+            font-weight: 300;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto; /* let rows size to content rather than equal fr */
+            gap: 8px; /* reduced gap from 20 */
+            flex: 1;
+            padding-bottom: 8px; /* reduced from 40 */
+        }
+        .service-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 8px; /* reduced from 20 */
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card.highlight {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .service-icon {
+            font-size: 32px;
+            color: #3B82F6;
+            margin-bottom: 10px; /* reduced from 15 */
+        }
+        .service-card.highlight .service-icon {
+            color: #10B981;
+        }
+        .service-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+        .service-desc {
+            font-size: 15px;
+            line-height: 1.4; /* slightly tighter to save space */
+            color: #94A3B8;
+            flex: none; /* prevent description from stretching rows */
+        }
+        .service-port {
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #3B82F6;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 8px;
+            display: inline-block;
+            align-self: flex-start;
+        }
+        .service-card.highlight .service-port {
+            color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="header">
+            <h1 class="title">Backend: 8 Node.js Microservices</h1>
+            <div class="divider"></div>
+            <div class="subtitle">Independent Express.js services running on AWS ECS Fargate, communicating via REST and sharing a PostgreSQL database.</div>
+        </div>
+        <div class="content">
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="service-title">Auth Service</div>
+                <div class="service-desc">Handles user registration, login, JWT generation, and role-based access control (RBAC) for all users.</div>
+                <div class="service-port">Port: 3001</div>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-building"></i></div>
+                <div class="service-title">Property API</div>
+                <div class="service-desc">Manages property listings, geospatial data (PostGIS), provider portfolios, and search filtering.</div>
+                <div class="service-port">Port: 3002</div>
+            </div>
+            <div class="service-card highlight">
+                <div class="service-icon"><i class="fas fa-id-card"></i></div>
+                <div class="service-title">KYC Service</div>
+                <div class="service-desc">Processes student verification, identity checks, and NSFAS status validation workflows.</div>
+                <div class="service-port">Port: 3005</div>
+            </div>
+            <div class="service-card highlight">
+                <div class="service-icon"><i class="fas fa-university"></i></div>
+                <div class="service-title">Institution API</div>
+                <div class="service-desc">Manages university data, student linking, enrollment verification, and nearby property queries.</div>
+                <div class="service-port">Port: 3008</div>
+            </div>
+            <div class="service-card highlight">
+                <div class="service-icon"><i class="fas fa-file-signature"></i></div>
+                <div class="service-title">Application Service</div>
+                <div class="service-desc">Handles the tenant application lifecycle, from student submission to provider approval/rejection.</div>
+                <div class="service-port">Port: 3006</div>
+            </div>
+            <div class="service-card highlight">
+                <div class="service-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="service-title">Lease Service</div>
+                <div class="service-desc">Generates PDF lease agreements, manages digital signatures, and tracks active lease statuses.</div>
+                <div class="service-port">Port: 3007</div>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-users"></i></div>
+                <div class="service-title">User Service</div>
+                <div class="service-desc">Manages extended user profiles, preferences, and cross-service user data synchronization.</div>
+                <div class="service-port">Port: 3003</div>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-bell"></i></div>
+                <div class="service-title">Notification Service</div>
+                <div class="service-desc">Integrates with AWS SES to send transactional emails, alerts, and system notifications.</div>
+                <div class="service-port">Port: 3004</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

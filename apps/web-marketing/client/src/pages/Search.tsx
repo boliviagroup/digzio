@@ -34,7 +34,7 @@ const AMENITY_ICONS: Record<string, React.ReactNode> = {
   parking: <Car size={14} />,
 };
 
-function PropertyCard({ property, onApply }: { property: Property; onApply: (p: Property) => void }) {
+function PropertyCard({ property, onApply, canApply }: { property: Property; onApply: (p: Property) => void; canApply: boolean }) {
   const [saved, setSaved] = useState(false);
   const primaryImage = property.images?.find((i) => i.is_primary)?.image_url;
   const amenities = ["wifi", "security", "parking"];
@@ -133,18 +133,27 @@ function PropertyCard({ property, onApply }: { property: Property; onApply: (p: 
             </span>
             <span className="text-xs ml-1" style={{ color: "#9CA3AF" }}>/month</span>
           </div>
-          <button
-            onClick={() => onApply(property)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
-            style={{
-              background: "linear-gradient(135deg, #0F2D4A, #1A9BAD)",
-              color: "#fff",
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 600,
-            }}
-          >
-            Apply <ArrowRight size={14} />
-          </button>
+          {canApply ? (
+            <button
+              onClick={() => onApply(property)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
+              style={{
+                background: "linear-gradient(135deg, #0F2D4A, #1A9BAD)",
+                color: "#fff",
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 600,
+              }}
+            >
+              Apply <ArrowRight size={14} />
+            </button>
+          ) : (
+            <span
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-600"
+              style={{ background: "rgba(107,114,128,0.08)", color: "#9CA3AF", fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600 }}
+            >
+              View Only
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -152,7 +161,8 @@ function PropertyCard({ property, onApply }: { property: Property; onApply: (p: 
 }
 
 export default function Search() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const canApply = !isAuthenticated || user?.role === "STUDENT";
   const [, navigate] = useLocation();
 
   // Filters
@@ -349,7 +359,7 @@ export default function Search() {
         {!loading && properties.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {properties.map((p) => (
-              <PropertyCard key={p.property_id} property={p} onApply={handleApply} />
+              <PropertyCard key={p.property_id} property={p} onApply={handleApply} canApply={canApply} />
             ))}
           </div>
         )}

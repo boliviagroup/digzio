@@ -195,3 +195,39 @@ export async function submitKyc(data: {
   }
   return res.json();
 }
+
+// ─── Properties (Provider) ────────────────────────────────────────────────────
+
+export interface CreatePropertyPayload {
+  title: string;
+  description: string;
+  address_line_1: string;
+  address_line_2?: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  property_type: string;
+  total_beds: number;
+  available_beds?: number;
+  base_price_monthly: number;
+  is_nsfas_accredited?: boolean;
+  lat?: number;
+  lng?: number;
+}
+
+export async function createProperty(data: CreatePropertyPayload): Promise<{ property_id: string; title: string; status: string }> {
+  const token = getStoredToken();
+  const res = await fetch(`${API_BASE}/api/v1/properties`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || err.message || "Failed to create property listing");
+  }
+  return res.json();
+}

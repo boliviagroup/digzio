@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* keep title top padding */
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px; /* reduced from 60 to tighten layout */
+        }
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: #3B82F6;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 48px;
+            flex: 1;
+            align-items: flex-start;
+        }
+        /* Diagram panel kept compact */
+        .diagram-panel {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 12px; /* tighter gaps */
+            padding-top: 8px; /* reduced */
+            align-content: start;
+        }
+        .arch-tier {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 10px; /* reduced */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 56px; /* ensure readable block */
+        }
+        .tier-label {
+            width: 110px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #3B82F6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .tier-blocks {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+        .block {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10B981;
+            padding: 8px;
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #E2E8F0;
+        }
+        .block i { display: block; font-size: 24px; margin-bottom: 6px; color: #10B981; }
+        /* Text panel reorganized into two columns to reduce vertical height */
+        .text-panel {
+            flex: 1;
+            padding-top: 12px; /* tightened */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+            align-content: start;
+        }
+        .point {
+            margin-bottom: 0;
+            padding: 6px 0;
+        }
+        .point-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3B82F6;
+            margin-bottom: 6px; /* reduced */
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .point-title i { color: #10B981; }
+        .point-desc {
+            font-size: 20px;
+            line-height: 1.4; /* tightened to save vertical space */
+            color: #94A3B8;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="header">
+            <h1 class="title">End-to-End Architecture Overview</h1>
+            <div class="divider"></div>
+        </div>
+        <div class="content">
+            <div class="diagram-panel">
+                <div class="arch-tier">
+                    <div class="tier-label">Client</div>
+                    <div class="tier-blocks">
+                        <div class="block"><i class="fab fa-react"></i>React Frontend</div>
+                    </div>
+                </div>
+                <div class="arch-tier">
+                    <div class="tier-label">Gateway</div>
+                    <div class="tier-blocks">
+                        <div class="block"><i class="fab fa-node-js"></i>Express Proxy</div>
+                        <div class="block"><i class="fas fa-network-wired"></i>AWS ALB</div>
+                    </div>
+                </div>
+                <div class="arch-tier">
+                    <div class="tier-label">Compute</div>
+                    <div class="tier-blocks">
+                        <div class="block"><i class="fas fa-cubes"></i>8 Microservices (ECS)</div>
+                    </div>
+                </div>
+                <div class="arch-tier">
+                    <div class="tier-label">Data</div>
+                    <div class="tier-blocks">
+                        <div class="block"><i class="fas fa-database"></i>PostgreSQL</div>
+                        <div class="block"><i class="fas fa-memory"></i>Redis Cache</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-panel">
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-layer-group"></i> Separation of Concerns</div>
+                    <div class="point-desc">Clear separation between UI, API routing, business logic, and persistence for modularity.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-shield-alt"></i> Secure Proxy Routing</div>
+                    <div class="point-desc">Express proxy handles CORS and hides internal APIs from clients.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title"><i class="fas fa-cloud"></i> Serverless Compute</div>
+                    <div class="point-desc">Backends run on ECS Fargate for autoscaling and reduced ops overhead.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

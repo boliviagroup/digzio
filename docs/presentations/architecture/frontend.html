@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* keep upper padding */
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 20px; /* reduced to save vertical space */
+        }
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: #3B82F6;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 60px;
+            flex: 1;
+        }
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px; /* reduced gap between sections */
+        }
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* align to top to avoid vertical centering growth */
+            align-items: center;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 16px; /* reduced padding */
+        }
+        .tech-tags {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .tag {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+            border: 1px solid #3B82F6;
+            padding: 6px 12px; /* slightly smaller */
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .point {
+            margin-bottom: 12px; /* reduced */
+        }
+        .point-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10B981;
+            margin-bottom: 6px; /* reduced */
+        }
+        .point-desc {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #94A3B8;
+            font-weight: 300;
+        }
+        .flow-diagram {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; /* reduced gap between nodes/arrows */
+        }
+        .flow-node {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #3B82F6;
+            padding: 12px; /* reduced */
+            text-align: center;
+        }
+        .flow-node.highlight {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .node-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px; /* reduced */
+        }
+        .node-desc {
+            font-size: 16px;
+            color: #94A3B8;
+        }
+        .flow-arrow {
+            color: #3B82F6;
+            font-size: 30px;
+        }
+        .url-path {
+            font-family: monospace;
+            background: #0F172A;
+            padding: 4px 8px;
+            color: #3B82F6;
+            font-size: 18px;
+            margin-top: 8px; /* slightly reduced */
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="header">
+            <h1 class="title">Frontend: React & Express Proxy</h1>
+            <div class="divider"></div>
+        </div>
+        <div class="content">
+            <div class="left-col">
+                <div class="tech-tags">
+                    <div class="tag"><i class="fab fa-react"></i> React</div>
+                    <div class="tag">TypeScript</div>
+                    <div class="tag">Tailwind CSS</div>
+                    <div class="tag"><i class="fab fa-node-js"></i> Express</div>
+                </div>
+                <div class="point">
+                    <div class="point-title">Modern User Experience</div>
+                    <div class="point-desc">A single-page application (SPA) providing distinct, tailored flows for Students, Providers, and Institutions, styled with utility-first Tailwind CSS.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title">The Mixed-Content Challenge</div>
+                    <div class="point-desc">The frontend is served over HTTPS, but the AWS ALB endpoint is HTTP. Browsers block these "mixed content" requests, preventing direct API calls from the client.</div>
+                </div>
+                <div class="point">
+                    <div class="point-title">The Reverse Proxy Solution</div>
+                    <div class="point-desc">A Node.js/Express server serves the static React files and acts as a reverse proxy. It intercepts all calls to <span style="font-family:monospace;color:#3B82F6;">/api/*</span> and forwards them server-side to the ALB, bypassing browser restrictions and CORS issues.</div>
+                </div>
+            </div>
+            <div class="right-col">
+                <div class="flow-diagram">
+                    <div class="flow-node">
+                        <div class="node-title"><i class="fas fa-browser"></i> Client Browser</div>
+                        <div class="node-desc">HTTPS Request</div>
+                        <div class="url-path">GET /api/v1/properties</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-node highlight">
+                        <div class="node-title"><i class="fab fa-node-js"></i> Express Proxy Server</div>
+                        <div class="node-desc">Intercepts /api/* and forwards server-to-server</div>
+                    </div>
+                    <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                    <div class="flow-node">
+                        <div class="node-title"><i class="fas fa-network-wired"></i> AWS ALB (HTTP)</div>
+                        <div class="node-desc">Routes to correct microservice</div>
+                        <div class="url-path">http://digzio-alb-prod.../api/v1/properties</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -67,9 +67,11 @@ export default function ForProviders() {
                 The only platform that automates your NSFAS payments, manages your compliance, and helps you earn extra income from vacant rooms — all in one place.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
-                  List Your Property <ArrowRight size={16} />
-                </button>
+                <Link href="/list-property">
+                  <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
+                    List Your Property <ArrowRight size={16} />
+                  </button>
+                </Link>
                 <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
                   View Pricing
                 </button>
@@ -242,7 +244,7 @@ export default function ForProviders() {
           <p className="text-xl mb-10" style={{ color: "rgba(255,255,255,0.75)" }}>
             Join 156 verified providers already using Digzio to automate payments and grow their income.
           </p>
-          <Link href="/contact">
+          <Link href="/list-property">
             <button className="btn-primary" style={{ padding: "0.875rem 2.5rem", fontSize: "1rem" }}>
               List Your Property <ArrowRight size={18} />
             </button>

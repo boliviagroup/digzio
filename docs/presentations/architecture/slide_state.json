@@ -1,0 +1,96 @@
+{
+  "project_info": {
+    "title": "Digzio Platform Architecture",
+    "created": 1777000241.8102894,
+    "last_updated": 1777000660.0367184,
+    "total_slides": 7
+  },
+  "slides": [
+    {
+      "id": "title",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "overview",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "frontend",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "infrastructure",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "data_layer",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "microservices",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "workflows",
+      "state": "edited",
+      "pageNum": 7
+    }
+  ],
+  "outline": [
+    {
+      "id": "title",
+      "title": "Digzio Platform Architecture",
+      "summary": "Title slide introducing the presentation on Digzio's end-to-end architecture, from frontend to backend infrastructure.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "overview",
+      "title": "End-to-End Architecture Overview",
+      "summary": "High-level diagram and summary of the Digzio platform architecture, highlighting the separation of frontend, API gateway, microservices, and data layer.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "frontend",
+      "title": "Frontend: React & Express Proxy",
+      "summary": "Details on the React, TypeScript, and Tailwind CSS frontend. Explains the Node.js/Express reverse proxy routing /api/* to the AWS ALB to handle CORS and mixed-content issues.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "infrastructure",
+      "title": "Infrastructure: AWS Fargate & ALB",
+      "summary": "Overview of the AWS af-south-1 infrastructure. Covers ECS Fargate for serverless compute, Application Load Balancer for routing, and S3 for hot-patching routes.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "data_layer",
+      "title": "Data Layer: PostgreSQL & PostGIS",
+      "summary": "Details on the Amazon RDS PostgreSQL 15 database. Highlights the use of the PostGIS extension for geospatial queries (e.g., finding properties near institutions).",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "microservices",
+      "title": "Backend: 8 Node.js Microservices",
+      "summary": "Overview of the 8 distinct Node.js/Express microservices (Auth, Property, Application, Lease, KYC, Institution, etc.) and their specific responsibilities.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "workflows",
+      "title": "Role-Based Workflows & Integration",
+      "summary": "Summary of how the architecture supports the three main user roles: Students, Providers, and Institutions, through independent microservices sharing a single database.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+            padding-left: 80px;
+            padding-right: 80px;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+        }
+        .header {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 50px;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: #3B82F6;
+        }
+        .region-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10B981;
+            color: #10B981;
+            padding: 8px 16px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            flex: 1;
+        }
+        .infra-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-top: 4px solid #3B82F6;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .infra-card:nth-child(2) {
+            border-top-color: #10B981;
+        }
+        .infra-card:nth-child(3) {
+            border-top-color: #8B5CF6;
+        }
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            margin-bottom: 25px;
+        }
+        .infra-card:nth-child(1) .icon-wrapper { color: #3B82F6; }
+        .infra-card:nth-child(2) .icon-wrapper { color: #10B981; }
+        .infra-card:nth-child(3) .icon-wrapper { color: #8B5CF6; }
+        
+        .card-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+        .card-desc {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #94A3B8;
+            text-align: left;
+        }
+        .feature-list {
+            margin-top: 20px;
+            width: 100%;
+            text-align: left;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            color: #E2E8F0;
+        }
+        .feature-item i {
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .infra-card:nth-child(1) .feature-item i { color: #3B82F6; }
+        .infra-card:nth-child(2) .feature-item i { color: #10B981; }
+        .infra-card:nth-child(3) .feature-item i { color: #8B5CF6; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="header">
+            <h1 class="title">Infrastructure: AWS Fargate & ALB</h1>
+            <div class="divider"></div>
+            <div class="region-badge"><i class="fas fa-map-marker-alt"></i> af-south-1 (Cape Town)</div>
+        </div>
+        <div class="content">
+            <div class="infra-card">
+                <div class="icon-wrapper"><i class="fas fa-server"></i></div>
+                <div class="card-title">Serverless Compute</div>
+                <div class="card-desc">All 8 microservices run on Amazon ECS using AWS Fargate, eliminating the need to manage underlying EC2 instances.</div>
+                <div class="feature-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>High availability across multiple AZs</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Automated scaling based on load</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Isolated container environments</span></div>
+                </div>
+            </div>
+            <div class="infra-card">
+                <div class="icon-wrapper"><i class="fas fa-network-wired"></i></div>
+                <div class="card-title">Intelligent Routing</div>
+                <div class="card-desc">An Application Load Balancer (ALB) serves as the single entry point, routing traffic to specific services based on URL paths.</div>
+                <div class="feature-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Path-based routing (e.g., /api/v1/auth)</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Health checks and automatic failover</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Centralized SSL termination</span></div>
+                </div>
+            </div>
+            <div class="infra-card">
+                <div class="icon-wrapper"><i class="fas fa-bolt"></i></div>
+                <div class="card-title">Rapid Hot-Patching</div>
+                <div class="card-desc">To bypass sandbox ECR upload restrictions, a custom S3-based patching mechanism is used for rapid route updates.</div>
+                <div class="feature-list">
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Patches uploaded to S3 bucket</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Init script fetches patches on startup</span></div>
+                    <div class="feature-item"><i class="fas fa-check"></i> <span>Enables fixes without full image rebuilds</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

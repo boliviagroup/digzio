@@ -41,12 +41,16 @@ export default function ForStudents() {
               Browse verified, NSFAS-accredited accommodation near your campus. Apply online, get paid on time, and move in with confidence.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
-                Find Accommodation <ArrowRight size={16} />
-              </button>
-              <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
-                How NSFAS Payments Work
-              </button>
+              <Link href="/search">
+                <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
+                  Find Accommodation <ArrowRight size={16} />
+                </button>
+              </Link>
+              <Link href="/how-it-works">
+                <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
+                  How NSFAS Payments Work
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -195,7 +199,7 @@ export default function ForStudents() {
           <p className="text-xl mb-10" style={{ color: "rgba(255,255,255,0.75)" }}>
             Join 2,847 students who found verified housing through Digzio. Zero fees. Zero stress.
           </p>
-          <Link href="/contact">
+          <Link href="/search">
             <button className="btn-primary" style={{ padding: "0.875rem 2.5rem", fontSize: "1rem" }}>
               Find My Accommodation <ArrowRight size={18} />
             </button>
