@@ -45,6 +45,13 @@ function requireInstitution(req, res, next) {
   next();
 }
 
+function requireProvider(req, res, next) {
+  if (req.user.role !== 'PROVIDER') {
+    return res.status(403).json({ error: 'Only providers can access this endpoint' });
+  }
+  next();
+}
+
 // ─── 1. Create institution record ────────────────────────────────────────────
 // POST /api/v1/institutions/register
 router.post('/register', authenticate, requireInstitution, async (req, res) => {
@@ -123,7 +130,8 @@ router.get('/:id/students', authenticate, requireInstitution, async (req, res) =
   try {
     const students = await pool.query(
       `SELECT u.user_id, u.first_name, u.last_name, u.email, u.kyc_status,
-              sp.student_number, sp.nsfas_status, sp.institution_id
+              sp.student_number, sp.nsfas_status, sp.institution_id,
+              sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding
        FROM student_profiles sp
        JOIN users u ON sp.student_id = u.user_id
        WHERE sp.institution_id = $1
@@ -144,7 +152,7 @@ router.get('/:id/properties', async (req, res) => {
     const radius_km = parseFloat(req.query.radius_km) || 5;
     const result = await pool.query(
       `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
-              p.is_nsfas_accredited, p.total_beds, p.status,
+              p.is_nsfas_accredited, p.total_beds, p.status, p.posa_code, p.posa_institution,
               ROUND(CAST(ST_Distance(
                 i.campus_location::geography,
                 p.location::geography
@@ -171,7 +179,10 @@ router.get('/:id/properties', async (req, res) => {
 // POST /api/v1/institutions/students/link
 router.post('/students/link', authenticate, async (req, res) => {
   try {
-    const { institution_id, student_number, id_number, date_of_birth } = req.body;
+    const {
+      institution_id, student_number, id_number, date_of_birth,
+      year_of_study, qualification, campus, next_of_kin_phone, type_of_funding, gender
+    } = req.body;
     // Generate a unique placeholder id_number if not provided to avoid NOT NULL constraint
     const safeIdNumber = id_number || `UNSET-${req.user.user_id.replace(/-/g,'').substring(0,13)}`;
     if (!institution_id || !student_number) {
@@ -184,14 +195,24 @@ router.post('/students/link', authenticate, async (req, res) => {
     if (instCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Institution not found' });
     }
-    // Upsert student profile
+    // Upsert student profile with POSA fields
     const result = await pool.query(
-      `INSERT INTO student_profiles (student_id, institution_id, student_number, id_number, date_of_birth)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO student_profiles (student_id, institution_id, student_number, id_number, date_of_birth,
+         year_of_study, qualification, campus, next_of_kin_phone, type_of_funding, gender)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (student_id) DO UPDATE
-         SET institution_id = $2, student_number = $3
-       RETURNING student_id, institution_id, student_number, nsfas_status`,
-      [req.user.user_id, institution_id, student_number, safeIdNumber, date_of_birth || '2000-01-01']
+         SET institution_id = $2, student_number = $3,
+             year_of_study = COALESCE($6, student_profiles.year_of_study),
+             qualification = COALESCE($7, student_profiles.qualification),
+             campus = COALESCE($8, student_profiles.campus),
+             next_of_kin_phone = COALESCE($9, student_profiles.next_of_kin_phone),
+             type_of_funding = COALESCE($10, student_profiles.type_of_funding),
+             gender = COALESCE($11, student_profiles.gender)
+       RETURNING student_id, institution_id, student_number, nsfas_status,
+                 year_of_study, qualification, campus, type_of_funding, gender`,
+      [req.user.user_id, institution_id, student_number, safeIdNumber, date_of_birth || '2000-01-01',
+       year_of_study || null, qualification || null, campus || null,
+       next_of_kin_phone || null, type_of_funding || 'NSFAS', gender || null]
     );
     res.status(201).json({ profile: result.rows[0] });
   } catch (err) {
@@ -206,6 +227,8 @@ router.get('/students/me', authenticate, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT sp.student_id, sp.student_number, sp.nsfas_status, sp.institution_id,
+              sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
+              sp.next_of_kin_phone, sp.id_number, sp.date_of_birth,
               i.name AS institution_name, i.contact_email AS institution_email
        FROM student_profiles sp
        JOIN institutions i ON sp.institution_id = i.institution_id
@@ -218,6 +241,114 @@ router.get('/students/me', authenticate, async (req, res) => {
     res.json({ profile: result.rows[0] });
   } catch (err) {
     console.error('Get student profile error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// ─── 8. POSA Occupancy List Generation ───────────────────────────────────────
+// GET /api/v1/institutions/posa/generate?property_id=xxx&month=2025-03
+// Returns JSON data for the UJ POSA occupancy list (Excel generation done client-side)
+router.get('/posa/generate', authenticate, requireProvider, async (req, res) => {
+  try {
+    const { property_id, month } = req.query;
+    if (!property_id) {
+      return res.status(400).json({ error: 'property_id is required' });
+    }
+
+    // Verify property belongs to this provider
+    const propCheck = await pool.query(
+      `SELECT property_id, title, address_line_1, city, province, postal_code,
+              total_beds, available_beds, base_price_monthly, is_nsfas_accredited,
+              posa_code, posa_institution
+       FROM properties WHERE property_id = $1 AND provider_id = $2`,
+      [property_id, req.user.user_id]
+    );
+    if (propCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found or not owned by this provider' });
+    }
+    const property = propCheck.rows[0];
+
+    // Get all active leases for this property with student POSA details
+    const leaseMonth = month || new Date().toISOString().slice(0, 7); // YYYY-MM
+    const students = await pool.query(
+      `SELECT
+         u.first_name, u.last_name, u.email, u.phone,
+         sp.student_number, sp.id_number, sp.date_of_birth,
+         sp.year_of_study, sp.qualification, sp.campus,
+         sp.next_of_kin_phone, sp.type_of_funding, sp.gender,
+         sp.nsfas_status,
+         l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+         i.name AS institution_name
+       FROM leases l
+       JOIN users u ON l.tenant_id = u.user_id
+       LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
+       LEFT JOIN institutions i ON sp.institution_id = i.institution_id
+       WHERE l.property_id = $1
+         AND l.status IN ('ACTIVE', 'SIGNED')
+       ORDER BY u.last_name ASC`,
+      [property_id]
+    );
+
+    // Build POSA occupancy data in UJ format
+    const occupancyList = students.rows.map((s, idx) => ({
+      row_number: idx + 1,
+      surname: s.last_name || '',
+      first_name: s.first_name || '',
+      id_number: s.id_number && !s.id_number.startsWith('UNSET') ? s.id_number : '',
+      student_number: s.student_number || '',
+      gender: s.gender || '',
+      year_of_study: s.year_of_study || '',
+      qualification: s.qualification || '',
+      campus: s.campus || s.institution_name || '',
+      type_of_funding: s.type_of_funding || 'NSFAS',
+      nsfas_status: s.nsfas_status || 'PENDING',
+      monthly_rent: s.monthly_rent || property.base_price_monthly,
+      lease_start: s.start_date ? s.start_date.toISOString().slice(0, 10) : '',
+      lease_end: s.end_date ? s.end_date.toISOString().slice(0, 10) : '',
+      next_of_kin_phone: s.next_of_kin_phone || '',
+      email: s.email || '',
+      phone: s.phone || ''
+    }));
+
+    res.json({
+      property: {
+        property_id: property.property_id,
+        title: property.title,
+        address: `${property.address_line_1}, ${property.city}, ${property.province} ${property.postal_code}`,
+        total_beds: property.total_beds,
+        posa_code: property.posa_code || '',
+        posa_institution: property.posa_institution || '',
+        is_nsfas_accredited: property.is_nsfas_accredited
+      },
+      month: leaseMonth,
+      occupancy_list: occupancyList,
+      total_occupants: occupancyList.length,
+      generated_at: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('POSA generate error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// ─── 9. Update property POSA details ─────────────────────────────────────────
+// PATCH /api/v1/institutions/posa/property/:property_id
+router.patch('/posa/property/:property_id', authenticate, requireProvider, async (req, res) => {
+  try {
+    const { posa_code, posa_institution } = req.body;
+    const result = await pool.query(
+      `UPDATE properties
+       SET posa_code = $1, posa_institution = $2
+       WHERE property_id = $3 AND provider_id = $4
+       RETURNING property_id, title, posa_code, posa_institution`,
+      [posa_code || null, posa_institution || null, req.params.property_id, req.user.user_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found or not owned by this provider' });
+    }
+    res.json({ property: result.rows[0] });
+  } catch (err) {
+    console.error('Update POSA property error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
