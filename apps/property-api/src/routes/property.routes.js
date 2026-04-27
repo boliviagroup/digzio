@@ -204,6 +204,84 @@ router.get('/', async (req, res) => {
   }
 });
 
+// PATCH /api/v1/properties/posa/:property_id - Save POSA code and institution name
+router.patch('/posa/:property_id', authenticate, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role.toUpperCase() !== 'PROVIDER') {
+      return res.status(403).json({ error: 'Only providers can update POSA details' });
+    }
+    const { property_id } = req.params;
+    const { posa_code, posa_institution } = req.body;
+    // Ensure the property belongs to this provider
+    const check = await db.query(
+      'SELECT property_id FROM properties WHERE property_id = $1 AND provider_id = $2',
+      [property_id, req.user.user_id]
+    );
+    if (check.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found or access denied' });
+    }
+    // Add columns if they don't exist yet (safe ALTER TABLE)
+    await db.query(`ALTER TABLE properties ADD COLUMN IF NOT EXISTS posa_code VARCHAR(50)`);
+    await db.query(`ALTER TABLE properties ADD COLUMN IF NOT EXISTS posa_institution VARCHAR(255)`);
+    const result = await db.query(
+      `UPDATE properties SET posa_code = $1, posa_institution = $2, updated_at = NOW()
+       WHERE property_id = $3 RETURNING property_id, posa_code, posa_institution`,
+      [posa_code, posa_institution, property_id]
+    );
+    res.json({ success: true, property: result.rows[0] });
+  } catch (err) {
+    console.error('POSA update error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/v1/properties/posa/students - Get students for POSA occupancy list
+router.get('/posa/students', authenticate, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role.toUpperCase() !== 'PROVIDER') {
+      return res.status(403).json({ error: 'Only providers can access POSA student data' });
+    }
+    const { property_id, month } = req.query;
+    const provider_id = req.user.user_id;
+    // Ensure columns exist
+    await db.query(`ALTER TABLE properties ADD COLUMN IF NOT EXISTS posa_code VARCHAR(50)`);
+    await db.query(`ALTER TABLE properties ADD COLUMN IF NOT EXISTS posa_institution VARCHAR(255)`);
+    // Get property info
+    const propResult = await db.query(
+      `SELECT property_id, title, posa_code, posa_institution FROM properties
+       WHERE property_id = $1 AND provider_id = $2`,
+      [property_id, provider_id]
+    );
+    if (propResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+    const property = propResult.rows[0];
+    // Get active leases for this property with student profiles
+    const leaseResult = await db.query(
+      `SELECT
+        l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status,
+        u.first_name, u.last_name, u.email,
+        sp.student_number, sp.year_of_study, sp.qualification,
+        sp.campus, sp.type_of_funding, sp.gender, sp.next_of_kin_phone
+       FROM leases l
+       JOIN users u ON l.tenant_id = u.user_id
+       LEFT JOIN student_profiles sp ON sp.user_id = u.user_id
+       WHERE l.property_id = $1
+         AND l.status IN ('ACTIVE', 'SIGNED', 'active', 'signed')
+       ORDER BY u.last_name, u.first_name`,
+      [property_id]
+    );
+    res.json({
+      property,
+      students: leaseResult.rows,
+      month: month || new Date().toISOString().slice(0, 7)
+    });
+  } catch (err) {
+    console.error('POSA students error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // GET /api/v1/properties/:id - Get single property
 router.get('/:id', async (req, res) => {
   try {

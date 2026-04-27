@@ -52,6 +52,12 @@ function requireProvider(req, res, next) {
   next();
 }
 
+// ─── 0. Health check ────────────────────────────────────────────────────────
+// GET /health
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', service: 'institution-api' });
+});
+
 // ─── 1. Create institution record ────────────────────────────────────────────
 // POST /api/v1/institutions/register
 router.post('/register', authenticate, requireInstitution, async (req, res) => {
@@ -99,27 +105,6 @@ router.get('/', async (req, res) => {
     res.json({ institutions: result.rows, count: result.rowCount });
   } catch (err) {
     console.error('List institutions error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 3. Get institution by ID (public) ───────────────────────────────────────
-// GET /api/v1/institutions/:id
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT institution_id, name, contact_email, is_active, created_at,
-              ST_X(campus_location::geometry) AS longitude,
-              ST_Y(campus_location::geometry) AS latitude
-       FROM institutions WHERE institution_id = $1`,
-      [req.params.id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Institution not found' });
-    }
-    res.json({ institution: result.rows[0] });
-  } catch (err) {
-    console.error('Get institution error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
@@ -396,6 +381,27 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
     res.json({ students: result.rows, count: result.rows.length });
   } catch (err) {
     console.error('Provider students error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// ─── 3. Get institution by ID (public) ───────────────────────────────────────
+// GET /api/v1/institutions/:id  (MUST be last to avoid swallowing specific routes)
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT institution_id, name, contact_email, is_active, created_at,
+              ST_X(campus_location::geometry) AS longitude,
+              ST_Y(campus_location::geometry) AS latitude
+       FROM institutions WHERE institution_id = $1`,
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Institution not found' });
+    }
+    res.json({ institution: result.rows[0] });
+  } catch (err) {
+    console.error('Get institution error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });

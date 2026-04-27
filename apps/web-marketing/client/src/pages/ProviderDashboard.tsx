@@ -206,7 +206,7 @@ export default function ProviderDashboard() {
     try {
       const [propsRes, studsRes] = await Promise.all([
         fetch("/api/v1/properties/my", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/v1/institutions/posa/provider-students", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`/api/v1/properties/posa/students?property_id=${selectedProperty || ''}`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       if (propsRes.ok) {
         const d = await propsRes.json();
@@ -238,12 +238,49 @@ export default function ProviderDashboard() {
     if (!token) return;
     setPosaLoading(true);
     try {
-      const res = await fetch(`/api/v1/institutions/posa/generate?property_id=${selectedProperty}&month=${selectedMonth}`, {
+      const res = await fetch(`/api/v1/properties/posa/students?property_id=${selectedProperty}&month=${selectedMonth}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const d = await res.json();
-        setPosaData(d);
+        // Map property-api response to PosaData format
+        const mapped: PosaData = {
+          property: {
+            property_id: d.property?.property_id || selectedProperty,
+            title: d.property?.title || '',
+            address: d.property?.title || '',
+            posa_code: d.property?.posa_code,
+            posa_institution: d.property?.posa_institution,
+          },
+          month: d.month || selectedMonth,
+          occupancy_list: (d.students || []).map((s: any, i: number) => ({
+            row_number: i + 1,
+            surname: s.last_name || '',
+            first_name: s.first_name || '',
+            id_number: s.id_number || '',
+            student_number: s.student_number || '',
+            gender: s.gender || '',
+            year_of_study: s.year_of_study || '',
+            qualification: s.qualification || '',
+            campus: s.campus || '',
+            type_of_funding: s.type_of_funding || '',
+            monthly_rent: s.monthly_rent || 0,
+            lease_start: s.start_date || '',
+            lease_end: s.end_date || '',
+            email: s.email || '',
+          })),
+          total_occupants: (d.students || []).length,
+          generated_at: new Date().toISOString(),
+        };
+        setPosaData(mapped);
+        // Also update students list from this response
+        if (d.students && d.students.length > 0) {
+          setStudents(d.students.map((s: any) => ({
+            ...s,
+            user_id: s.user_id || s.tenant_id,
+            nsfas_status: s.type_of_funding?.toLowerCase().includes('nsfas') ? 'NSFAS Verified' : s.nsfas_status,
+          })));
+        }
       }
     } catch (e) {
       // silently fail
@@ -263,7 +300,7 @@ export default function ProviderDashboard() {
     if (!token) return;
     setPosaSaving(true);
     try {
-      await fetch(`/api/v1/institutions/posa/property/${selectedProperty}`, {
+      await fetch(`/api/v1/properties/posa/${selectedProperty}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ posa_code: posaCode, posa_institution: posaInstitution }),
