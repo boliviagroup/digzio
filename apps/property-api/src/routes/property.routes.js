@@ -271,29 +271,22 @@ router.get('/posa/students', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Property not found' });
     }
     const property = propResult.rows[0];
-    // Detect tenant column name dynamically
-    const colCheck = await db.query(`
-      SELECT column_name FROM information_schema.columns
-      WHERE table_name = 'leases' AND column_name IN ('tenant_id', 'student_id', 'user_id')
-    `);
-    const tenantCol = colCheck.rows.length > 0 ? colCheck.rows[0].column_name : 'tenant_id';
-    // Ensure tenant_id column exists (add if missing)
-    if (tenantCol === 'tenant_id') {
-      await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS tenant_id UUID`);
-    }
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
     // Get active leases for this property with student profiles
+    // leases table uses student_id (not tenant_id) and is_active (bool) for status
     const leaseResult = await db.query(
       `SELECT
-        l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status,
+        l.lease_id, l.start_date, l.end_date,
+        COALESCE(l.monthly_rent, l.rent_amount_monthly) as monthly_rent,
+        CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END as status,
         u.first_name, u.last_name, u.email,
         sp.student_number, sp.year_of_study, sp.qualification,
         sp.campus, sp.type_of_funding, sp.gender, sp.next_of_kin_phone
        FROM leases l
-       JOIN users u ON l.${tenantCol} = u.user_id
+       JOIN users u ON l.student_id = u.user_id
        LEFT JOIN student_profiles sp ON sp.user_id = u.user_id
        WHERE l.property_id = $1
-         AND l.status IN ('ACTIVE', 'SIGNED', 'active', 'signed')
+         AND (l.is_active = true OR l.monthly_rent IS NOT NULL)
        ORDER BY u.last_name, u.first_name`,
       [property_id]
     );
@@ -525,42 +518,24 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
     if (check.rows.length === 0) {
       return res.status(404).json({ error: 'Property not found or access denied' });
     }
-    // Ensure leases table exists with all required columns
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS leases (
-        lease_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        property_id UUID NOT NULL,
-        tenant_id UUID NOT NULL,
-        application_id UUID,
-        start_date DATE,
-        end_date DATE,
-        monthly_rent NUMERIC(10,2),
-        rent_amount NUMERIC(10,2),
-        deposit_amount NUMERIC(10,2),
-        document_url TEXT,
-        status VARCHAR(50) DEFAULT 'ACTIVE',
-        room_number VARCHAR(20),
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
+    // Ensure extra columns exist on the leases table
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS monthly_rent NUMERIC(10,2)`);
     await db.query(`ALTER TABLE leases ADD COLUMN IF NOT EXISTS room_number VARCHAR(20)`);
     const results = [];
     for (const lease of leases) {
-      // Check if lease already exists for this tenant+property
+      // Check if lease already exists for this student+property
       const existing = await db.query(
-        `SELECT lease_id FROM leases WHERE property_id = $1 AND tenant_id = $2 AND status IN ('ACTIVE', 'active', 'SIGNED', 'signed')`,
+        `SELECT lease_id FROM leases WHERE property_id = $1 AND student_id = $2 AND is_active = true`,
         [property_id, lease.tenant_id]
       );
       if (existing.rows.length > 0) {
-        results.push({ tenant_id: lease.tenant_id, status: 'already_exists', lease_id: existing.rows[0].lease_id });
+        results.push({ student_id: lease.tenant_id, status: 'already_exists', lease_id: existing.rows[0].lease_id });
         continue;
       }
       const r = await db.query(
-        `INSERT INTO leases (property_id, tenant_id, start_date, end_date, monthly_rent, rent_amount, deposit_amount, status, room_number)
-         VALUES ($1, $2, $3, $4, $5, $5, $6, 'ACTIVE', $7)
-         RETURNING lease_id, tenant_id, status`,
+        `INSERT INTO leases (property_id, student_id, start_date, end_date, monthly_rent, rent_amount_monthly, deposit_amount, is_active, room_number)
+         VALUES ($1, $2, $3, $4, $5, $5, $6, true, $7)
+         RETURNING lease_id, student_id, is_active`,
         [property_id, lease.tenant_id, lease.start_date || '2026-02-01', lease.end_date || '2026-11-30',
          lease.monthly_rent || 5200, lease.deposit || 5200, lease.room || null]
       );
