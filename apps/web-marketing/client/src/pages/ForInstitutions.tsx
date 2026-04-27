@@ -12,36 +12,6 @@ const features = [
   { icon: Globe, title: "Multi-Campus Management", body: "Manage housing compliance across multiple campuses from a single institutional dashboard. Ideal for universities with distributed student populations.", color: "#2EC4C4" },
 ];
 
-const institutionTiers = [
-  {
-    name: "Campus",
-    price: "R2,999",
-    period: "/month",
-    desc: "For single-campus institutions",
-    features: ["Single campus dashboard", "Up to 500 student records", "Automated DHET reporting", "Provider compliance monitoring", "Email & phone support"],
-    cta: "Get Started",
-    highlight: false,
-  },
-  {
-    name: "University",
-    price: "R7,499",
-    period: "/month",
-    desc: "For multi-faculty universities",
-    features: ["Multi-campus dashboard", "Unlimited student records", "Everything in Campus", "Custom compliance workflows", "API integration", "Dedicated account manager"],
-    cta: "Get Started",
-    highlight: true,
-  },
-  {
-    name: "Consortium",
-    price: "Custom",
-    period: "",
-    desc: "For university groups & TVET colleges",
-    features: ["Unlimited campuses", "Everything in University", "Cross-institution reporting", "Government data integration", "SLA guarantee", "Executive reporting suite"],
-    cta: "Contact Sales",
-    highlight: false,
-  },
-];
-
 export default function ForInstitutions() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -56,7 +26,7 @@ export default function ForInstitutions() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-700 uppercase tracking-widest mb-6" style={{ background: "rgba(46,196,196,0.15)", border: "1px solid rgba(46,196,196,0.3)", color: "#2EC4C4" }}>
-                For Universities & Institutions
+                For Universities &amp; Institutions
               </span>
               <h1 className="text-5xl lg:text-6xl font-800 text-white mb-6 leading-tight" style={{ fontWeight: 800 }}>
                 Compliance, automated.<br />
@@ -66,12 +36,16 @@ export default function ForInstitutions() {
                 Real-time compliance dashboards, automated DHET reporting, and a verified provider network — built for university housing offices.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
-                  Request a Demo <ArrowRight size={16} />
-                </button>
-                <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
-                  Download Brochure
-                </button>
+                <Link href="/contact">
+                  <button className="btn-primary" style={{ padding: "0.875rem 2rem" }}>
+                    Request a Demo <ArrowRight size={16} />
+                  </button>
+                </Link>
+                <a href="/digzio-brochure.pdf" download="Digzio-Platform-Brochure.pdf">
+                  <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
+                    Download Brochure
+                  </button>
+                </a>
               </div>
             </div>
 
@@ -188,64 +162,6 @@ export default function ForInstitutions() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-24" style={{ background: "#F5F7FA" }}>
-        <div className="container">
-          <div className="text-center mb-16">
-            <span className="section-label">Institutional Pricing</span>
-            <h2 className="text-4xl font-800 text-gray-900 mb-4" style={{ fontWeight: 800 }}>
-              Scalable pricing for every institution.
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {institutionTiers.map((plan) => (
-              <div
-                key={plan.name}
-                className="rounded-2xl p-8"
-                style={{
-                  background: plan.highlight ? "linear-gradient(135deg, #0F2D4A, #1A4A6B)" : "white",
-                  boxShadow: plan.highlight ? "0 20px 60px rgba(15,45,74,0.3)" : "0 4px 20px rgba(15,45,74,0.07)",
-                  transform: plan.highlight ? "scale(1.03)" : "scale(1)",
-                }}
-              >
-                {plan.highlight && (
-                  <div className="text-xs font-700 uppercase tracking-widest mb-4 px-3 py-1 rounded-full inline-block" style={{ background: "#1A9BAD", color: "white" }}>
-                    Most Popular
-                  </div>
-                )}
-                <h3 className="text-xl font-700 mb-1" style={{ color: plan.highlight ? "white" : "#0F2D4A", fontWeight: 700 }}>{plan.name}</h3>
-                <p className="text-sm mb-6" style={{ color: plan.highlight ? "rgba(255,255,255,0.6)" : "#9BA3AE" }}>{plan.desc}</p>
-                <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-4xl font-800" style={{ color: plan.highlight ? "white" : "#0F2D4A", fontWeight: 800 }}>{plan.price}</span>
-                  <span className="text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.6)" : "#9BA3AE" }}>{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.8)" : "#4B5563" }}>
-                      <CheckCircle size={14} style={{ color: plan.highlight ? "#2EC4C4" : "#2ECC71", flexShrink: 0, marginTop: 2 }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/contact">
-                  <button
-                    className="w-full py-3 rounded-xl text-sm font-700 transition-all"
-                    style={{
-                      background: plan.highlight ? "linear-gradient(135deg, #1A9BAD, #2EC4C4)" : "transparent",
-                      color: plan.highlight ? "white" : "#0F2D4A",
-                      border: plan.highlight ? "none" : "2px solid #0F2D4A",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {plan.cta}
-                  </button>
-                </Link>
-              </div>
-            ))}
           </div>
         </div>
       </section>

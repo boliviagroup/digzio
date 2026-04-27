@@ -12,36 +12,6 @@ const features = [
   { icon: TrendingUp, title: "Verified Student Pipeline", body: "Access a verified pipeline of NSFAS-approved students matched to your property's capacity and location. Fill vacancies faster with qualified tenants.", color: "#2ECC71" },
 ];
 
-const pricing = [
-  {
-    name: "Starter",
-    price: "R299",
-    period: "/month",
-    desc: "For individual landlords with 1–5 units",
-    features: ["Up to 5 listed units", "Automated NSFAS payments", "Digital compliance management", "Basic occupancy dashboard", "Email support"],
-    cta: "Start Free Trial",
-    highlight: false,
-  },
-  {
-    name: "Professional",
-    price: "R799",
-    period: "/month",
-    desc: "For growing providers with 6–30 units",
-    features: ["Up to 30 listed units", "Everything in Starter", "Holiday rental marketplace access", "Advanced analytics & reporting", "Priority phone support", "Dedicated account manager"],
-    cta: "Get Started",
-    highlight: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    desc: "For large portfolios and property companies",
-    features: ["Unlimited units", "Everything in Professional", "Custom integrations", "Multi-property dashboard", "SLA guarantee", "On-site onboarding"],
-    cta: "Contact Sales",
-    highlight: false,
-  },
-];
-
 export default function ForProviders() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -72,9 +42,11 @@ export default function ForProviders() {
                     List Your Property <ArrowRight size={16} />
                   </button>
                 </Link>
-                <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
-                  View Pricing
-                </button>
+                <Link href="/contact">
+                  <button className="btn-outline-white" style={{ padding: "0.875rem 2rem" }}>
+                    Contact Us
+                  </button>
+                </Link>
               </div>
             </div>
 
@@ -170,67 +142,6 @@ export default function ForProviders() {
                 We handle the listing, guest vetting, check-in coordination, and payment processing. You simply unlock your calendar and watch the income arrive.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-24" style={{ background: "#F5F7FA" }}>
-        <div className="container">
-          <div className="text-center mb-16">
-            <span className="section-label">Pricing</span>
-            <h2 className="text-4xl font-800 text-gray-900 mb-4" style={{ fontWeight: 800 }}>
-              Transparent pricing. No surprises.
-            </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              A flat monthly fee — never a percentage of your NSFAS income. Your revenue stays yours.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricing.map((plan) => (
-              <div
-                key={plan.name}
-                className="rounded-2xl p-8"
-                style={{
-                  background: plan.highlight ? "linear-gradient(135deg, #0F2D4A, #1A4A6B)" : "white",
-                  boxShadow: plan.highlight ? "0 20px 60px rgba(15,45,74,0.3)" : "0 4px 20px rgba(15,45,74,0.07)",
-                  transform: plan.highlight ? "scale(1.03)" : "scale(1)",
-                }}
-              >
-                {plan.highlight && (
-                  <div className="text-xs font-700 uppercase tracking-widest mb-4 px-3 py-1 rounded-full inline-block" style={{ background: "#1A9BAD", color: "white" }}>
-                    Most Popular
-                  </div>
-                )}
-                <h3 className="text-xl font-700 mb-1" style={{ color: plan.highlight ? "white" : "#0F2D4A", fontWeight: 700 }}>{plan.name}</h3>
-                <p className="text-sm mb-6" style={{ color: plan.highlight ? "rgba(255,255,255,0.6)" : "#9BA3AE" }}>{plan.desc}</p>
-                <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-4xl font-800" style={{ color: plan.highlight ? "white" : "#0F2D4A", fontWeight: 800 }}>{plan.price}</span>
-                  <span className="text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.6)" : "#9BA3AE" }}>{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm" style={{ color: plan.highlight ? "rgba(255,255,255,0.8)" : "#4B5563" }}>
-                      <CheckCircle size={14} style={{ color: plan.highlight ? "#2EC4C4" : "#2ECC71", flexShrink: 0, marginTop: 2 }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/contact">
-                  <button
-                    className="w-full py-3 rounded-xl text-sm font-700 transition-all"
-                    style={{
-                      background: plan.highlight ? "linear-gradient(135deg, #1A9BAD, #2EC4C4)" : "transparent",
-                      color: plan.highlight ? "white" : "#0F2D4A",
-                      border: plan.highlight ? "none" : "2px solid #0F2D4A",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {plan.cta}
-                  </button>
-                </Link>
-              </div>
-            ))}
           </div>
         </div>
       </section>

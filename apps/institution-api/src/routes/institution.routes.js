@@ -353,4 +353,51 @@ router.patch('/posa/property/:property_id', authenticate, requireProvider, async
   }
 });
 
+// ─── 10. Get all students for a provider (across all properties) ─────────────
+// GET /api/v1/institutions/posa/provider-students?property_id=xxx
+router.get('/posa/provider-students', authenticate, requireProvider, async (req, res) => {
+  try {
+    const { property_id } = req.query;
+    let query, params;
+    if (property_id) {
+      query = `
+        SELECT DISTINCT
+          u.user_id, u.first_name, u.last_name, u.email, u.phone,
+          sp.student_number, sp.id_number, sp.nsfas_status,
+          sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+          l.signed_at, l.pdf_url,
+          p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
+        FROM leases l
+        JOIN users u ON l.tenant_id = u.user_id
+        JOIN properties p ON l.property_id = p.property_id
+        LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
+        WHERE p.property_id = $1 AND p.provider_id = $2
+        ORDER BY u.last_name ASC`;
+      params = [property_id, req.user.user_id];
+    } else {
+      query = `
+        SELECT DISTINCT
+          u.user_id, u.first_name, u.last_name, u.email, u.phone,
+          sp.student_number, sp.id_number, sp.nsfas_status,
+          sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+          l.signed_at, l.pdf_url,
+          p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
+        FROM leases l
+        JOIN users u ON l.tenant_id = u.user_id
+        JOIN properties p ON l.property_id = p.property_id
+        LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
+        WHERE p.provider_id = $1
+        ORDER BY u.last_name ASC`;
+      params = [req.user.user_id];
+    }
+    const result = await pool.query(query, params);
+    res.json({ students: result.rows, count: result.rows.length });
+  } catch (err) {
+    console.error('Provider students error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
 module.exports = router;
