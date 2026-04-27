@@ -247,6 +247,10 @@ router.get('/:id', async (req, res) => {
 // POST /api/v1/properties - Create property (provider only)
 router.post('/', authenticate, async (req, res) => {
   try {
+    // Only providers can create property listings
+    if (!req.user.role || req.user.role.toUpperCase() !== 'PROVIDER') {
+      return res.status(403).json({ error: 'Access denied. Only providers can create property listings.' });
+    }
     const provider_id = req.user.user_id;
 
     const {
