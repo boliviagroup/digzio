@@ -313,7 +313,7 @@ export default function ProviderDashboard() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
 
-  if (!isAuthenticated || (user && user.role !== "provider")) return null;
+  if (!isAuthenticated || (user && user.role !== "PROVIDER")) return null;
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
