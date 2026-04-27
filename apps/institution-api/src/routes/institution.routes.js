@@ -145,10 +145,10 @@ router.get('/:id/properties', async (req, res) => {
     const result = await pool.query(
       `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
               p.is_nsfas_accredited, p.total_beds, p.status,
-              ROUND(ST_Distance(
+              ROUND(CAST(ST_Distance(
                 i.campus_location::geography,
                 p.location::geography
-              ) / 1000, 2) AS distance_km
+              ) / 1000 AS numeric), 2) AS distance_km
        FROM institutions i
        JOIN properties p ON ST_DWithin(
          i.campus_location::geography,
@@ -189,7 +189,7 @@ router.post('/students/link', authenticate, async (req, res) => {
        ON CONFLICT (student_id) DO UPDATE
          SET institution_id = $2, student_number = $3
        RETURNING student_id, institution_id, student_number, nsfas_status`,
-      [req.user.user_id, institution_id, student_number, id_number || '0000000000000', date_of_birth || '2000-01-01']
+      [req.user.user_id, institution_id, student_number, id_number || null, date_of_birth || null]
     );
     res.status(201).json({ profile: result.rows[0] });
   } catch (err) {
