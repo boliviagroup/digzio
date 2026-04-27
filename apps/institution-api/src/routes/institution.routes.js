@@ -172,6 +172,8 @@ router.get('/:id/properties', async (req, res) => {
 router.post('/students/link', authenticate, async (req, res) => {
   try {
     const { institution_id, student_number, id_number, date_of_birth } = req.body;
+    // Generate a unique placeholder id_number if not provided to avoid NOT NULL constraint
+    const safeIdNumber = id_number || `UNSET-${req.user.user_id.replace(/-/g,'').substring(0,13)}`;
     if (!institution_id || !student_number) {
       return res.status(400).json({ error: 'Missing required fields: institution_id, student_number' });
     }
@@ -189,7 +191,7 @@ router.post('/students/link', authenticate, async (req, res) => {
        ON CONFLICT (student_id) DO UPDATE
          SET institution_id = $2, student_number = $3
        RETURNING student_id, institution_id, student_number, nsfas_status`,
-      [req.user.user_id, institution_id, student_number, id_number || null, date_of_birth || null]
+      [req.user.user_id, institution_id, student_number, safeIdNumber, date_of_birth || '2000-01-01']
     );
     res.status(201).json({ profile: result.rows[0] });
   } catch (err) {
