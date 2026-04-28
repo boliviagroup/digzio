@@ -1,0 +1,96 @@
+name: Property API CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/property-api/**'
+      - '.github/workflows/property-api.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: af-south-1
+  ECR_REPOSITORY: digzio/property-api
+  ECS_SERVICE: digzio-property-api-prod
+  ECS_CLUSTER: digzio-cluster-prod
+  CONTAINER_NAME: property-api
+
+jobs:
+  deploy:
+    name: Build and Deploy Property API
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG apps/property-api/
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Get current task definition
+      id: get-task-def
+      run: |
+        aws ecs describe-task-definition \
+          --task-definition digzio-property-api-prod \
+          --query 'taskDefinition' \
+          --output json > task-def.json
+        echo "Task definition retrieved"
+
+    - name: Update task definition with new image
+      id: task-def
+      run: |
+        # Update the image in the task definition
+        NEW_IMAGE="${{ steps.build-image.outputs.image }}"
+        python3 -c "
+        import json, sys
+        with open('task-def.json') as f:
+            td = json.load(f)
+        # Remove fields that can't be in RegisterTaskDefinition
+        for field in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes',
+                      'placementConstraints', 'compatibilities', 'registeredAt', 'registeredBy']:
+            td.pop(field, None)
+        # Update image
+        for container in td.get('containerDefinitions', []):
+            if container.get('name') == 'property-api':
+                container['image'] = '$NEW_IMAGE'
+        with open('task-def-new.json', 'w') as f:
+            json.dump(td, f)
+        print('Updated task definition written')
+        "
+        # Register new task definition
+        NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+          --cli-input-json file://task-def-new.json \
+          --query 'taskDefinition.taskDefinitionArn' \
+          --output text)
+        echo "new_task_def_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
+        echo "New task def: $NEW_TASK_DEF_ARN"
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs update-service \
+          --cluster ${{ env.ECS_CLUSTER }} \
+          --service ${{ env.ECS_SERVICE }} \
+          --task-definition ${{ steps.task-def.outputs.new_task_def_arn }} \
+          --force-new-deployment
+        echo "Deployment triggered for ${{ env.ECS_SERVICE }}"
