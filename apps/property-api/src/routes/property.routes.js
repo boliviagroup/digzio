@@ -549,4 +549,29 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/v1/properties/admin/update-demo-emails - Update demo student emails for SES testing
+router.post('/admin/update-demo-emails', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'provider' && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Provider or admin access required' });
+    }
+    const { target_email, student_emails } = req.body;
+    if (!target_email || !student_emails || !Array.isArray(student_emails)) {
+      return res.status(400).json({ error: 'target_email and student_emails[] required' });
+    }
+    const results = [];
+    for (const email of student_emails) {
+      const r = await db.query(
+        'UPDATE users SET email = $1 WHERE email = $2 RETURNING user_id, email',
+        [target_email, email]
+      );
+      results.push({ original: email, updated: r.rows.length > 0, rows: r.rows });
+    }
+    res.json({ success: true, results });
+  } catch (err) {
+    console.error('update-demo-emails error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
