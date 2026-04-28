@@ -94,7 +94,7 @@ export default function Navbar() {
 
             {/* Ntumu Button */}
             <a
-              href="https://roomzapay-yssjb3a9.manus.space/submission"
+              href="https://ap.digzio.co.za"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
@@ -196,7 +196,7 @@ export default function Navbar() {
                 </Link>
               ))}
               <a
-                href="https://roomzapay-yssjb3a9.manus.space/submission"
+                href="https://ap.digzio.co.za"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-3 rounded-md text-sm font-medium flex items-center gap-2"
