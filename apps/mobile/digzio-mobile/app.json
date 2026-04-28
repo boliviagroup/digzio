@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Digzio",
+    "slug": "digzio-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F2D4A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "co.za.digzio.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Digzio needs camera access to take property photos.",
+        "NSPhotoLibraryUsageDescription": "Digzio needs photo library access to upload property images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F2D4A"
+      },
+      "package": "co.za.digzio.mobile",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Digzio to access your camera to take property photos."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Digzio to access your photos to upload property images."
+        }
+      ]
+    ],
+    "scheme": "digzio",
+    "extra": {
+      "eas": {
+        "projectId": "digzio-mobile-prod"
+      }
+    }
+  }
+}
