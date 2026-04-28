@@ -560,13 +560,29 @@ router.post('/admin/update-demo-emails', authenticate, async (req, res) => {
     if (!target_email || !student_emails || !Array.isArray(student_emails)) {
       return res.status(400).json({ error: 'target_email and student_emails[] required' });
     }
+    // Parse target_email into local+domain parts to generate unique plus-addressed variants
+    const [localPart, domain] = target_email.split('@');
     const results = [];
-    for (const email of student_emails) {
+    for (let i = 0; i < student_emails.length; i++) {
+      const email = student_emails[i];
+      // Generate a unique plus-addressed email: e.g. siphiwe+student1@digzio.co.za
+      const uniqueEmail = `${localPart}+student${i + 1}@${domain}`;
+      // First check if this student email already points to a siphiwe address (already updated)
+      const existing = await db.query('SELECT user_id, email FROM users WHERE email = $1', [email]);
+      if (existing.rows.length === 0) {
+        // Already updated or not found — check if it was already migrated
+        const alreadyMigrated = await db.query(
+          "SELECT user_id, email FROM users WHERE email LIKE $1",
+          [`${localPart}+%@${domain}`]
+        );
+        results.push({ original: email, updated: false, note: 'not found (may already be updated)', existing_migrated: alreadyMigrated.rows });
+        continue;
+      }
       const r = await db.query(
         'UPDATE users SET email = $1 WHERE email = $2 RETURNING user_id, email',
-        [target_email, email]
+        [uniqueEmail, email]
       );
-      results.push({ original: email, updated: r.rows.length > 0, rows: r.rows });
+      results.push({ original: email, new_email: uniqueEmail, updated: r.rows.length > 0, rows: r.rows });
     }
     res.json({ success: true, results });
   } catch (err) {
