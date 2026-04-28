@@ -2,7 +2,7 @@ name: Property API CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'apps/property-api/**'
       - '.github/workflows/property-api.yml'
