@@ -79,7 +79,7 @@ interface PosaData {
   generated_at: string;
 }
 
-type Section = "dashboard" | "students" | "occupancy" | "contracts" | "invoices" | "submit";
+type Section = "dashboard" | "students" | "occupancy" | "contracts" | "invoices" | "submit" | "applications";
 
 const NAVY = "#0F2D4A";
 const TEAL = "#1A9BAD";
@@ -178,6 +178,8 @@ export default function ProviderDashboard() {
 
   const [section, setSection] = useState<Section>("dashboard");
   const [students, setStudents] = useState<Student[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [appsLoading, setAppsLoading] = useState(false);
   const [properties, setProperties] = useState<ProviderProperty[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<string>("");
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth());
@@ -198,38 +200,74 @@ export default function ProviderDashboard() {
   }, [isAuthenticated, user, navigate]);
 
   // Fetch properties and students
+  // Fetch students for a specific property ID
+  const fetchStudents = useCallback(async (propId: string) => {
+    if (!propId) return;
+    const token = getStoredToken();
+    if (!token) return;
+    try {
+      const studsRes = await fetch(`/api/v1/properties/posa/students?property_id=${propId}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (studsRes.ok) {
+        const d = await studsRes.json();
+        setStudents((d.students || []).map((s: any) => ({
+          ...s,
+          property_id: propId,
+          nsfas_status: s.type_of_funding?.toLowerCase().includes('nsfas') ? 'NSFAS Verified' : (s.nsfas_status || 'Unknown'),
+        })));
+      }
+    } catch (e) {
+      // silently fail
+    }
+  }, []);
+
+  // Fetch applications for the provider
+  const fetchApplications = useCallback(async () => {
+    const token = getStoredToken();
+    if (!token) return;
+    setAppsLoading(true);
+    try {
+      const res = await fetch("/api/v1/applications/provider", { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const d = await res.json();
+        setApplications(d.applications || (Array.isArray(d) ? d : []));
+      }
+    } catch (e) {
+      // silently fail
+    } finally {
+      setAppsLoading(false);
+    }
+  }, []);
+
+  // Fetch properties (runs once on mount)
   const fetchData = useCallback(async () => {
     const token = getStoredToken();
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const [propsRes, studsRes] = await Promise.all([
-        fetch("/api/v1/properties/my", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`/api/v1/properties/posa/students?property_id=${selectedProperty || ''}`, { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
+      const propsRes = await fetch("/api/v1/properties/my", { headers: { Authorization: `Bearer ${token}` } });
       if (propsRes.ok) {
         const d = await propsRes.json();
         const props = d.properties || [];
         setProperties(props);
-        if (props.length > 0 && !selectedProperty) {
-          setSelectedProperty(props[0].property_id);
+        if (props.length > 0) {
+          const firstId = props[0].property_id;
+          setSelectedProperty(firstId);
           setPosaCode(props[0].posa_code || "");
           setPosaInstitution(props[0].posa_institution || "");
+          await fetchStudents(firstId);
         }
-      }
-      if (studsRes.ok) {
-        const d = await studsRes.json();
-        setStudents(d.students || []);
       }
     } catch (e: any) {
       setError(e.message || "Failed to load data");
     } finally {
       setLoading(false);
     }
-  }, [selectedProperty]);
+  }, [fetchStudents]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); fetchApplications(); }, []);
+  // Re-fetch students when selected property changes
+  useEffect(() => { if (selectedProperty) fetchStudents(selectedProperty); }, [selectedProperty, fetchStudents]);
 
   // Fetch POSA data when property or month changes
   const fetchPosa = useCallback(async () => {
@@ -333,7 +371,7 @@ export default function ProviderDashboard() {
 
   // Derived stats
   const filteredStudents = students.filter((s) =>
-    !selectedProperty || s.property_id === selectedProperty
+    true || s.property_id === selectedProperty
   ).filter((s) =>
     !searchQuery || `${s.first_name} ${s.last_name} ${s.student_number || ""} ${s.id_number || ""}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -406,6 +444,7 @@ export default function ProviderDashboard() {
               <SidebarItem icon={FileText} label="Contracts" active={section === "contracts"} badge={contractsSigned} onClick={() => setSection("contracts")} />
               <SidebarItem icon={Receipt} label="Invoices" active={section === "invoices"} onClick={() => setSection("invoices")} />
               <SidebarItem icon={Send} label="Submit to UJ" active={section === "submit"} onClick={() => setSection("submit")} />
+              <SidebarItem icon={ClipboardList} label="Applications" active={section === "applications"} badge={applications.length} onClick={() => { setSection("applications"); fetchApplications(); }} />
             </nav>
 
             {/* Footer */}
@@ -1141,6 +1180,51 @@ export default function ProviderDashboard() {
                     </div>
                   </div>
                 )}
+              {section === "applications" && (
+                <div className="p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-2xl font-800 text-gray-900" style={{ fontWeight: 800 }}>Applications</h2>
+                      <p className="text-sm text-gray-400">{applications.length} application{applications.length !== 1 ? 's' : ''} received</p>
+                    </div>
+                    <button onClick={fetchApplications} className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-600 border border-gray-200 text-gray-600" style={{ fontWeight: 600 }}>
+                      <RefreshCw size={13} /> Refresh
+                    </button>
+                  </div>
+                  {appsLoading ? (
+                    <div className="flex items-center justify-center py-16"><Loader2 size={24} className="animate-spin" style={{ color: TEAL }} /></div>
+                  ) : applications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <ClipboardList size={40} style={{ color: '#D1D5DB' }} className="mb-3" />
+                      <p className="text-gray-400 text-sm">No applications yet</p>
+                      <p className="text-gray-300 text-xs mt-1">Applications from students will appear here</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {applications.map((app: any) => {
+                        const statusColor = app.status === 'APPROVED' ? GREEN : app.status === 'REJECTED' ? RED : app.status === 'SUBMITTED' ? TEAL : AMBER;
+                        const statusBg = app.status === 'APPROVED' ? 'rgba(16,185,129,0.1)' : app.status === 'REJECTED' ? 'rgba(239,68,68,0.1)' : app.status === 'SUBMITTED' ? 'rgba(26,155,173,0.1)' : 'rgba(245,158,11,0.1)';
+                        return (
+                          <div key={app.application_id || app.id} className="bg-white rounded-2xl p-5 flex items-center gap-4" style={{ boxShadow: '0 2px 12px rgba(15,45,74,0.07)' }}>
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${NAVY}12` }}>
+                              <span className="text-sm font-700" style={{ color: NAVY, fontWeight: 700 }}>{(app.first_name || 'S')[0]}{(app.last_name || '')[0]}</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-700 text-gray-900" style={{ fontWeight: 700 }}>{app.first_name} {app.last_name}</p>
+                              <p className="text-xs text-gray-400 truncate">{app.email}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{app.property_title || app.property_name || 'Property'}</p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-xs px-2.5 py-1 rounded-full font-700" style={{ background: statusBg, color: statusColor, fontWeight: 700 }}>{app.status}</span>
+                              <p className="text-xs text-gray-300 mt-1">{app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-ZA') : ''}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
               </>
             )}
           </main>
