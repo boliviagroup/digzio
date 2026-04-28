@@ -238,6 +238,30 @@ export default function ProviderDashboard() {
     }
   }, []);
 
+  const updateApplicationStatus = useCallback(async (applicationId: string, newStatus: string, notes?: string) => {
+    const token = getStoredToken();
+    if (!token) return;
+    try {
+      const body: any = { status: newStatus };
+      if (notes) body.provider_notes = notes;
+      const res = await fetch(`/api/v1/applications/${applicationId}/status`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        // Optimistically update local state
+        setApplications(prev => prev.map(a =>
+          (a.application_id === applicationId || a.id === applicationId)
+            ? { ...a, status: newStatus, provider_notes: notes ?? a.provider_notes }
+            : a
+        ));
+      }
+    } catch (e) {
+      // silently fail
+    }
+  }, []);
+
   // Fetch properties (runs once on mount)
   const fetchData = useCallback(async () => {
     const token = getStoredToken();
@@ -1200,24 +1224,134 @@ export default function ProviderDashboard() {
                       <p className="text-gray-300 text-xs mt-1">Applications from students will appear here</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {applications.map((app: any) => {
-                        const statusColor = app.status === 'APPROVED' ? GREEN : app.status === 'REJECTED' ? RED : app.status === 'SUBMITTED' ? TEAL : AMBER;
-                        const statusBg = app.status === 'APPROVED' ? 'rgba(16,185,129,0.1)' : app.status === 'REJECTED' ? 'rgba(239,68,68,0.1)' : app.status === 'SUBMITTED' ? 'rgba(26,155,173,0.1)' : 'rgba(245,158,11,0.1)';
+                        const appId = app.application_id || app.id;
+                        const status = app.status || 'SUBMITTED';
+                        const kycVerified = app.kyc_status === 'VERIFIED' || app.kyc_status === 'APPROVED';
+                        const nsfasConfirmed = status === 'PENDING_NSFAS' || status === 'APPROVED' || status === 'LEASE_SIGNED';
+
+                        // Workflow steps
+                        const steps = [
+                          { key: 'SUBMITTED', label: 'Submitted' },
+                          { key: 'PENDING_NSFAS', label: 'NSFAS Check' },
+                          { key: 'APPROVED', label: 'Approved' },
+                        ];
+                        const stepIndex = steps.findIndex(s => s.key === status);
+                        const isRejected = status === 'REJECTED';
+                        const isApproved = status === 'APPROVED' || status === 'LEASE_SIGNED';
+
+                        // Status badge colour
+                        const statusColor = isApproved ? GREEN : isRejected ? RED : status === 'SUBMITTED' ? TEAL : AMBER;
+                        const statusBg = isApproved ? 'rgba(16,185,129,0.1)' : isRejected ? 'rgba(239,68,68,0.1)' : status === 'SUBMITTED' ? 'rgba(26,155,173,0.1)' : 'rgba(245,158,11,0.1)';
+                        const statusLabel = status === 'PENDING_NSFAS' ? 'NSFAS Check' : status === 'LEASE_SIGNED' ? 'Lease Signed' : status;
+
                         return (
-                          <div key={app.application_id || app.id} className="bg-white rounded-2xl p-5 flex items-center gap-4" style={{ boxShadow: '0 2px 12px rgba(15,45,74,0.07)' }}>
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${NAVY}12` }}>
-                              <span className="text-sm font-700" style={{ color: NAVY, fontWeight: 700 }}>{(app.first_name || 'S')[0]}{(app.last_name || '')[0]}</span>
+                          <div key={appId} className="bg-white rounded-2xl p-5" style={{ boxShadow: '0 2px 12px rgba(15,45,74,0.07)' }}>
+                            {/* Header row */}
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${NAVY}12` }}>
+                                <span className="text-sm font-700" style={{ color: NAVY, fontWeight: 700 }}>{(app.first_name || 'S')[0]}{(app.last_name || '')[0]}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-700 text-gray-900" style={{ fontWeight: 700 }}>{app.first_name} {app.last_name}</p>
+                                <p className="text-xs text-gray-400 truncate">{app.student_email || app.email}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{app.property_title || app.property_name || 'Property'}</p>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <span className="text-xs px-2.5 py-1 rounded-full font-700" style={{ background: statusBg, color: statusColor, fontWeight: 700 }}>{statusLabel}</span>
+                                <p className="text-xs text-gray-300 mt-1">{app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-ZA') : ''}</p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-700 text-gray-900" style={{ fontWeight: 700 }}>{app.first_name} {app.last_name}</p>
-                              <p className="text-xs text-gray-400 truncate">{app.email}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">{app.property_title || app.property_name || 'Property'}</p>
+
+                            {/* KYC + NSFAS indicators */}
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-600" style={{ background: kycVerified ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: kycVerified ? GREEN : AMBER, fontWeight: 600 }}>
+                                {kycVerified ? <CheckCircle size={12} /> : <Clock size={12} />}
+                                KYC {kycVerified ? 'Verified' : 'Pending'}
+                              </div>
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-600" style={{ background: nsfasConfirmed ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', color: nsfasConfirmed ? GREEN : AMBER, fontWeight: 600 }}>
+                                {nsfasConfirmed ? <CheckCircle size={12} /> : <Clock size={12} />}
+                                NSFAS {nsfasConfirmed ? 'Confirmed' : 'Pending'}
+                              </div>
+                              {app.provider_notes && (
+                                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs" style={{ background: 'rgba(15,45,74,0.06)', color: NAVY }}>
+                                  <FileText size={12} /> {app.provider_notes}
+                                </div>
+                              )}
                             </div>
-                            <div className="text-right flex-shrink-0">
-                              <span className="text-xs px-2.5 py-1 rounded-full font-700" style={{ background: statusBg, color: statusColor, fontWeight: 700 }}>{app.status}</span>
-                              <p className="text-xs text-gray-300 mt-1">{app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-ZA') : ''}</p>
-                            </div>
+
+                            {/* Workflow progress bar */}
+                            {!isRejected && (
+                              <div className="flex items-center gap-1 mb-4">
+                                {steps.map((step, i) => {
+                                  const done = i < stepIndex || isApproved;
+                                  const active = i === stepIndex && !isApproved;
+                                  return (
+                                    <div key={step.key} className="flex items-center gap-1 flex-1">
+                                      <div className="flex flex-col items-center flex-1">
+                                        <div className="w-full h-1.5 rounded-full" style={{ background: done || active ? TEAL : '#E5E7EB' }} />
+                                        <span className="text-xs mt-1" style={{ color: done || active ? TEAL : '#9CA3AF', fontWeight: done || active ? 600 : 400 }}>{step.label}</span>
+                                      </div>
+                                      {i < steps.length - 1 && <div className="w-2 h-1.5 rounded-full flex-shrink-0" style={{ background: done ? TEAL : '#E5E7EB' }} />}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Action buttons */}
+                            {!isRejected && !isApproved && (
+                              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                                {status === 'SUBMITTED' && (
+                                  <button
+                                    onClick={() => updateApplicationStatus(appId, 'PENDING_NSFAS')}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-600 transition-all"
+                                    style={{ background: `${AMBER}18`, color: AMBER, fontWeight: 600 }}
+                                  >
+                                    <BadgeCheck size={13} /> Confirm NSFAS
+                                  </button>
+                                )}
+                                {status === 'PENDING_NSFAS' && (
+                                  <button
+                                    onClick={() => updateApplicationStatus(appId, 'APPROVED')}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-600 transition-all"
+                                    style={{ background: `${GREEN}18`, color: GREEN, fontWeight: 600 }}
+                                  >
+                                    <CheckCircle size={13} /> Approve
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => updateApplicationStatus(appId, 'REJECTED', 'Rejected by provider')}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-600 transition-all"
+                                  style={{ background: `${RED}12`, color: RED, fontWeight: 600 }}
+                                >
+                                  <XCircle size={13} /> Reject
+                                </button>
+                              </div>
+                            )}
+                            {isApproved && (
+                              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                                <button
+                                  onClick={() => updateApplicationStatus(appId, 'LEASE_SIGNED')}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-600 transition-all"
+                                  style={{ background: `${NAVY}12`, color: NAVY, fontWeight: 600 }}
+                                >
+                                  <FileText size={13} /> Mark Lease Signed
+                                </button>
+                              </div>
+                            )}
+                            {isRejected && (
+                              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                                <button
+                                  onClick={() => updateApplicationStatus(appId, 'SUBMITTED')}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-600 transition-all"
+                                  style={{ background: `${TEAL}12`, color: TEAL, fontWeight: 600 }}
+                                >
+                                  <RefreshCw size={13} /> Reopen
+                                </button>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
