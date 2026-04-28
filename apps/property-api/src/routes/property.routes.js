@@ -591,4 +591,32 @@ router.post('/admin/update-demo-emails', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/v1/properties/:id/images/seed - Admin: seed images for a property
+router.post('/:id/images/seed', async (req, res) => {
+  const { id } = req.params;
+  const { image_urls } = req.body; // array of { image_url, is_primary, display_order }
+  if (!image_urls || !Array.isArray(image_urls) || image_urls.length === 0) {
+    return res.status(400).json({ error: 'image_urls array required' });
+  }
+  try {
+    // Delete existing images for this property first
+    await db.query('DELETE FROM property_images WHERE property_id = $1', [id]);
+    // Insert new images
+    const inserted = [];
+    for (let i = 0; i < image_urls.length; i++) {
+      const { image_url, is_primary = (i === 0), display_order = i + 1 } = image_urls[i];
+      const r = await db.query(
+        `INSERT INTO property_images (property_id, image_url, is_primary, display_order)
+         VALUES ($1, $2, $3, $4) RETURNING image_id, image_url, is_primary, display_order`,
+        [id, image_url, is_primary, display_order]
+      );
+      inserted.push(r.rows[0]);
+    }
+    res.status(201).json({ success: true, property_id: id, images: inserted });
+  } catch (err) {
+    console.error('Image seed error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
