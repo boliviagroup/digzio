@@ -552,7 +552,8 @@ router.post('/posa/seed-leases', authenticate, async (req, res) => {
 // POST /api/v1/properties/admin/update-demo-emails - Update demo student emails for SES testing
 router.post('/admin/update-demo-emails', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'provider' && req.user.role !== 'admin') {
+    const userRole = (req.user.role || '').toLowerCase();
+    if (userRole !== 'provider' && userRole !== 'admin') {
       return res.status(403).json({ error: 'Provider or admin access required' });
     }
     const { target_email, student_emails } = req.body;
