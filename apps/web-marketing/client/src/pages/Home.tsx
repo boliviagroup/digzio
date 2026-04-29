@@ -154,7 +154,7 @@ export default function Home() {
             </div>
 
             <h1
-              className="text-5xl lg:text-7xl font-800 text-white leading-tight mb-6"
+              className="text-4xl sm:text-5xl lg:text-7xl font-800 text-white leading-tight mb-6"
               style={{
                 fontWeight: 800,
                 opacity: heroVisible ? 1 : 0,
@@ -168,7 +168,7 @@ export default function Home() {
             </h1>
 
             <p
-              className="text-lg lg:text-xl leading-relaxed mb-10 max-w-xl"
+              className="text-base lg:text-xl leading-relaxed mb-8 max-w-xl"
               style={{
                 color: "rgba(255,255,255,0.8)",
                 opacity: heroVisible ? 1 : 0,

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px; /* keep as required */
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px; /* keep upper padding */
+            padding-left: 60px;
+            padding-right: 60px;
+            height: 180px;
+        }
+        .title-accent { width: 60px; height: 4px; background: #1A9BAD; margin-bottom: 16px; }
+        .title { color: #FFFFFF; font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+        .headline { color: #F59E0B; font-size: 28px; font-weight: 600; line-height: 1.3; }
+        .content {
+            flex: 1;
+            padding-top: 8px; /* reduced */
+            padding-left: 60px;
+            padding-right: 60px;
+            display: flex;
+            gap: 24px; /* reduced gap */
+        }
+        .team-col {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #1A9BAD;
+            padding: 24px 20px; /* reduced vertical padding */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .team-col:nth-child(2) { border-top-color: #F59E0B; background: rgba(245, 158, 11, 0.03); }
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            background: rgba(26, 155, 173, 0.1);
+            border: 2px solid #1A9BAD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px; /* keep font-size */
+            color: #1A9BAD;
+            margin-bottom: 16px; /* reduced */
+            border-radius: 0;
+        }
+        .team-col:nth-child(2) .avatar-placeholder { background: rgba(245, 158, 11, 0.1); border-color: #F59E0B; color: #F59E0B; }
+        .member-name { font-size: 28px; font-weight: 700; color: #FFFFFF; margin-bottom: 8px; }
+        .member-role { font-size: 18px; font-weight: 600; color: #1A9BAD; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .team-col:nth-child(2) .member-role { color: #F59E0B; }
+        .member-desc {
+            font-size: 16px; line-height: 1.6; color: #E5E7EB; text-align: left; width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 12px; /* reduced */
+        }
+        .member-desc ul { list-style: none; }
+        .member-desc li { margin-bottom: 12px; position: relative; padding-left: 20px; }
+        .member-desc li::before { content: "■"; color: #1A9BAD; position: absolute; left: 0; top: 2px; font-size: 10px; }
+        .team-col:nth-child(2) .member-desc li::before { color: #F59E0B; }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">Team</h2>
+            <p class="headline">Founders with domain expertise and execution speed</p>
+        </div>
+        <div class="content">
+            <div class="team-col">
+                <div class="avatar-placeholder"><i class="fas fa-user-tie"></i></div>
+                <div class="member-name">ES Mthandi</div>
+                <div class="member-role">Founder &amp; CEO</div>
+                <div class="member-desc">
+                    <ul>
+                        <li>Deep domain expertise in South African PropTech and student housing markets.</li>
+                        <li>Strategic vision for NSFAS payment automation and compliance integration.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="team-col">
+                <div class="avatar-placeholder"><i class="fas fa-code"></i></div>
+                <div class="member-name">Technical Leadership</div>
+                <div class="member-role">Engineering &amp; Product</div>
+                <div class="member-desc">
+                    <ul>
+                        <li>Built and deployed the full-stack Digzio platform (Web + Mobile) in record time.</li>
+                        <li>Expertise in scalable cloud infrastructure (AWS ECS, TiDB, CloudFront).</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="team-col">
+                <div class="avatar-placeholder"><i class="fas fa-users-cog"></i></div>
+                <div class="member-name">Advisory Board</div>
+                <div class="member-role">Domain Experts</div>
+                <div class="member-desc">
+                    <ul>
+                        <li><strong>Higher Education:</strong> Experts in DHET compliance and university housing policies.</li>
+                        <li><strong>FinTech &amp; Payments:</strong> Specialists in secure disbursement and NSFAS frameworks.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px;
+            padding-left: 80px;
+            padding-right: 80px;
+            height: 200px;
+        }
+        .title-accent {
+            width: 60px;
+            height: 4px;
+            background: #1A9BAD;
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .headline {
+            color: #F59E0B;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .content {
+            flex: 1;
+            padding-top: 40px;
+            padding-left: 80px;
+            padding-right: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 40px;
+        }
+        .entity-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            position: relative;
+        }
+        .entity-col::after {
+            content: "\f127";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: -30px;
+            top: 40px;
+            font-size: 24px;
+            color: #EF4444; /* Red for broken link */
+        }
+        .entity-col:last-child::after {
+            display: none;
+        }
+        .entity-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .entity-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(26, 155, 173, 0.1);
+            border: 1px solid #1A9BAD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #1A9BAD;
+        }
+        .entity-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        .pain-points {
+            list-style-type: none;
+        }
+        .pain-points li {
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            position: relative;
+            padding-left: 30px;
+        }
+        .pain-points li::before {
+            content: "\f00d"; /* Times/X icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: #EF4444;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 16px;
+        }
+        .highlight {
+            color: #F59E0B;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">The Root Cause: A Fragmented, Analogue System</h2>
+            <p class="headline">Three parties. Zero integration. Billions lost to inefficiency.</p>
+        </div>
+        <div class="content">
+            <div class="entity-col">
+                <div class="entity-header">
+                    <div class="entity-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="entity-title">Students</div>
+                </div>
+                <ul class="pain-points">
+                    <li>Rely on informal WhatsApp groups and word-of-mouth to find housing</li>
+                    <li>No centralized platform for <span class="highlight">verified, accredited</span> listings</li>
+                    <li>Vulnerable to scams and unsafe living conditions</li>
+                </ul>
+            </div>
+            
+            <div class="entity-col">
+                <div class="entity-header">
+                    <div class="entity-icon"><i class="fas fa-building"></i></div>
+                    <div class="entity-title">Providers</div>
+                </div>
+                <ul class="pain-points">
+                    <li>Submit paper-based NSFAS claims through disconnected third-party portals</li>
+                    <li>Suffer from <span class="highlight">5% fee deductions</span> by inefficient middlemen</li>
+                    <li>Struggle with manual compliance and accreditation paperwork</li>
+                </ul>
+            </div>
+
+            <div class="entity-col">
+                <div class="entity-header">
+                    <div class="entity-icon"><i class="fas fa-university"></i></div>
+                    <div class="entity-title">Universities & NSFAS</div>
+                </div>
+                <ul class="pain-points">
+                    <li>No live data on student residence locations or compliance status</li>
+                    <li>NSFAS currently investigating its own contracted tech middlemen (Jan 2026)</li>
+                    <li>High administrative burden for DHET reporting</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

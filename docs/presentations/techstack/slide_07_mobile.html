@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #94A3B8;
+        }
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: #10B981;
+            margin-top: 15px;
+            border-radius: 2px;
+        }
+        .content {
+            display: flex;
+            padding-left: 80px;
+            padding-right: 80px;
+            gap: 60px;
+            flex: 1;
+        }
+        .text-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .point {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .point-icon {
+            color: #10B981;
+            font-size: 24px;
+            margin-top: 4px;
+        }
+        .point-text {
+            font-size: 20px;
+            line-height: 1.4;
+            color: #E2E8F0;
+        }
+        .point-text strong {
+            color: #38BDF8;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .visual-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+        }
+        .tech-row {
+            display: flex;
+            gap: 20px;
+        }
+        .tech-box {
+            flex: 1;
+            height: 80px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        .tech-box.primary {
+            border-color: #38BDF8;
+            background: rgba(56, 189, 248, 0.1);
+        }
+        .tech-box.secondary {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .tech-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+        .tech-sub {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .platform-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .platform-box {
+            flex: 1;
+            height: 100px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #F8FAFC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            border-radius: 12px;
+        }
+        .platform-box i {
+            font-size: 40px;
+            color: #F8FAFC;
+        }
+        .platform-box span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Mobile App — React Native</h1>
+            <h2>One Codebase, Two Platforms — Built with Expo & React Native</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="text-column">
+                <div class="point">
+                    <i class="fas fa-mobile-alt point-icon"></i>
+                    <div class="point-text"><strong>Core Framework</strong> Expo SDK + React Native with TypeScript for a unified, type-safe codebase across iOS and Android.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-route point-icon"></i>
+                    <div class="point-text"><strong>Navigation & Styling</strong> Expo Router for file-based routing and NativeWind for TailwindCSS styling in React Native.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-database point-icon"></i>
+                    <div class="point-text"><strong>State & Forms</strong> TanStack Query for server state, Zustand for local state, and React Hook Form + Zod for validation.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-camera point-icon"></i>
+                    <div class="point-text"><strong>Native Capabilities</strong> expo-camera and expo-image-picker for KYC document uploads, expo-secure-store for JWT storage.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-tachometer-alt point-icon"></i>
+                    <div class="point-text"><strong>Performance</strong> Shopify FlashList for high-performance lists, Reanimated + Gesture Handler for smooth interactions.</div>
+                </div>
+            </div>
+            <div class="visual-column">
+                <div class="tech-row">
+                    <div class="tech-box primary">
+                        <div class="tech-name">Expo SDK</div>
+                        <div class="tech-sub">Framework</div>
+                    </div>
+                    <div class="tech-box primary">
+                        <div class="tech-name">React Native</div>
+                        <div class="tech-sub">Core</div>
+                    </div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-box secondary">
+                        <div class="tech-name">NativeWind</div>
+                        <div class="tech-sub">Styling</div>
+                    </div>
+                    <div class="tech-box secondary">
+                        <div class="tech-name">Expo Router</div>
+                        <div class="tech-sub">Navigation</div>
+                    </div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-box">
+                        <div class="tech-name">TanStack Query</div>
+                        <div class="tech-sub">State</div>
+                    </div>
+                    <div class="tech-box">
+                        <div class="tech-name">FlashList</div>
+                        <div class="tech-sub">Performance</div>
+                    </div>
+                </div>
+                <div class="platform-row">
+                    <div class="platform-box">
+                        <i class="fab fa-apple"></i>
+                        <span>iOS</span>
+                    </div>
+                    <div class="platform-box">
+                        <i class="fab fa-android" style="color: #A4C639;"></i>
+                        <span style="color: #A4C639;">Android</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

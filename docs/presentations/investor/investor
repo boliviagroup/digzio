@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px; /* keep upper padding */
+            padding-left: 80px;
+            padding-right: 80px;
+            height: 180px;
+        }
+        .title-accent {
+            width: 60px;
+            height: 4px;
+            background: #1A9BAD;
+            margin-bottom: 16px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .headline {
+            color: #F59E0B;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .content {
+            flex: 1;
+            padding-top: 10px;
+            padding-left: 80px;
+            padding-right: 80px;
+            display: flex;
+            gap: 40px; /* reduced gap to save height */
+        }
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title i {
+            color: #1A9BAD;
+        }
+        .chart-wrapper {
+            height: 240px; /* reduced from 280px */
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .legend-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        .legend-text {
+            font-size: 16px;
+            color: #E5E7EB;
+            line-height: 1.4;
+        }
+        .legend-text strong {
+            color: #FFFFFF;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            border-left: 2px solid rgba(26, 155, 173, 0.3);
+            margin-top: 10px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -39px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: #0F2D4A;
+            border: 4px solid #F59E0B;
+            border-radius: 50%;
+        }
+        .timeline-date {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A9BAD;
+            margin-bottom: 8px;
+        }
+        .timeline-content {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .timeline-sub {
+            font-size: 16px;
+            color: #9CA3AF;
+        }
+        .contact-banner {
+            margin-top: auto;
+            background: #1A9BAD;
+            padding: 8px 80px; /* reduced vertical padding from 20px */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F2D4A;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">The Ask</h2>
+            <p class="headline">Raising R5M seed round to capture the market before it consolidates.</p>
+        </div>
+        <div class="content">
+            <div class="left-col">
+                <div class="section-title"><i class="fas fa-chart-pie"></i> Use of Funds</div>
+                <div class="chart-wrapper">
+                    <canvas id="fundsChart"></canvas>
+                </div>
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #1A9BAD;"></div>
+                        <div class="legend-text"><strong>40% Sales & Marketing</strong>Provider acquisition, university partnerships</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <div class="legend-text"><strong>30% Engineering</strong>NSFAS direct API integration, mobile app launch</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3B82F6;"></div>
+                        <div class="legend-text"><strong>20% Operations</strong>Compliance team, customer success</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10B981;"></div>
+                        <div class="legend-text"><strong>10% Legal & Regulatory</strong>NSFAS accreditation, data compliance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-col">
+                <div class="section-title"><i class="fas fa-flag-checkered"></i> Milestones with Funding</div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Month 3</div>
+                        <div class="timeline-content">100 Properties & 3 University Partnerships</div>
+                        <div class="timeline-sub">Establish strong foothold in Gauteng and Western Cape</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Month 6</div>
+                        <div class="timeline-content">500 Properties & NSFAS Direct Payment Pilot</div>
+                        <div class="timeline-sub">Launch automated payment rails bypassing middlemen</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">Month 12</div>
+                        <div class="timeline-content">2,000 Properties & R12M ARR Run Rate</div>
+                        <div class="timeline-sub">National rollout and holiday rental scale</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contact-banner">
+            <div class="contact-text"><i class="fas fa-envelope"></i> founders@digzio.co.za</div>
+            <div class="contact-text"><i class="fas fa-globe"></i> www.digzio.co.za</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('fundsChart').getContext('2d');
+            
+            Chart.defaults.color = '#E5E7EB';
+            Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sales & Marketing', 'Engineering', 'Operations', 'Legal & Regulatory'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: [
+                            '#1A9BAD',
+                            '#F59E0B',
+                            '#3B82F6',
+                            '#10B981'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 45, 74, 0.9)',
+                            titleFont: { size: 14, family: "'Space Grotesk', sans-serif" },
+                            bodyFont: { size: 14, family: "'Space Grotesk', sans-serif" },
+                            padding: 12,
+                            borderColor: '#1A9BAD',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

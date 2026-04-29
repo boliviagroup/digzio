@@ -16,6 +16,18 @@
         "EXPO_PUBLIC_API_URL": "https://www.digzio.co.za"
       }
     },
+    "preview-simulator": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://www.digzio.co.za"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "ios": {

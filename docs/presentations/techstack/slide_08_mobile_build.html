@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #94A3B8;
+        }
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: #10B981;
+            margin-top: 15px;
+            border-radius: 2px;
+        }
+        .content {
+            display: flex;
+            padding-left: 80px;
+            padding-right: 80px;
+            gap: 40px;
+            flex: 1;
+        }
+        .build-column {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 30px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            height: 420px;
+        }
+        .build-column.android {
+            border-top: 4px solid #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .build-column.ios {
+            border-top: 4px solid #38BDF8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+        .build-column.ota {
+            border-top: 4px solid #F59E0B;
+            background: rgba(245, 158, 11, 0.05);
+        }
+        .col-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(248, 250, 252, 0.1);
+        }
+        .col-icon {
+            font-size: 32px;
+        }
+        .android .col-icon { color: #10B981; }
+        .ios .col-icon { color: #38BDF8; }
+        .ota .col-icon { color: #F59E0B; }
+        
+        .col-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+        .point-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .point i {
+            color: #94A3B8;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+        .point-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #E2E8F0;
+        }
+        .point-text strong {
+            color: #F8FAFC;
+        }
+        .status-badge {
+            margin-top: auto;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .android .status-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid #10B981;
+        }
+        .ios .status-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38BDF8;
+            border: 1px solid #38BDF8;
+        }
+        .ota .status-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+            border: 1px solid #F59E0B;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Mobile Build & Distribution</h1>
+            <h2>Cloud-Based Native Builds via Expo Application Services (EAS)</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="build-column android">
+                <div class="col-header">
+                    <i class="fab fa-android col-icon"></i>
+                    <div class="col-title">Android Builds</div>
+                </div>
+                <div class="point-list">
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>APK Generation:</strong> For internal testing and direct distribution.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>AAB Generation:</strong> Optimized Android App Bundles for Google Play production.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>Google Play Ready:</strong> Internal track configured via service account.</div>
+                    </div>
+                </div>
+                <div class="status-badge">APK Available Now</div>
+            </div>
+            
+            <div class="build-column ios">
+                <div class="col-header">
+                    <i class="fab fa-apple col-icon"></i>
+                    <div class="col-title">iOS Builds</div>
+                </div>
+                <div class="point-list">
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>Simulator Builds:</strong> .app files generated for testing on macOS Xcode simulators.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>IPA Generation:</strong> Full native builds for real devices and TestFlight.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>App Store Connect:</strong> Automated submission pipeline configured.</div>
+                    </div>
+                </div>
+                <div class="status-badge">Pending Apple Dev Activation</div>
+            </div>
+            
+            <div class="build-column ota">
+                <div class="col-header">
+                    <i class="fas fa-cloud-download-alt col-icon"></i>
+                    <div class="col-title">OTA Updates</div>
+                </div>
+                <div class="point-list">
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>EAS Update:</strong> Push JavaScript and asset updates instantly to users.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>Bypass Review:</strong> Fix bugs and deploy features without waiting for App Store review.</div>
+                    </div>
+                    <div class="point">
+                        <i class="fas fa-check"></i>
+                        <div class="point-text"><strong>Environments:</strong> Separate channels for development, preview, and production.</div>
+                    </div>
+                </div>
+                <div class="status-badge">Configured & Active</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

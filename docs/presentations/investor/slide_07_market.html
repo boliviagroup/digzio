@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px; /* keep upper padding */
+            padding-left: 80px;
+            padding-right: 80px;
+            height: 180px;
+        }
+        .title-accent {
+            width: 60px;
+            height: 4px;
+            background: #1A9BAD;
+            margin-bottom: 16px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .headline {
+            color: #F59E0B;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .content {
+            flex: 1;
+            padding-top: 8px; /* reduced from 20 to save vertical space */
+            padding-left: 80px;
+            padding-right: 80px;
+            display: flex;
+            gap: 60px;
+        }
+        .left-col {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px; /* reduced from 20 */
+        }
+        .right-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* reduced from 40 */
+        }
+        .market-block {
+            padding: 12px 20px; /* reduced vertical padding from 24 to 12 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 4px solid transparent;
+        }
+        .tam-block {
+            width: 100%;
+            background: rgba(26, 155, 173, 0.1);
+            border-left-color: #1A9BAD;
+        }
+        .sam-block {
+            width: 85%;
+            background: rgba(26, 155, 173, 0.2);
+            border-left-color: #1A9BAD;
+        }
+        .som-block {
+            width: 70%;
+            background: rgba(245, 158, 11, 0.15);
+            border-left-color: #F59E0B;
+        }
+        .block-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .block-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #F59E0B;
+        }
+        .tam-block .block-value, .sam-block .block-value {
+            color: #1A9BAD;
+        }
+        .block-desc {
+            font-size: 16px;
+            color: #E5E7EB;
+            line-height: 1.4;
+        }
+        .info-section {
+            background: transparent;
+        }
+        .info-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 12px; /* reduced spacing under titles */
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .info-title i {
+            color: #1A9BAD;
+        }
+        .info-list {
+            list-style: none;
+        }
+        .info-list li {
+            margin-bottom: 12px; /* reduced from 16 */
+            font-size: 18px;
+            line-height: 1.5;
+            padding-left: 24px;
+            position: relative;
+        }
+        .info-list li::before {
+            content: "■";
+            color: #F59E0B;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 12px;
+        }
+        .highlight {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .competitor-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px; /* reduced gap */
+            margin-top: 12px;
+        }
+        .competitor-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 16px; /* reduced padding */
+            border-left: 2px solid #1A9BAD;
+        }
+        .comp-name {
+            font-weight: 700;
+            color: #FFFFFF;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .comp-desc {
+            font-size: 15px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">Market Opportunity</h2>
+            <p class="headline">R10 billion annual market. No dominant digital platform.</p>
+        </div>
+        <div class="content">
+            <div class="left-col">
+                <div class="market-block tam-block">
+                    <div class="block-title">
+                        <span>TAM (Total Addressable Market)</span>
+                        <span class="block-value">R10B+</span>
+                    </div>
+                    <div class="block-desc">Annual NSFAS disbursement + private student accommodation market</div>
+                </div>
+                <div class="market-block sam-block">
+                    <div class="block-title">
+                        <span>SAM (Serviceable Addressable Market)</span>
+                        <span class="block-value">R32.4B</span>
+                    </div>
+                    <div class="block-desc">811,000 NSFAS-funded students × R40,000/year average allowance</div>
+                </div>
+                <div class="market-block som-block">
+                    <div class="block-title">
+                        <span>SOM (Serviceable Obtainable Market)</span>
+                        <span class="block-value">R2B GMV</span>
+                    </div>
+                    <div class="block-desc">Year 3 Target: 50,000 students × R40,000 allowance<br><strong style="color:#FFFFFF; margin-top:8px; display:block;">→ R60M Revenue at 3% take rate</strong></div>
+                </div>
+            </div>
+            <div class="right-col">
+                <div class="info-section">
+                    <h3 class="info-title"><i class="fas fa-chart-line"></i> Market Dynamics</h3>
+                    <ul class="info-list">
+                        <li><span class="highlight">15–20% Annual Investment Yields:</span> The highest returning asset class in the South African property sector.</li>
+                        <li><span class="highlight">Structural Deficit:</span> University enrollment growing 4–6% annually, outpacing new bed construction.</li>
+                    </ul>
+                </div>
+                <div class="info-section">
+                    <h3 class="info-title"><i class="fas fa-chess-knight"></i> Competitor Landscape</h3>
+                    <div class="competitor-grid">
+                        <div class="competitor-item">
+                            <div class="comp-name">DigsConnect</div>
+                            <div class="comp-desc">Listings only. No NSFAS integration, no payment automation.</div>
+                        </div>
+                        <div class="competitor-item">
+                            <div class="comp-name">Uniplaces / Roomies</div>
+                            <div class="comp-desc">International focus. Lacks South African compliance and NSFAS capability.</div>
+                        </div>
+                        <div class="competitor-item" style="border-left-color: #F59E0B; background: rgba(245, 158, 11, 0.05);">
+                            <div class="comp-name" style="color: #F59E0B;">Digzio Advantage</div>
+                            <div class="comp-desc" style="color: #E5E7EB;">The only platform with full-stack NSFAS payment automation and DHET compliance.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -36,17 +36,19 @@ const AMENITY_ICONS: Record<string, React.ReactNode> = {
 
 function PropertyCard({ property, onApply, canApply }: { property: Property; onApply: (p: Property) => void; canApply: boolean }) {
   const [saved, setSaved] = useState(false);
+  const [, navigate] = useLocation();
   const primaryImage = property.images?.find((i) => i.is_primary)?.image_url;
   const amenities = ["wifi", "security", "parking"];
 
   return (
     <div
-      className="rounded-2xl overflow-hidden transition-all duration-300 group"
+      className="rounded-2xl overflow-hidden transition-all duration-300 group cursor-pointer"
       style={{
         background: "#fff",
         border: "1px solid #F3F4F6",
         boxShadow: "0 2px 8px rgba(15,45,74,0.06)",
       }}
+      onClick={() => navigate(`/property/${property.property_id}`)}
       onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 32px rgba(15,45,74,0.14)")}
       onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(15,45,74,0.06)")}
     >
@@ -74,7 +76,7 @@ function PropertyCard({ property, onApply, canApply }: { property: Property; onA
         )}
         {/* Save button */}
         <button
-          onClick={() => setSaved(!saved)}
+          onClick={(e) => { e.stopPropagation(); setSaved(!saved); }}
           className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           style={{ background: "rgba(255,255,255,0.9)", backdropFilter: "blur(4px)" }}
         >
@@ -135,7 +137,7 @@ function PropertyCard({ property, onApply, canApply }: { property: Property; onA
           </div>
           {canApply ? (
             <button
-              onClick={() => onApply(property)}
+              onClick={(e) => { e.stopPropagation(); onApply(property); }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
               style={{
                 background: "linear-gradient(135deg, #0F2D4A, #1A9BAD)",
@@ -257,12 +259,12 @@ export default function Search() {
       <Navbar />
 
       {/* Hero search bar */}
-      <div className="pt-24 pb-8 px-4" style={{ background: "linear-gradient(135deg, #0F2D4A 0%, #1A4A6B 60%, #1A9BAD 100%)" }}>
+      <div className="pt-20 pb-6 px-4" style={{ background: "linear-gradient(135deg, #0F2D4A 0%, #1A4A6B 60%, #1A9BAD 100%)" }}>
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl lg:text-4xl font-800 text-white mb-2 text-center" style={{ fontWeight: 800 }}>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-800 text-white mb-1.5 text-center" style={{ fontWeight: 800 }}>
             Find Your Perfect Student Accommodation
           </h1>
-          <p className="text-center mb-6" style={{ color: "rgba(255,255,255,0.7)" }}>
+          <p className="text-center mb-5 text-sm md:text-base" style={{ color: "rgba(255,255,255,0.7)" }}>
             Browse {total > 0 ? `${total} verified` : "verified"} properties across South Africa
           </p>
 
@@ -273,19 +275,19 @@ export default function Search() {
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search by property name, city, or university..."
-              className="w-full pl-11 pr-4 py-4 rounded-xl text-sm outline-none"
+              placeholder="Search by city, property or university..."
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm outline-none"
               style={{ fontFamily: "'Space Grotesk', sans-serif", boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}
             />
           </div>
 
-          {/* Quick filters */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Quick filters — scrollable on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
             <select
               value={province}
               onChange={(e) => setProvince(e.target.value)}
-              className="px-4 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+              className="flex-shrink-0 px-3 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", minWidth: 130 }}
             >
               {PROVINCES.map((p) => <option key={p} value={p} style={{ color: "#0F2D4A" }}>{p}</option>)}
             </select>
@@ -293,8 +295,8 @@ export default function Search() {
             <select
               value={priceRangeIdx}
               onChange={(e) => setPriceRangeIdx(Number(e.target.value))}
-              className="px-4 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+              className="flex-shrink-0 px-3 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", minWidth: 130 }}
             >
               {PRICE_RANGES.map((r, i) => <option key={i} value={i} style={{ color: "#0F2D4A" }}>{r.label}</option>)}
             </select>
@@ -302,13 +304,13 @@ export default function Search() {
             <select
               value={propertyType}
               onChange={(e) => setPropertyType(e.target.value)}
-              className="px-4 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }}
+              className="flex-shrink-0 px-3 py-2.5 rounded-lg text-sm outline-none cursor-pointer"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", minWidth: 140 }}
             >
               {PROPERTY_TYPES.map((t) => <option key={t} value={t} style={{ color: "#0F2D4A" }}>{t.replace("_", " ")}</option>)}
             </select>
 
-            <label className="flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-lg" style={{ background: nsfasOnly ? "rgba(26,155,173,0.4)" : "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff" }}>
+            <label className="flex-shrink-0 flex items-center gap-2 cursor-pointer px-3 py-2.5 rounded-lg" style={{ background: nsfasOnly ? "rgba(26,155,173,0.4)" : "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", minWidth: 120 }}>
               <input type="checkbox" checked={nsfasOnly} onChange={(e) => setNsfasOnly(e.target.checked)} className="w-4 h-4 rounded" />
               <span className="text-sm">NSFAS Only</span>
             </label>

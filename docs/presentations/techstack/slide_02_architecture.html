@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* keep title upper padding */
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #94A3B8;
+        }
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: #10B981;
+            margin-top: 15px;
+            border-radius: 2px;
+        }
+        .content {
+            display: flex;
+            padding-left: 80px;
+            padding-right: 80px;
+            gap: 60px;
+            flex: 1;
+        }
+        .text-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* reduced gap to shrink total height */
+        }
+        .point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .point-icon {
+            color: #38BDF8;
+            font-size: 24px;
+            margin-top: 2px;
+        }
+        .point-text {
+            font-size: 20px;
+            line-height: 1.35; /* slightly reduced line-height to save space */
+            color: #E2E8F0;
+        }
+        .point-text strong {
+            color: #F8FAFC;
+            font-weight: 600;
+        }
+        .diagram-column {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            padding-top: 20px; /* reduced internal top padding */
+            padding-left: 30px;
+            padding-right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            height: 450px; /* keep the diagram area but we compacted text-column more */
+        }
+        .diagram-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            color: #38BDF8;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .alb {
+            width: 80%;
+            height: 50px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38BDF8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 20px; /* reduced margin */
+            border-radius: 6px;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px; /* reduced margin */
+        }
+        .service-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10B981;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .db-layer {
+            display: flex;
+            gap: 20px;
+            width: 80%;
+            justify-content: center;
+        }
+        .db-box {
+            flex: 1;
+            height: 60px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid #F59E0B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+        .connector {
+            position: absolute;
+            width: 2px;
+            background: rgba(248, 250, 252, 0.2);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Architecture Overview</h1>
+            <h2>A Production-Grade Microservices Platform Running on AWS Cape Town</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="text-column">
+                <div class="point">
+                    <i class="fas fa-server point-icon"></i>
+                    <div class="point-text"><strong>9 Independent Services</strong> deployed on AWS ECS (Fargate) in af-south-1 (Cape Town) for minimal latency.</div>
+                </div>
+                <div class="point">
+                    <i class="fab fa-docker point-icon"></i>
+                    <div class="point-text"><strong>Containerized Infrastructure:</strong> Each service runs in Docker (Node.js 20 Alpine), ensuring consistent environments.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-network-wired point-icon"></i>
+                    <div class="point-text"><strong>Traffic Management:</strong> All services sit behind an Application Load Balancer (ALB) with enforced HTTPS.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-database point-icon"></i>
+                    <div class="point-text"><strong>Data & Caching:</strong> Persistent data stored in TiDB, with Redis handling caching and sessions.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-bolt point-icon"></i>
+                    <div class="point-text"><strong>Content Delivery:</strong> Static assets and images served globally via AWS CloudFront CDN.</div>
+                </div>
+            </div>
+            <div class="diagram-column">
+                <div class="diagram-title">AWS ECS Fargate Cluster</div>
+                <div class="alb">Application Load Balancer (HTTPS)</div>
+                <div class="services-grid">
+                    <div class="service-box">Auth Service</div>
+                    <div class="service-box">Property API</div>
+                    <div class="service-box">App Service</div>
+                    <div class="service-box">Image API</div>
+                    <div class="service-box">KYC Service</div>
+                    <div class="service-box">Lease Service</div>
+                    <div class="service-box">Notif Service</div>
+                    <div class="service-box">Inst. API</div>
+                    <div class="service-box">Web Frontend</div>
+                </div>
+                <div class="db-layer">
+                    <div class="db-box"><i class="fas fa-database" style="margin-right: 8px;"></i> TiDB</div>
+                    <div class="db-box" style="border-color: #EF4444; background: rgba(239, 68, 68, 0.1);"><i class="fas fa-memory" style="margin-right: 8px;"></i> Redis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

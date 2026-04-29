@@ -1,0 +1,78 @@
+{
+  "exterior_luxury_1.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/fd0f3e41-c272-4143-8d9e-dd09d90b8df5.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/fd0f3e41-c272-4143-8d9e-dd09d90b8df5.webp"
+  },
+  "exterior_luxury_2.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/57dba328-69c5-4d40-ba9a-8a867e391107.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/57dba328-69c5-4d40-ba9a-8a867e391107.webp"
+  },
+  "exterior_stellenbosch.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/298d420a-43e3-42ef-b50c-1eb08427e0c9.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/298d420a-43e3-42ef-b50c-1eb08427e0c9.webp"
+  },
+  "gen_apartment_exterior.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/f0301091-8b69-43dd-82f0-a4227a916465.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/f0301091-8b69-43dd-82f0-a4227a916465.webp"
+  },
+  "gen_apartment_exterior_2.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/2b3912eb-6576-420b-8294-8e8640e8643c.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/2b3912eb-6576-420b-8294-8e8640e8643c.webp"
+  },
+  "gen_apartment_lounge.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/4430c681-e2df-4e3a-9151-9d5691b154b0.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/4430c681-e2df-4e3a-9151-9d5691b154b0.webp"
+  },
+  "interior_studio_1.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/56e5da0b-ae65-4bc7-bbbf-de401f3dc023.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/56e5da0b-ae65-4bc7-bbbf-de401f3dc023.webp"
+  },
+  "interior_studio_2.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/1031b508-dff3-4bf5-b1c0-80d1a2c7b338.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/1031b508-dff3-4bf5-b1c0-80d1a2c7b338.webp"
+  },
+  "interior_studio_large.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/e0416cc4-e528-478a-8134-3e5cb6bdb63c.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/e0416cc4-e528-478a-8134-3e5cb6bdb63c.webp"
+  },
+  "gen_residence_exterior.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/749e276d-1a56-409d-b45d-1f54b54b59f0.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/749e276d-1a56-409d-b45d-1f54b54b59f0.webp"
+  },
+  "interior_shared.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/a77ea10e-a2bc-4a4b-a235-e8973a34a865.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/a77ea10e-a2bc-4a4b-a235-e8973a34a865.webp"
+  },
+  "exterior_jhb.webp": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/eff634ab_exterior_jhb.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/eff634ab_exterior_jhb.webp"
+  },
+  "gen_communal_kitchen.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/fa46d2cf_gen_communal_kitchen.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/fa46d2cf_gen_communal_kitchen.webp"
+  },
+  "gen_house_exterior.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/c49c6928_gen_house_exterior.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/c49c6928_gen_house_exterior.webp"
+  },
+  "gen_house_lounge.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/9eb2755f_gen_house_lounge.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/9eb2755f_gen_house_lounge.webp"
+  },
+  "gen_residence_exterior_2.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/787e639a_gen_residence_exterior_2.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/787e639a_gen_residence_exterior_2.webp"
+  },
+  "gen_residence_room.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/21a63d06_gen_residence_room.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/21a63d06_gen_residence_room.webp"
+  },
+  "gen_study_room.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/b76ad92c_gen_study_room.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/b76ad92c_gen_study_room.webp"
+  },
+  "interior_residence.jpg": {
+    "original": "https://d1t2pdt9c1syrh.cloudfront.net/properties/original/9db01b7b_interior_residence.webp",
+    "thumbnail": "https://d1t2pdt9c1syrh.cloudfront.net/properties/thumbnail/9db01b7b_interior_residence.webp"
+  }
+}

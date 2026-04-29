@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #94A3B8;
+        }
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: #10B981;
+            margin-top: 15px;
+            border-radius: 2px;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding-left: 80px;
+            padding-right: 80px;
+            gap: 40px;
+            flex: 1;
+        }
+        .top-row {
+            display: flex;
+            gap: 40px;
+        }
+        .info-card {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 24px;
+            border-radius: 8px;
+        }
+        .info-card.highlight {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            color: #38BDF8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .highlight .card-title {
+            color: #10B981;
+        }
+        .card-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #E2E8F0;
+        }
+        .pipeline-section {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(248, 250, 252, 0.1);
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .pipeline-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            color: #F8FAFC;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .pipeline-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .pipeline-flow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background: rgba(56, 189, 248, 0.3);
+            z-index: 0;
+        }
+        .step {
+            background: #1E293B;
+            border: 2px solid #38BDF8;
+            width: 180px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 10px;
+        }
+        .step-icon {
+            font-size: 32px;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        .step-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #F8FAFC;
+        }
+        .step-sub {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 4px;
+        }
+        .step.deploy {
+            border-color: #10B981;
+        }
+        .step.deploy .step-icon {
+            color: #10B981;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Infrastructure & DevOps</h1>
+            <h2>AWS af-south-1 (Cape Town) — Fully Containerised, Production-Ready</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="top-row">
+                <div class="info-card">
+                    <div class="card-title"><i class="fas fa-map-marker-alt"></i> AWS Region</div>
+                    <div class="card-text">Deployed in <strong>af-south-1 (Cape Town)</strong> to ensure the lowest possible latency for South African users and compliance with local data sovereignty requirements.</div>
+                </div>
+                <div class="info-card highlight">
+                    <div class="card-title"><i class="fas fa-cubes"></i> ECS Fargate</div>
+                    <div class="card-text">Serverless container orchestration via <strong>AWS ECS Fargate</strong>. No EC2 instances to manage, automatic scaling, and isolated compute environments for all 9 services.</div>
+                </div>
+                <div class="info-card">
+                    <div class="card-title"><i class="fab fa-docker"></i> Container Runtime</div>
+                    <div class="card-text">All services use <strong>Node.js 20 Alpine</strong> as the base image. This provides a minimal, secure, and highly optimized runtime environment.</div>
+                </div>
+            </div>
+            
+            <div class="pipeline-section">
+                <div class="pipeline-title">CI/CD Deployment Pipeline</div>
+                <div class="pipeline-flow">
+                    <div class="step">
+                        <i class="fab fa-docker step-icon"></i>
+                        <div class="step-title">Docker Build</div>
+                        <div class="step-sub">Multi-stage builds</div>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-box-open step-icon"></i>
+                        <div class="step-title">AWS ECR</div>
+                        <div class="step-sub">Push to 9 repositories</div>
+                    </div>
+                    <div class="step deploy">
+                        <i class="fas fa-rocket step-icon"></i>
+                        <div class="step-title">ECS Deploy</div>
+                        <div class="step-sub">Force new deployment</div>
+                    </div>
+                    <div class="step deploy">
+                        <i class="fas fa-network-wired step-icon"></i>
+                        <div class="step-title">AWS ALB</div>
+                        <div class="step-sub">Traffic routing & SSL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

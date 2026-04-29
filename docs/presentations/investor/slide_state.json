@@ -1,0 +1,156 @@
+{
+  "project_info": {
+    "title": "Digzio",
+    "created": 1777476801.0615218,
+    "last_updated": 1777477115.208638,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "slide_01_cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_02_problem",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_03_root_cause",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_04_solution",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_05_product",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_06_traction",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_07_market",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_08_business_model",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_09_financials",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_10_competitive_advantage",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_11_team",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_12_ask",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_01_cover",
+      "title": "Digzio",
+      "summary": "Cover slide with Digzio logo, tagline, and presentation title.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_02_problem",
+      "title": "The Problem: South Africa's Student Housing Crisis",
+      "summary": "Highlighting the 550,000 bed shortage and inefficiencies in the NSFAS payment system.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_03_root_cause",
+      "title": "The Root Cause: A Fragmented, Analogue System",
+      "summary": "Showing the disconnection between students, providers, and universities leading to delays and fraud.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_04_solution",
+      "title": "The Solution: Digzio",
+      "summary": "Presenting the unified platform that connects all three audiences and automates payments.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_05_product",
+      "title": "Product: What We've Built",
+      "summary": "Showcasing the live full-stack web and mobile platform features.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_06_traction",
+      "title": "Traction: Early Platform Metrics",
+      "summary": "Displaying current live metrics: 22 properties, 18 NSFAS-accredited, 205 beds.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_07_market",
+      "title": "Market Opportunity",
+      "summary": "Breaking down the R10 billion annual NSFAS market and the 811,000 funded students.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_08_business_model",
+      "title": "Business Model",
+      "summary": "Explaining the multiple revenue streams: provider subscriptions, transaction fees, and university SaaS.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_09_financials",
+      "title": "Financial Projections (3-Year)",
+      "summary": "Showing the path to R60M ARR by Year 3 with 2,000 properties and 20,000 beds.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10_competitive_advantage",
+      "title": "Competitive Advantage",
+      "summary": "Detailing the moat: NSFAS integration, network effects, and first-mover advantage.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11_team",
+      "title": "Team",
+      "summary": "Highlighting the founding team's domain expertise and execution speed.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_12_ask",
+      "title": "The Ask",
+      "summary": "Stating the R5M seed round goal, use of funds, and key milestones.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

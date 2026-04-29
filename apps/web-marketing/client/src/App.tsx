@@ -17,6 +17,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import ListProperty from "./pages/ListProperty";
 import AdminDashboard from "./pages/AdminDashboard";
+import PropertyDetail from "./pages/PropertyDetail";
 
 // Guard component: only renders children if user has ADMIN role
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/search" component={Search} />
+      <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/dashboard/student" component={StudentDashboard} />
       <Route path="/dashboard/provider" component={ProviderDashboard} />
       <Route path="/list-property" component={ListProperty} />

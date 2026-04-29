@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px;
+            padding-left: 80px;
+            padding-right: 80px;
+            height: 200px;
+        }
+        .title-accent {
+            width: 60px;
+            height: 4px;
+            background: #1A9BAD;
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .headline {
+            color: #F59E0B;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .content {
+            flex: 1;
+            padding-top: 20px;
+            padding-left: 80px;
+            padding-right: 80px;
+            display: flex;
+            gap: 60px;
+        }
+        .metrics-grid {
+            flex: 1.2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 30px;
+        }
+        .metric-item {
+            border-left: 4px solid #1A9BAD;
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-right: 20px;
+        }
+        .metric-value {
+            font-size: 64px;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .metric-value span {
+            font-size: 32px;
+            color: #1A9BAD;
+        }
+        .metric-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #F59E0B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .metric-sub {
+            font-size: 16px;
+            color: #9CA3AF;
+        }
+        .details-column {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .detail-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
+        }
+        .detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .detail-title i {
+            color: #1A9BAD;
+        }
+        .detail-list {
+            list-style: none;
+        }
+        .detail-list li {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.4;
+        }
+        .detail-list li i {
+            color: #F59E0B;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+        .city-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .city-tag {
+            background: rgba(26, 155, 173, 0.15);
+            border: 1px solid rgba(26, 155, 173, 0.3);
+            color: #E5E7EB;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">Traction: Early Platform Metrics</h2>
+            <p class="headline">22 properties. 10 cities. Live in 3 months.</p>
+        </div>
+        <div class="content">
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value">22</div>
+                    <div class="metric-label">Active Properties</div>
+                    <div class="metric-sub">Listed across the platform</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">18</div>
+                    <div class="metric-label">NSFAS Accredited</div>
+                    <div class="metric-sub">82% of total listings</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">205</div>
+                    <div class="metric-label">Total Beds</div>
+                    <div class="metric-sub">109 currently available</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value"><span>R</span>4,509</div>
+                    <div class="metric-label">Avg Monthly Price</div>
+                    <div class="metric-sub">Aligned with NSFAS caps</div>
+                </div>
+            </div>
+            <div class="details-column">
+                <div class="detail-section">
+                    <div class="detail-title"><i class="fas fa-laptop-code"></i> Product Execution</div>
+                    <ul class="detail-list">
+                        <li><i class="fas fa-check"></i> Full web platform live in production</li>
+                        <li><i class="fas fa-check"></i> Android APK shipped and available</li>
+                        <li><i class="fas fa-spinner fa-spin" style="color: #1A9BAD;"></i> iOS app in final build stage</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-title"><i class="fas fa-map-marker-alt"></i> Geographic Coverage</div>
+                    <div class="city-tags">
+                        <div class="city-tag">Cape Town (7)</div>
+                        <div class="city-tag">Johannesburg (5)</div>
+                        <div class="city-tag">Pretoria (2)</div>
+                        <div class="city-tag">Durban (2)</div>
+                        <div class="city-tag">Stellenbosch</div>
+                        <div class="city-tag">Polokwane</div>
+                        <div class="city-tag">Bloemfontein</div>
+                        <div class="city-tag">Mthatha</div>
+                        <div class="city-tag">Kimberley</div>
+                        <div class="city-tag">Mafikeng</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

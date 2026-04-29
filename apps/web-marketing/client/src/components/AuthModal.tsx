@@ -66,10 +66,10 @@ export default function AuthModal({ open, onClose, defaultTab = "login", default
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
-      <div className="relative w-full max-w-md rounded-2xl overflow-hidden" style={{ background: "#fff", boxShadow: "0 25px 60px rgba(15,45,74,0.25)" }}>
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
+      <div className="relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl overflow-hidden overflow-y-auto" style={{ background: "#fff", boxShadow: "0 25px 60px rgba(15,45,74,0.25)", maxHeight: "95dvh" }}>
         {/* Header */}
-        <div className="px-8 pt-8 pb-6" style={{ background: "linear-gradient(135deg, #0F2D4A 0%, #1A4A6B 100%)" }}>
+        <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-6" style={{ background: "linear-gradient(135deg, #0F2D4A 0%, #1A4A6B 100%)" }}>
           <button onClick={onClose} className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
             <X size={20} />
           </button>
@@ -105,7 +105,7 @@ export default function AuthModal({ open, onClose, defaultTab = "login", default
         </div>
 
         {/* Body */}
-        <div className="px-8 py-6">
+        <div className="px-5 sm:px-8 py-5 sm:py-6">
           {error && (
             <div className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }}>
               {error}

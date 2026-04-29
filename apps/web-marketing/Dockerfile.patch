@@ -1,0 +1,7 @@
+# Use the existing cached image as base (avoids npm install network requirement)
+FROM 244718668833.dkr.ecr.af-south-1.amazonaws.com/digzio/web-frontend:latest
+WORKDIR /app
+# Replace only the pre-built dist with the fresh build
+COPY dist ./dist
+EXPOSE 3000
+CMD ["node", "dist/index.js"]

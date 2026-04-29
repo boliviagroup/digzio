@@ -1,0 +1,132 @@
+{
+  "project_info": {
+    "title": "Digzio Technology Overview",
+    "created": 1777478992.678097,
+    "last_updated": 1777479422.0767696,
+    "total_slides": 10
+  },
+  "slides": [
+    {
+      "id": "slide_01_title",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_02_architecture",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_03_frontend",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_04_backend",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_05_data",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_06_infrastructure",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_07_mobile",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_08_mobile_build",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_09_security",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_10_closing",
+      "state": "edited",
+      "pageNum": 10
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_01_title",
+      "title": "Digzio Technology Overview",
+      "summary": "Title slide introducing the presentation on Digzio's full-stack architecture, microservices, and mobile apps (iOS + Android).",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_02_architecture",
+      "title": "Architecture Overview",
+      "summary": "Overview of the production-grade microservices platform running on AWS Cape Town, detailing the 9 independent services, containerization, load balancing, database, and CDN.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_03_frontend",
+      "title": "Frontend — Web Platform",
+      "summary": "Details the modern, responsive web application built with React, TypeScript, Vite, TailwindCSS, and state management tools, deployed on AWS ECS.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_04_backend",
+      "title": "Backend Microservices",
+      "summary": "Breaks down the 8 specialized Node.js microservices (auth, property, application, image, kyc, lease, notification, institution) and their responsibilities.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_05_data",
+      "title": "Data & Storage",
+      "summary": "Highlights the storage infrastructure built for scale: TiDB for primary data, Redis for caching, AWS S3 for files, CloudFront for CDN, and SES for email.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_06_infrastructure",
+      "title": "Infrastructure & DevOps",
+      "summary": "Explains the fully containerized, production-ready setup on AWS af-south-1 using ECR, ECS Fargate, ALB, and CI/CD pipelines.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_07_mobile",
+      "title": "Mobile App — React Native",
+      "summary": "Showcases the single codebase approach for iOS and Android using Expo, React Native, TypeScript, NativeWind, and performance optimization tools.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_08_mobile_build",
+      "title": "Mobile Build & Distribution",
+      "summary": "Details the cloud-based native builds using EAS Build, covering Android APK/AAB distribution, iOS simulator/IPA builds, and OTA updates.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_09_security",
+      "title": "Security Architecture",
+      "summary": "Outlines the security-first design across all layers, including JWT auth, bcrypt hashing, Helmet.js, rate limiting, HTTPS, and secure token storage.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10_closing",
+      "title": "Built for Scale",
+      "summary": "Closing slide summarizing the platform's production readiness, current live status, scalability, and future technical roadmap.",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}

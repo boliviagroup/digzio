@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px; /* keep as required */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* must not change */
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 20px; /* reduced from 40 */
+            text-align: center;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 56px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 28px;
+            font-weight: 500;
+            color: #10B981;
+        }
+        .accent-line {
+            width: 120px;
+            height: 4px;
+            background: #F8FAFC;
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding-left: 80px;
+            padding-right: 80px;
+            flex: 1;
+        }
+        /* Changed layout: single row of 4 cards to reduce vertical height */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* fit all cards in one row */
+            gap: 20px; /* reduced gap */
+            margin-bottom: 20px; /* reduced margin */
+        }
+        .takeaway-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 18px; /* reduced from 30 */
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        .takeaway-card.primary {
+            border-left: 4px solid #38BDF8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+        .takeaway-card.secondary {
+            border-left: 4px solid #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px; /* reduced */
+        }
+        .card-icon {
+            font-size: 28px;
+        }
+        .primary .card-icon { color: #38BDF8; }
+        .secondary .card-icon { color: #10B981; }
+        
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+        .card-body {
+            font-size: 18px; /* font sizes must not be reduced */
+            line-height: 1.4; /* slightly tighter */
+            color: #E2E8F0;
+        }
+        .card-body ul { list-style: none; }
+        .card-body li { margin-bottom: 6px; position: relative; padding-left: 20px; }
+        .card-body li::before { content: "■"; color: #38BDF8; position: absolute; left: 0; top: 2px; font-size: 12px; }
+        .secondary .card-body li::before { color: #10B981; }
+        .bottom-banner {
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(248, 250, 252, 0.2);
+            padding: 12px 24px; /* reduced */
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px; /* reduced */
+            margin-bottom: 20px; /* reduced */
+        }
+        .banner-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+        .banner-link {
+            font-size: 20px;
+            color: #38BDF8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Make cards wrap on very small widths to avoid overflow; keeps heights controlled */
+        @media (max-width: 1200px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Built for Scale</h1>
+            <h2>Production-Grade Today. Ready to Scale to 1M Users.</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="grid-container">
+                <div class="takeaway-card primary">
+                    <div class="card-header">
+                        <i class="fas fa-globe card-icon"></i>
+                        <div class="card-title">Live Status</div>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Live at <strong>www.digzio.co.za</strong> serving real users today.</li>
+                            <li>Android APK available for immediate testing.</li>
+                            <li>iOS build pending Apple Developer activation.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="takeaway-card secondary">
+                    <div class="card-header">
+                        <i class="fas fa-expand-arrows-alt card-icon"></i>
+                        <div class="card-title">Scalability</div>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Architecture supports horizontal scaling via <strong>ECS Fargate</strong>.</li>
+                            <li>Database (<strong>TiDB</strong>) designed for distributed scale.</li>
+                            <li>CDN ensures fast asset delivery across all 9 SA provinces.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="takeaway-card secondary">
+                    <div class="card-header">
+                        <i class="fas fa-shield-alt card-icon"></i>
+                        <div class="card-title">Security &amp; Compliance</div>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Security-first design across every layer (JWT, bcrypt, Helmet).</li>
+                            <li>KYC document verification workflow integrated.</li>
+                            <li>Secure token storage on mobile devices.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="takeaway-card primary">
+                    <div class="card-header">
+                        <i class="fas fa-road card-icon"></i>
+                        <div class="card-title">Technical Roadmap</div>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>NSFAS direct payment API integration.</li>
+                            <li>University Single Sign-On (SSO) integration.</li>
+                            <li>Holiday rental module expansion.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-banner">
+                <div class="banner-text">Digzio Technology Stack</div>
+                <div class="banner-link"><i class="fas fa-link"></i> www.digzio.co.za</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

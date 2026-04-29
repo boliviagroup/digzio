@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        .content-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            z-index: 2;
+        }
+        .image-right {
+            flex: 1;
+            position: relative;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+        }
+        .image-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #0F2D4A 0%, rgba(15, 45, 74, 0.4) 100%);
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 84px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+        .tagline {
+            color: #1A9BAD;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 48px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            color: #F59E0B;
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: auto;
+        }
+        .accent-line {
+            width: 80px;
+            height: 6px;
+            background: #1A9BAD;
+            margin-bottom: 40px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="content-left">
+            <div class="accent-line"></div>
+            <h1 class="title">Digzio</h1>
+            <p class="tagline">South Africa's First Complete<br>Student Housing Ecosystem</p>
+            <p class="subtitle">Investor Presentation · April 2026</p>
+        </div>
+        <div class="image-right">
+            <img src="/home/ubuntu/digzio/docs/presentations/investor/assets/student_residence_exterior.jpg" alt="Modern Student Residence">
+            <div class="overlay"></div>
+        </div>
+    </div>
+</body>
+</html>

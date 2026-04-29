@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #0F2D4A;
+            color: #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .header {
+            padding-top: 60px;
+            padding-left: 80px;
+            padding-right: 80px;
+            height: 180px;
+        }
+        .title-accent {
+            width: 60px;
+            height: 4px;
+            background: #1A9BAD;
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+        .title {
+            color: #FFFFFF;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .headline {
+            color: #F59E0B;
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .content {
+            flex: 1;
+            padding-top: 20px;
+            padding-left: 80px;
+            padding-right: 80px;
+            display: flex;
+            gap: 60px;
+        }
+        .features-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .feature-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(26, 155, 173, 0.1);
+            border: 1px solid #1A9BAD;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #1A9BAD;
+            flex-shrink: 0;
+        }
+        .feature-content {
+            flex: 1;
+        }
+        .feature-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+        .feature-desc {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #E5E7EB;
+        }
+        .highlight {
+            color: #F59E0B;
+            font-weight: 600;
+        }
+        .image-col {
+            width: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+        .image-wrapper {
+            width: 480px;
+            height: 360px;
+            border: 4px solid #1A9BAD;
+            position: relative;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .live-badge {
+            margin-top: 30px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #F59E0B;
+            padding: 20px;
+            text-align: center;
+        }
+        .live-badge-title {
+            color: #F59E0B;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .live-badge-url {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <div class="title-accent"></div>
+            <h2 class="title">Product: What We've Built</h2>
+            <p class="headline">Full-stack platform live in production — web + mobile</p>
+        </div>
+        <div class="content">
+            <div class="features-col">
+                <div class="feature-block">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="feature-content">
+                        <div class="feature-title">Student App</div>
+                        <div class="feature-desc">Property search with NSFAS filters, digital application flow, KYC submission, and payment tracking.</div>
+                    </div>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-icon"><i class="fas fa-laptop-house"></i></div>
+                    <div class="feature-content">
+                        <div class="feature-title">Provider Portal</div>
+                        <div class="feature-desc">Comprehensive property management dashboard, application processing, and automated student verification.</div>
+                    </div>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="feature-content">
+                        <div class="feature-title">University Dashboard</div>
+                        <div class="feature-desc">Real-time compliance monitoring, student housing data analytics, and automated DHET reporting.</div>
+                    </div>
+                </div>
+                <div class="feature-block">
+                    <div class="feature-icon"><i class="fas fa-server"></i></div>
+                    <div class="feature-content">
+                        <div class="feature-title">Enterprise Infrastructure</div>
+                        <div class="feature-desc">React Native mobile app (Android APK live), AWS ECS hosting, TiDB Cloud database, and CloudFront CDN.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="image-col">
+                <div class="image-wrapper">
+                    <img src="/home/ubuntu/digzio/docs/presentations/investor/assets/student_room.jpg" alt="Modern Student Room">
+                </div>
+                <div class="live-badge">
+                    <div class="live-badge-title"><i class="fas fa-circle" style="font-size: 12px; margin-right: 8px; vertical-align: middle;"></i>Live Now</div>
+                    <div class="live-badge-url">www.digzio.co.za</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

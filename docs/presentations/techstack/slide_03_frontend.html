@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* keep title top padding */
+        }
+        .header {
+            padding-left: 80px;
+            padding-right: 80px;
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #38BDF8;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #94A3B8;
+        }
+        .accent-line {
+            width: 80px;
+            height: 4px;
+            background: #10B981;
+            margin-top: 15px;
+            border-radius: 2px;
+        }
+        /* layout tightened to reduce vertical space */
+        .content {
+            display: flex;
+            padding-left: 80px;
+            padding-right: 80px;
+            gap: 40px; /* reduced from 60 */
+            flex: 1;
+        }
+        .text-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* reduced from 20 */
+        }
+        .point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .point-icon {
+            color: #10B981;
+            font-size: 24px;
+            margin-top: 2px; /* slight tighten */
+        }
+        .point-text {
+            font-size: 20px;
+            line-height: 1.4;
+            color: #E2E8F0;
+        }
+        .point-text strong {
+            color: #38BDF8;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .visual-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px; /* reduced from 20 */
+        }
+        .tech-row {
+            display: flex;
+            gap: 12px;
+        }
+        .tech-box {
+            flex: 1;
+            height: 80px; /* reduced from 100 */
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        .tech-box.primary {
+            border-color: #38BDF8;
+            background: rgba(56, 189, 248, 0.1);
+        }
+        .tech-box.secondary {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .tech-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+        .tech-sub {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Frontend — Web Platform</h1>
+            <h2>React + TypeScript + Vite: Modern, responsive web app</h2>
+            <div class="accent-line"></div>
+        </div>
+        <div class="content">
+            <div class="text-column">
+                <div class="point">
+                    <i class="fas fa-code point-icon"></i>
+                    <div class="point-text"><strong>Core Framework</strong> React 18 + TypeScript, built with Vite for fast HMR and optimized bundles.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-paint-brush point-icon"></i>
+                    <div class="point-text"><strong>Styling & UI</strong> TailwindCSS utilities with Radix UI primitives for accessibility.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-database point-icon"></i>
+                    <div class="point-text"><strong>State Management</strong> React Query for server state and Zustand for light local state.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-check-circle point-icon"></i>
+                    <div class="point-text"><strong>Forms & Validation</strong> React Hook Form paired with Zod schemas for robust validation.</div>
+                </div>
+                <div class="point">
+                    <i class="fas fa-route point-icon"></i>
+                    <div class="point-text"><strong>Routing & Delivery</strong> Wouter for lightweight routing; served via Node/Docker on AWS ECS.</div>
+                </div>
+            </div>
+            <div class="visual-column">
+                <div class="tech-row">
+                    <div class="tech-box primary">
+                        <div class="tech-name">React 18</div>
+                        <div class="tech-sub">UI Library</div>
+                    </div>
+                    <div class="tech-box primary">
+                        <div class="tech-name">TypeScript</div>
+                        <div class="tech-sub">Type Safety</div>
+                    </div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-box secondary">
+                        <div class="tech-name">Vite</div>
+                        <div class="tech-sub">Build Tool</div>
+                    </div>
+                    <div class="tech-box secondary">
+                        <div class="tech-name">TailwindCSS</div>
+                        <div class="tech-sub">Styling</div>
+                    </div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-box">
+                        <div class="tech-name">React Query</div>
+                        <div class="tech-sub">Server State</div>
+                    </div>
+                    <div class="tech-box">
+                        <div class="tech-name">Zustand</div>
+                        <div class="tech-sub">Local State</div>
+                    </div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-box">
+                        <div class="tech-name">React Hook Form</div>
+                        <div class="tech-sub">Forms</div>
+                    </div>
+                    <div class="tech-box">
+                        <div class="tech-name">Zod</div>
+                        <div class="tech-sub">Validation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
