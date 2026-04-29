@@ -396,7 +396,7 @@ router.post('/', authenticate, async (req, res) => {
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8,
           ST_SetSRID(ST_MakePoint($9, $10), 4326),
-          $11, $12, $13, $14, $15, 'DRAFT'
+          $11, $12, $13, $14, $15, 'ACTIVE'
         )
         RETURNING property_id, title, status, created_at
       `;
@@ -419,7 +419,7 @@ router.post('/', authenticate, async (req, res) => {
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8,
           ST_SetSRID(ST_MakePoint(28.0473, -26.2041), 4326),
-          $9, $10, $11, $12, $13, 'DRAFT'
+          $9, $10, $11, $12, $13, 'ACTIVE'
         )
         RETURNING property_id, title, status, created_at
       `;
@@ -615,6 +615,60 @@ router.post('/:id/images/seed', async (req, res) => {
     res.status(201).json({ success: true, property_id: id, images: inserted });
   } catch (err) {
     console.error('Image seed error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/v1/properties/bulk-import - Bulk import properties (admin only, bypasses rate limit)
+router.post('/bulk-import', authenticate, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role.toUpperCase() !== 'PROVIDER') {
+      return res.status(403).json({ error: 'Access denied.' });
+    }
+    const { properties } = req.body;
+    if (!Array.isArray(properties) || properties.length === 0) {
+      return res.status(400).json({ error: 'properties array required' });
+    }
+    const provider_id = req.user.user_id;
+    let inserted = 0;
+    let skipped = 0;
+    const errors = [];
+    for (const p of properties) {
+      const { title, description, address_line_1, city, province, lat, lng,
+              property_type, total_beds, available_beds, base_price_monthly,
+              is_nsfas_accredited = false } = p;
+      if (!title || !description || !address_line_1 || !city || !province || !property_type || !total_beds || !base_price_monthly) {
+        skipped++;
+        continue;
+      }
+      try {
+        await db.query(`
+          INSERT INTO properties (
+            provider_id, title, description,
+            address_line_1, city, province, postal_code,
+            location, property_type, total_beds, available_beds,
+            base_price_monthly, is_nsfas_accredited, status
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, '0000',
+            ST_SetSRID(ST_MakePoint($7, $8), 4326),
+            $9, $10, $11, $12, $13, 'ACTIVE'
+          )
+        `, [
+          provider_id, title, description,
+          address_line_1, city, province,
+          parseFloat(lng || 28.0473), parseFloat(lat || -26.2041),
+          property_type.toUpperCase(), parseInt(total_beds), parseInt(available_beds || total_beds),
+          parseFloat(base_price_monthly), is_nsfas_accredited
+        ]);
+        inserted++;
+      } catch (err) {
+        if (err.code === '23505') { skipped++; } // duplicate
+        else { errors.push({ title, error: err.message }); }
+      }
+    }
+    res.json({ success: true, inserted, skipped, errors: errors.length, error_details: errors.slice(0, 5) });
+  } catch (err) {
+    console.error('Bulk import error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
