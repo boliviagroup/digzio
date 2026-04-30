@@ -1,0 +1,64 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:af-south-1:244718668833:log-group:/aws/lambda/digzio-rds-rotation-handler:*"
+    },
+    {
+      "Sid": "SecretsManagerRead",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": [
+        "arn:aws:secretsmanager:af-south-1:244718668833:secret:rds!db-7e8ec887-9904-4e87-a3fb-e378d4c598ca-YBZddz",
+        "arn:aws:secretsmanager:af-south-1:244718668833:secret:digzio/prod/db-password-*"
+      ]
+    },
+    {
+      "Sid": "SecretsManagerWrite",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:UpdateSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:af-south-1:244718668833:secret:digzio/prod/db-password-*"
+    },
+    {
+      "Sid": "ECSDescribe",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:ListServices"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECSUpdate",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:RegisterTaskDefinition",
+        "ecs:UpdateService"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "PassRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": [
+        "arn:aws:iam::244718668833:role/digzio-ecs-task-execution-role-prod",
+        "arn:aws:iam::244718668833:role/digzio-ecs-task-role-prod"
+      ]
+    }
+  ]
+}
