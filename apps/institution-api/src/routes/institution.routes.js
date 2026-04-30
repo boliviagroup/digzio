@@ -53,30 +53,23 @@ function requireProvider(req, res, next) {
 }
 
 // ─── 0. Health check ────────────────────────────────────────────────────────
-// GET /health
 router.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'institution-api' });
 });
 
 // ─── 1. Create institution record ────────────────────────────────────────────
-// POST /api/v1/institutions/register
 router.post('/register', authenticate, requireInstitution, async (req, res) => {
   try {
     const { name, contact_email, lat, lng } = req.body;
     if (!name || !contact_email) {
       return res.status(400).json({ error: 'Missing required fields: name, contact_email' });
     }
-    // Check if institution with this name already exists
     const existing = await pool.query(
       `SELECT institution_id, name FROM institutions WHERE name = $1`, [name]
     );
     if (existing.rows.length > 0) {
-      return res.status(200).json({
-        message: 'Institution already exists',
-        institution: existing.rows[0]
-      });
+      return res.status(200).json({ message: 'Institution already exists', institution: existing.rows[0] });
     }
-    // campus_location is required geometry - use provided lat/lng or default to Cape Town
     const latitude = lat || -33.9249;
     const longitude = lng || 18.4241;
     const result = await pool.query(
@@ -93,7 +86,6 @@ router.post('/register', authenticate, requireInstitution, async (req, res) => {
 });
 
 // ─── 2. List all institutions (public) ───────────────────────────────────────
-// GET /api/v1/institutions/
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
@@ -109,78 +101,23 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ─── 4. Get students linked to an institution ─────────────────────────────────
-// GET /api/v1/institutions/:id/students
-router.get('/:id/students', authenticate, requireInstitution, async (req, res) => {
-  try {
-    const students = await pool.query(
-      `SELECT u.user_id, u.first_name, u.last_name, u.email, u.kyc_status,
-              sp.student_number, sp.nsfas_status, sp.institution_id,
-              sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding
-       FROM student_profiles sp
-       JOIN users u ON sp.student_id = u.user_id
-       WHERE sp.institution_id = $1
-       ORDER BY u.last_name ASC`,
-      [req.params.id]
-    );
-    res.json({ students: students.rows, count: students.rowCount });
-  } catch (err) {
-    console.error('Get students error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 5. Get properties near institution ──────────────────────────────────────
-// GET /api/v1/institutions/:id/properties?radius_km=5
-router.get('/:id/properties', async (req, res) => {
-  try {
-    const radius_km = parseFloat(req.query.radius_km) || 5;
-    const result = await pool.query(
-      `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
-              p.is_nsfas_accredited, p.total_beds, p.status, p.posa_code, p.posa_institution,
-              ROUND(CAST(ST_Distance(
-                i.campus_location::geography,
-                p.location::geography
-              ) / 1000 AS numeric), 2) AS distance_km
-       FROM institutions i
-       JOIN properties p ON ST_DWithin(
-         i.campus_location::geography,
-         p.location::geography,
-         $2 * 1000
-       )
-       WHERE i.institution_id = $1 AND p.status = 'ACTIVE'
-       ORDER BY distance_km ASC
-       LIMIT 20`,
-      [req.params.id, radius_km]
-    );
-    res.json({ properties: result.rows, count: result.rowCount, radius_km });
-  } catch (err) {
-    console.error('Get nearby properties error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── 6. Link student to institution (student self-service) ───────────────────
-// POST /api/v1/institutions/students/link
+// ─── 3. Link student to institution (student self-service) ───────────────────
 router.post('/students/link', authenticate, async (req, res) => {
   try {
     const {
       institution_id, student_number, id_number, date_of_birth,
       year_of_study, qualification, campus, next_of_kin_phone, type_of_funding, gender
     } = req.body;
-    // Generate a unique placeholder id_number if not provided to avoid NOT NULL constraint
     const safeIdNumber = id_number || `UNSET-${req.user.user_id.replace(/-/g,'').substring(0,13)}`;
     if (!institution_id || !student_number) {
       return res.status(400).json({ error: 'Missing required fields: institution_id, student_number' });
     }
-    // Verify institution exists
     const instCheck = await pool.query(
       `SELECT institution_id FROM institutions WHERE institution_id = $1`, [institution_id]
     );
     if (instCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Institution not found' });
     }
-    // Upsert student profile with POSA fields
     const result = await pool.query(
       `INSERT INTO student_profiles (student_id, institution_id, student_number, id_number, date_of_birth,
          year_of_study, qualification, campus, next_of_kin_phone, type_of_funding, gender)
@@ -206,8 +143,7 @@ router.post('/students/link', authenticate, async (req, res) => {
   }
 });
 
-// ─── 7. Get my student profile ────────────────────────────────────────────────
-// GET /api/v1/institutions/students/me
+// ─── 4. Get my student profile ────────────────────────────────────────────────
 router.get('/students/me', authenticate, async (req, res) => {
   try {
     const result = await pool.query(
@@ -230,17 +166,13 @@ router.get('/students/me', authenticate, async (req, res) => {
   }
 });
 
-// ─── 8. POSA Occupancy List Generation ───────────────────────────────────────
-// GET /api/v1/institutions/posa/generate?property_id=xxx&month=2025-03
-// Returns JSON data for the UJ POSA occupancy list (Excel generation done client-side)
+// ─── 5. POSA Occupancy List Generation ───────────────────────────────────────
 router.get('/posa/generate', authenticate, requireProvider, async (req, res) => {
   try {
     const { property_id, month } = req.query;
     if (!property_id) {
       return res.status(400).json({ error: 'property_id is required' });
     }
-
-    // Verify property belongs to this provider
     const propCheck = await pool.query(
       `SELECT property_id, title, address_line_1, city, province, postal_code,
               total_beds, available_beds, base_price_monthly, is_nsfas_accredited,
@@ -252,29 +184,25 @@ router.get('/posa/generate', authenticate, requireProvider, async (req, res) => 
       return res.status(404).json({ error: 'Property not found or not owned by this provider' });
     }
     const property = propCheck.rows[0];
-
-    // Get all active leases for this property with student POSA details
-    const leaseMonth = month || new Date().toISOString().slice(0, 7); // YYYY-MM
+    const leaseMonth = month || new Date().toISOString().slice(0, 7);
     const students = await pool.query(
       `SELECT
-         u.first_name, u.last_name, u.email, u.phone,
+         u.first_name, u.last_name, u.email,
          sp.student_number, sp.id_number, sp.date_of_birth,
          sp.year_of_study, sp.qualification, sp.campus,
          sp.next_of_kin_phone, sp.type_of_funding, sp.gender,
          sp.nsfas_status,
-         l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
+         l.lease_id, l.start_date, l.end_date, l.monthly_rent,
+         CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
          i.name AS institution_name
        FROM leases l
        JOIN users u ON l.student_id = u.user_id
        LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
        LEFT JOIN institutions i ON sp.institution_id = i.institution_id
-       WHERE l.property_id = $1
-         AND l.is_active = true
+       WHERE l.property_id = $1 AND l.is_active = true
        ORDER BY u.last_name ASC`,
       [property_id]
     );
-
-    // Build POSA occupancy data in UJ format
     const occupancyList = students.rows.map((s, idx) => ({
       row_number: idx + 1,
       surname: s.last_name || '',
@@ -291,10 +219,8 @@ router.get('/posa/generate', authenticate, requireProvider, async (req, res) => 
       lease_start: s.start_date ? s.start_date.toISOString().slice(0, 10) : '',
       lease_end: s.end_date ? s.end_date.toISOString().slice(0, 10) : '',
       next_of_kin_phone: s.next_of_kin_phone || '',
-      email: s.email || '',
-      phone: s.phone || ''
+      email: s.email || ''
     }));
-
     res.json({
       property: {
         property_id: property.property_id,
@@ -316,8 +242,7 @@ router.get('/posa/generate', authenticate, requireProvider, async (req, res) => 
   }
 });
 
-// ─── 9. Update property POSA details ─────────────────────────────────────────
-// PATCH /api/v1/institutions/posa/property/:property_id
+// ─── 6. Update property POSA details ─────────────────────────────────────────
 router.patch('/posa/property/:property_id', authenticate, requireProvider, async (req, res) => {
   try {
     const { posa_code, posa_institution } = req.body;
@@ -338,8 +263,7 @@ router.patch('/posa/property/:property_id', authenticate, requireProvider, async
   }
 });
 
-// ─── 10. Get all students for a provider (across all properties) ─────────────
-// GET /api/v1/institutions/posa/provider-students?property_id=xxx
+// ─── 7. Get all students for a provider (across all properties) ─────────────
 router.get('/posa/provider-students', authenticate, requireProvider, async (req, res) => {
   try {
     const { property_id } = req.query;
@@ -347,10 +271,11 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
     if (property_id) {
       query = `
         SELECT DISTINCT
-          u.user_id, u.first_name, u.last_name, u.email, u.phone,
+          u.user_id, u.first_name, u.last_name, u.email,
           sp.student_number, sp.id_number, sp.nsfas_status,
           sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
-          l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent,
+          CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
           l.signed_at, l.pdf_url,
           p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
         FROM leases l
@@ -363,10 +288,11 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
     } else {
       query = `
         SELECT DISTINCT
-          u.user_id, u.first_name, u.last_name, u.email, u.phone,
+          u.user_id, u.first_name, u.last_name, u.email,
           sp.student_number, sp.id_number, sp.nsfas_status,
           sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
-          l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent,
+          CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
           l.signed_at, l.pdf_url,
           p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
         FROM leases l
@@ -385,7 +311,8 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
   }
 });
 
-// ─── INSTITUTION DASHBOARD ENDPOINTS (must be before /:id to avoid route conflict) ─
+// ─── INSTITUTION DASHBOARD ENDPOINTS ─────────────────────────────────────────
+// NOTE: These MUST be defined before /:id/* routes to avoid route conflicts
 
 // GET /api/v1/institutions/dashboard/overview
 router.get('/dashboard/overview', authenticate, requireInstitution, async (req, res) => {
@@ -422,7 +349,7 @@ router.get('/dashboard/overview', authenticate, requireInstitution, async (req, 
       : await pool.query(`SELECT COUNT(*) FROM student_profiles WHERE nsfas_status = 'APPROVED'`);
     const nsfasStudents = parseInt(nsfasQ.rows[0].count);
 
-    const pendingQ = await pool.query(`SELECT COUNT(*) FROM leases WHERE status = 'PENDING'`);
+    const pendingQ = await pool.query(`SELECT COUNT(*) FROM leases WHERE is_active = false`);
     const pendingApplications = parseInt(pendingQ.rows[0].count);
 
     res.json({
@@ -462,24 +389,24 @@ router.get('/dashboard/students', authenticate, requireInstitution, async (req, 
       if (searchVal) {
         params = [instId, limit, offset, searchVal];
         countParams = [instId, searchVal];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $4 OR u.last_name ILIKE $4 OR sp.student_number ILIKE $4) ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $4 OR u.last_name ILIKE $4 OR sp.student_number ILIKE $4) ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $2 OR u.last_name ILIKE $2 OR sp.student_number ILIKE $2)`;
       } else {
         params = [instId, limit, offset];
         countParams = [instId];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp WHERE sp.institution_id = $1`;
       }
     } else {
       if (searchVal) {
         params = [limit, offset, searchVal];
         countParams = [searchVal];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE (u.first_name ILIKE $3 OR u.last_name ILIKE $3 OR sp.student_number ILIKE $3) ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE (u.first_name ILIKE $3 OR u.last_name ILIKE $3 OR sp.student_number ILIKE $3) ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE (u.first_name ILIKE $1 OR u.last_name ILIKE $1 OR sp.student_number ILIKE $1)`;
       } else {
         params = [limit, offset];
         countParams = [];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
         countQuery = `SELECT COUNT(*) FROM student_profiles`;
       }
     }
@@ -498,18 +425,18 @@ router.get('/dashboard/providers', authenticate, requireInstitution, async (req,
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;
     const result = await pool.query(`
-      SELECT u.user_id AS provider_id, u.first_name, u.last_name, u.email, u.phone,
+      SELECT u.user_id AS provider_id, u.first_name, u.last_name, u.email,
         COUNT(p.property_id) AS total_properties,
         COUNT(CASE WHEN p.status = 'ACTIVE' THEN 1 END) AS active_properties,
         COUNT(CASE WHEN p.posa_code IS NOT NULL THEN 1 END) AS posa_properties,
-        COUNT(CASE WHEN p.nsfas_accredited = true THEN 1 END) AS nsfas_properties,
+        COUNT(CASE WHEN p.is_nsfas_accredited = true THEN 1 END) AS nsfas_properties,
         COUNT(CASE WHEN l.is_active = true THEN 1 END) AS active_leases,
         MAX(p.created_at) AS last_property_added
       FROM users u
       JOIN properties p ON p.provider_id = u.user_id
       LEFT JOIN leases l ON l.property_id = p.property_id AND l.is_active = true
       WHERE u.role = 'PROVIDER'
-      GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.phone
+      GROUP BY u.user_id, u.first_name, u.last_name, u.email
       ORDER BY active_properties DESC
       LIMIT $1 OFFSET $2`, [limit, offset]);
     const countResult = await pool.query(`SELECT COUNT(DISTINCT u.user_id) FROM users u JOIN properties p ON p.provider_id = u.user_id WHERE u.role = 'PROVIDER'`);
@@ -540,8 +467,58 @@ router.get('/dashboard/report', authenticate, requireInstitution, async (req, re
   }
 });
 
-// ─── 3. Get institution by ID (public) ───────────────────────────────────────
-// GET /api/v1/institutions/:id  (MUST be last to avoid swallowing specific routes)
+// ─── PARAMETERISED ROUTES (must come AFTER all specific named routes) ─────────
+
+// GET /api/v1/institutions/:id/students
+router.get('/:id/students', authenticate, requireInstitution, async (req, res) => {
+  try {
+    const students = await pool.query(
+      `SELECT u.user_id, u.first_name, u.last_name, u.email, u.kyc_status,
+              sp.student_number, sp.nsfas_status, sp.institution_id,
+              sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding
+       FROM student_profiles sp
+       JOIN users u ON sp.student_id = u.user_id
+       WHERE sp.institution_id = $1
+       ORDER BY u.last_name ASC`,
+      [req.params.id]
+    );
+    res.json({ students: students.rows, count: students.rowCount });
+  } catch (err) {
+    console.error('Get students error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// GET /api/v1/institutions/:id/properties?radius_km=5
+router.get('/:id/properties', async (req, res) => {
+  try {
+    const radius_km = parseFloat(req.query.radius_km) || 5;
+    const result = await pool.query(
+      `SELECT p.property_id, p.title, p.city, p.province, p.base_price_monthly,
+              p.is_nsfas_accredited, p.total_beds, p.status, p.posa_code, p.posa_institution,
+              ROUND(CAST(ST_Distance(
+                i.campus_location::geography,
+                p.location::geography
+              ) / 1000 AS numeric), 2) AS distance_km
+       FROM institutions i
+       JOIN properties p ON ST_DWithin(
+         i.campus_location::geography,
+         p.location::geography,
+         $2 * 1000
+       )
+       WHERE i.institution_id = $1 AND p.status = 'ACTIVE'
+       ORDER BY distance_km ASC
+       LIMIT 20`,
+      [req.params.id, radius_km]
+    );
+    res.json({ properties: result.rows, count: result.rowCount, radius_km });
+  } catch (err) {
+    console.error('Get nearby properties error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// GET /api/v1/institutions/:id  (MUST be last)
 router.get('/:id', async (req, res) => {
   try {
     const result = await pool.query(
@@ -560,6 +537,5 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
-
 
 module.exports = router;
