@@ -262,14 +262,14 @@ router.get('/posa/generate', authenticate, requireProvider, async (req, res) => 
          sp.year_of_study, sp.qualification, sp.campus,
          sp.next_of_kin_phone, sp.type_of_funding, sp.gender,
          sp.nsfas_status,
-         l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+         l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
          i.name AS institution_name
        FROM leases l
-       JOIN users u ON l.tenant_id = u.user_id
+       JOIN users u ON l.student_id = u.user_id
        LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
        LEFT JOIN institutions i ON sp.institution_id = i.institution_id
        WHERE l.property_id = $1
-         AND l.status IN ('ACTIVE', 'SIGNED')
+         AND l.is_active = true
        ORDER BY u.last_name ASC`,
       [property_id]
     );
@@ -350,11 +350,11 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
           u.user_id, u.first_name, u.last_name, u.email, u.phone,
           sp.student_number, sp.id_number, sp.nsfas_status,
           sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
-          l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
           l.signed_at, l.pdf_url,
           p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
         FROM leases l
-        JOIN users u ON l.tenant_id = u.user_id
+        JOIN users u ON l.student_id = u.user_id
         JOIN properties p ON l.property_id = p.property_id
         LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
         WHERE p.property_id = $1 AND p.provider_id = $2
@@ -366,11 +366,11 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
           u.user_id, u.first_name, u.last_name, u.email, u.phone,
           sp.student_number, sp.id_number, sp.nsfas_status,
           sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding,
-          l.lease_id, l.start_date, l.end_date, l.monthly_rent, l.status AS lease_status,
+          l.lease_id, l.start_date, l.end_date, l.monthly_rent, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status,
           l.signed_at, l.pdf_url,
           p.property_id, p.title AS property_title, p.posa_code, p.posa_institution
         FROM leases l
-        JOIN users u ON l.tenant_id = u.user_id
+        JOIN users u ON l.student_id = u.user_id
         JOIN properties p ON l.property_id = p.property_id
         LEFT JOIN student_profiles sp ON sp.student_id = u.user_id
         WHERE p.provider_id = $1
@@ -404,8 +404,8 @@ router.get('/dashboard/overview', authenticate, requireInstitution, async (req, 
     const totalStudents = parseInt(studentsQ.rows[0].count);
 
     const housedQ = instId
-      ? await pool.query(`SELECT COUNT(DISTINCT l.tenant_id) FROM leases l JOIN student_profiles sp ON sp.student_id = l.tenant_id WHERE sp.institution_id = $1 AND l.status = 'ACTIVE'`, [instId])
-      : await pool.query(`SELECT COUNT(DISTINCT l.tenant_id) FROM leases l WHERE l.status = 'ACTIVE'`);
+      ? await pool.query(`SELECT COUNT(DISTINCT l.student_id) FROM leases l JOIN student_profiles sp ON sp.student_id = l.student_id WHERE sp.institution_id = $1 AND l.is_active = true`, [instId])
+      : await pool.query(`SELECT COUNT(DISTINCT l.student_id) FROM leases l WHERE l.is_active = true`);
     const housedStudents = parseInt(housedQ.rows[0].count);
 
     const providersQ = await pool.query(`SELECT COUNT(DISTINCT provider_id) FROM properties WHERE status = 'ACTIVE'`);
@@ -462,24 +462,24 @@ router.get('/dashboard/students', authenticate, requireInstitution, async (req, 
       if (searchVal) {
         params = [instId, limit, offset, searchVal];
         countParams = [instId, searchVal];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $4 OR u.last_name ILIKE $4 OR sp.student_number ILIKE $4) ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $4 OR u.last_name ILIKE $4 OR sp.student_number ILIKE $4) ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $2 OR u.last_name ILIKE $2 OR sp.student_number ILIKE $2)`;
       } else {
         params = [instId, limit, offset];
         countParams = [instId];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp WHERE sp.institution_id = $1`;
       }
     } else {
       if (searchVal) {
         params = [limit, offset, searchVal];
         countParams = [searchVal];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE (u.first_name ILIKE $3 OR u.last_name ILIKE $3 OR sp.student_number ILIKE $3) ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE (u.first_name ILIKE $3 OR u.last_name ILIKE $3 OR sp.student_number ILIKE $3) ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
         countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE (u.first_name ILIKE $1 OR u.last_name ILIKE $1 OR sp.student_number ILIKE $1)`;
       } else {
         params = [limit, offset];
         countParams = [];
-        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
         countQuery = `SELECT COUNT(*) FROM student_profiles`;
       }
     }
@@ -503,11 +503,11 @@ router.get('/dashboard/providers', authenticate, requireInstitution, async (req,
         COUNT(CASE WHEN p.status = 'ACTIVE' THEN 1 END) AS active_properties,
         COUNT(CASE WHEN p.posa_code IS NOT NULL THEN 1 END) AS posa_properties,
         COUNT(CASE WHEN p.nsfas_accredited = true THEN 1 END) AS nsfas_properties,
-        COUNT(CASE WHEN l.status = 'ACTIVE' THEN 1 END) AS active_leases,
+        COUNT(CASE WHEN l.is_active = true THEN 1 END) AS active_leases,
         MAX(p.created_at) AS last_property_added
       FROM users u
       JOIN properties p ON p.provider_id = u.user_id
-      LEFT JOIN leases l ON l.property_id = p.property_id AND l.status = 'ACTIVE'
+      LEFT JOIN leases l ON l.property_id = p.property_id AND l.is_active = true
       WHERE u.role = 'PROVIDER'
       GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.phone
       ORDER BY active_properties DESC
@@ -531,8 +531,8 @@ router.get('/dashboard/report', authenticate, requireInstitution, async (req, re
     const instId = instResult.rows[0]?.institution_id || null;
     const instName = instResult.rows[0]?.name || 'Institution';
     const studentsQ = instId
-      ? await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC`, [instId])
-      : await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC`);
+      ? await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC`, [instId])
+      : await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, CASE WHEN l.is_active THEN 'ACTIVE' ELSE 'INACTIVE' END AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC`);
     res.json({ institution: instName, generated_at: new Date().toISOString(), report_period: new Date().getFullYear(), total_students: studentsQ.rows.length, students: studentsQ.rows });
   } catch (err) {
     console.error('Dashboard report error:', err.message);
