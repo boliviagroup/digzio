@@ -25,6 +25,41 @@ function useCounter(target: number, duration = 2000, start = false) {
   return count;
 }
 
+// Live stats type
+type LiveStats = { students: number; providers: number; institutions: number; active_properties: number };
+
+// StatsBar: fetches live counts from the API and renders animated counters
+function StatsBar() {
+  const [stats, setStats] = useState<LiveStats>({
+    students: 0,
+    providers: 0,
+    institutions: 0,
+    active_properties: 0,
+  });
+
+  useEffect(() => {
+    fetch('/api/v1/auth/stats')
+      .then((r) => r.json())
+      .then((d: LiveStats) => {
+        if (d && typeof d.students === 'number') setStats(d);
+      })
+      .catch(() => {/* silently keep zeros */});
+  }, []);
+
+  return (
+    <section style={{ background: '#0F2D4A' }} className="py-16">
+      <div className="container">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <StatCard value={stats.students}   suffix="+" label="Students Housed"    delay={0}   />
+          <StatCard value={stats.providers}  suffix="+" label="Verified Providers" delay={100} />
+          <StatCard value={stats.institutions} suffix="" label="Partner Universities" delay={200} />
+          <StatCard value={stats.active_properties} suffix="" label="Active Properties" delay={300} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function StatCard({ value, suffix, label, delay }: { value: number; suffix: string; label: string; delay: number }) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -114,9 +149,14 @@ const testimonials = [
 
 export default function Home() {
   const [heroVisible, setHeroVisible] = useState(false);
+  const [liveStats, setLiveStats] = useState<LiveStats>({ students: 0, providers: 0, institutions: 0, active_properties: 0 });
 
   useEffect(() => {
     const timer = setTimeout(() => setHeroVisible(true), 100);
+    fetch('/api/v1/auth/stats')
+      .then((r) => r.json())
+      .then((d: LiveStats) => { if (d && typeof d.students === 'number') setLiveStats(d); })
+      .catch(() => {});
     return () => clearTimeout(timer);
   }, []);
 
@@ -209,16 +249,7 @@ export default function Home() {
       </section>
 
       {/* ── STATS BAR ── */}
-      <section style={{ background: "#0F2D4A" }} className="py-16">
-        <div className="container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            <StatCard value={2847} suffix="+" label="Students Housed" delay={0} />
-            <StatCard value={156} suffix="+" label="Verified Providers" delay={100} />
-            <StatCard value={23} suffix="" label="Partner Universities" delay={200} />
-            <StatCard value={99} suffix=".8%" label="NSFAS Success Rate" delay={300} />
-          </div>
-        </div>
-      </section>
+      <StatsBar />
 
       {/* ── THREE AUDIENCES ── */}
       <section className="py-24" style={{ background: "#F5F7FA" }}>
@@ -549,7 +580,7 @@ export default function Home() {
             Ready to find your place?
           </h2>
           <p className="text-xl mb-10 max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.75)" }}>
-            Join 2,847 students, 156 providers, and 23 universities already on Digzio.
+            Join {liveStats.students.toLocaleString()} students, {liveStats.providers.toLocaleString()} providers, and {liveStats.institutions.toLocaleString()} institutions already on Digzio.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/students">

@@ -140,6 +140,32 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// GET /api/v1/auth/stats  — PUBLIC: returns live platform counts for homepage
+router.get('/stats', async (req, res) => {
+  try {
+    const userStats = await db.query(`
+      SELECT
+        COUNT(*) FILTER (WHERE role = 'STUDENT') AS students,
+        COUNT(*) FILTER (WHERE role = 'PROVIDER') AS providers,
+        COUNT(*) FILTER (WHERE role = 'INSTITUTION') AS institutions
+      FROM users
+    `);
+    const propStats = await db.query(`
+      SELECT COUNT(*) AS active_properties FROM properties WHERE status = 'ACTIVE'
+    `).catch(() => ({ rows: [{ active_properties: 0 }] }));
+    res.set('Cache-Control', 'public, max-age=300'); // cache 5 min
+    res.json({
+      students: parseInt(userStats.rows[0].students, 10),
+      providers: parseInt(userStats.rows[0].providers, 10),
+      institutions: parseInt(userStats.rows[0].institutions, 10),
+      active_properties: parseInt(propStats.rows[0].active_properties, 10),
+    });
+  } catch (err) {
+    console.error('Public stats error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
 // GET /api/v1/auth/admin/stats  — ADMIN only
 router.get('/admin/stats', async (req, res) => {
   try {
