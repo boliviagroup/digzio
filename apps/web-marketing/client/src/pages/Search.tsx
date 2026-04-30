@@ -8,7 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Search as SearchIcon, SlidersHorizontal, MapPin, Bed, Bath,
   Wifi, Shield, Dumbbell, Car, ChevronDown, Star, Heart,
-  Loader2, AlertCircle, CheckCircle, X, ArrowRight
+  Loader2, AlertCircle, CheckCircle, X, ArrowRight,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 
 const PROVINCES = [
@@ -26,6 +27,7 @@ const PRICE_RANGES = [
 ];
 
 const PROPERTY_TYPES = ["All Types", "APARTMENT", "HOUSE", "ROOM", "STUDENT_RESIDENCE"];
+const PAGE_SIZE = 24;
 
 const AMENITY_ICONS: Record<string, React.ReactNode> = {
   wifi: <Wifi size={14} />,
@@ -173,7 +175,9 @@ export default function Search() {
   const [priceRangeIdx, setPriceRangeIdx] = useState(0);
   const [nsfasOnly, setNsfasOnly] = useState(false);
   const [propertyType, setPropertyType] = useState("All Types");
-  const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Data
   const [properties, setProperties] = useState<Property[]>([]);
@@ -191,7 +195,9 @@ export default function Search() {
   const [applySuccess, setApplySuccess] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
 
-  const fetchProperties = useCallback(async () => {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  const fetchProperties = useCallback(async (page: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -203,7 +209,8 @@ export default function Search() {
         max_price: priceRange.max,
         nsfas_accredited: nsfasOnly ? true : undefined,
         property_type: propertyType !== "All Types" ? propertyType : undefined,
-        limit: 24,
+        limit: PAGE_SIZE,
+        page,
       });
       setProperties(result.properties || []);
       setTotal(result.total || 0);
@@ -214,10 +221,22 @@ export default function Search() {
     }
   }, [searchText, province, priceRangeIdx, nsfasOnly, propertyType]);
 
+  // Reset to page 1 whenever filters change
   useEffect(() => {
-    const timer = setTimeout(fetchProperties, 300);
+    setCurrentPage(1);
+  }, [searchText, province, priceRangeIdx, nsfasOnly, propertyType]);
+
+  // Fetch when page or filters change (debounced for text input)
+  useEffect(() => {
+    const timer = setTimeout(() => fetchProperties(currentPage), 300);
     return () => clearTimeout(timer);
-  }, [fetchProperties]);
+  }, [fetchProperties, currentPage]);
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleApply = (property: Property) => {
     if (!isAuthenticated) {
@@ -254,6 +273,20 @@ export default function Search() {
     }
   };
 
+  // Build page number array with ellipsis
+  const getPageNumbers = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | "...")[] = [];
+    if (currentPage <= 4) {
+      pages.push(1, 2, 3, 4, 5, "...", totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      pages.push(1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+    }
+    return pages;
+  };
+
   return (
     <div className="min-h-screen" style={{ background: "#F9FAFB", fontFamily: "'Space Grotesk', sans-serif" }}>
       <Navbar />
@@ -269,7 +302,7 @@ export default function Search() {
           </p>
 
           {/* Search input */}
-          <div className="relative max-w-2xl mx-auto mb-4">
+          <div className="relative mb-4">
             <SearchIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "#9CA3AF" }} />
             <input
               type="text"
@@ -320,11 +353,21 @@ export default function Search() {
 
       {/* Results */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Results count */}
+        {/* Results count + pagination info */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm" style={{ color: "#6B7280" }}>
-            {loading ? "Loading..." : `${total} propert${total !== 1 ? "ies" : "y"} found`}
+            {loading
+              ? "Loading..."
+              : total > 0
+                ? `Showing ${((currentPage - 1) * PAGE_SIZE) + 1}–${Math.min(currentPage * PAGE_SIZE, total)} of ${total} propert${total !== 1 ? "ies" : "y"}`
+                : "0 properties found"
+            }
           </p>
+          {!loading && totalPages > 1 && (
+            <p className="text-sm" style={{ color: "#6B7280" }}>
+              Page {currentPage} of {totalPages}
+            </p>
+          )}
         </div>
 
         {/* Error state */}
@@ -332,7 +375,7 @@ export default function Search() {
           <div className="flex items-center gap-3 p-4 rounded-xl mb-6" style={{ background: "#FEF2F2", border: "1px solid #FECACA" }}>
             <AlertCircle size={20} style={{ color: "#DC2626" }} />
             <p className="text-sm" style={{ color: "#DC2626" }}>{error}</p>
-            <button onClick={fetchProperties} className="ml-auto text-sm font-600" style={{ color: "#DC2626" }}>Retry</button>
+            <button onClick={() => fetchProperties(currentPage)} className="ml-auto text-sm font-600" style={{ color: "#DC2626" }}>Retry</button>
           </div>
         )}
 
@@ -363,6 +406,64 @@ export default function Search() {
             {properties.map((p) => (
               <PropertyCard key={p.property_id} property={p} onApply={handleApply} canApply={canApply} />
             ))}
+          </div>
+        )}
+
+        {/* Pagination controls */}
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-10">
+            {/* Previous */}
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
+              style={{
+                background: currentPage === 1 ? "#F3F4F6" : "#fff",
+                color: currentPage === 1 ? "#9CA3AF" : "#0F2D4A",
+                border: "1px solid #E5E7EB",
+                fontWeight: 600,
+                cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              <ChevronLeft size={16} /> Prev
+            </button>
+
+            {/* Page numbers */}
+            {getPageNumbers().map((pg, idx) =>
+              pg === "..." ? (
+                <span key={`ellipsis-${idx}`} className="px-2 text-sm" style={{ color: "#9CA3AF" }}>…</span>
+              ) : (
+                <button
+                  key={pg}
+                  onClick={() => goToPage(pg as number)}
+                  className="w-9 h-9 rounded-lg text-sm font-600 transition-all"
+                  style={{
+                    background: currentPage === pg ? "linear-gradient(135deg, #0F2D4A, #1A9BAD)" : "#fff",
+                    color: currentPage === pg ? "#fff" : "#374151",
+                    border: currentPage === pg ? "none" : "1px solid #E5E7EB",
+                    fontWeight: 600,
+                  }}
+                >
+                  {pg}
+                </button>
+              )
+            )}
+
+            {/* Next */}
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-600 transition-all"
+              style={{
+                background: currentPage === totalPages ? "#F3F4F6" : "linear-gradient(135deg, #0F2D4A, #1A9BAD)",
+                color: currentPage === totalPages ? "#9CA3AF" : "#fff",
+                border: currentPage === totalPages ? "1px solid #E5E7EB" : "none",
+                fontWeight: 600,
+                cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+              }}
+            >
+              Next <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
