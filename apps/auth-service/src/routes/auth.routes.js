@@ -191,7 +191,7 @@ router.get('/admin/stats', async (req, res) => {
           COUNT(*) FILTER (WHERE status = 'INACTIVE') AS inactive_properties,
           COUNT(*) FILTER (WHERE is_nsfas_accredited = true) AS nsfas_properties
         FROM properties
-      `).catch(() => ({ rows: [{ total_properties: 0, active_properties: 0, draft_properties: 0, inactive_properties: 0, nsfas_properties: 0 }] }))
+      `).catch((e) => { console.error('Properties count error:', e.message); return { rows: [{ total_properties: 0, active_properties: 0, draft_properties: 0, inactive_properties: 0, nsfas_properties: 0 }] }; })
     ]);
     res.json({
       ...userStats.rows[0],
