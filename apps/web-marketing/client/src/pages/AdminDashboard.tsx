@@ -17,6 +17,10 @@ interface UserStats {
   students: string; providers: string; institutions: string;
   total_users: string; kyc_verified: string; kyc_pending: string;
   new_this_week: string; new_this_month: string;
+  // Property counts from the extended admin/stats endpoint
+  total_properties: number; active_properties: number;
+  draft_properties: number; inactive_properties: number;
+  nsfas_properties: number;
 }
 
 interface User {
@@ -79,7 +83,12 @@ export default function AdminDashboard() {
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  // Properties tab: server-side paginated
   const [properties, setProperties] = useState<Property[]>([]);
+  const [propTotal, setPropTotal] = useState(0);
+  const [propPage, setPropPage] = useState(1);
+  const [propLoading, setPropLoading] = useState(false);
+  const PROP_PAGE_SIZE = 50;
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,21 +131,35 @@ export default function AdminDashboard() {
     finally { setStatusUpdating(null); }
   };
 
+  const fetchProperties = async (page: number) => {
+    setPropLoading(true);
+    try {
+      const offset = (page - 1) * PROP_PAGE_SIZE;
+      const res = await fetch(`${API}/properties?limit=${PROP_PAGE_SIZE}&offset=${offset}`);
+      if (res.ok) {
+        const d = await res.json();
+        setProperties(d.properties || []);
+        setPropTotal(d.total || 0);
+      }
+    } catch {}
+    finally { setPropLoading(false); }
+  };
+
   const fetchAll = async () => {
     setRefreshing(true);
     setError(null);
     try {
       const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-      const [statsRes, usersRes, propsRes, instRes] = await Promise.all([
+      const [statsRes, usersRes, instRes] = await Promise.all([
         fetch(`${API}/auth/admin/stats`, { headers }),
         fetch(`${API}/auth/admin/users?limit=200`, { headers }),
-        fetch(`${API}/properties?limit=200`),
         fetch(`${API}/institutions`),
       ]);
       if (statsRes.ok) setStats(await statsRes.json());
       if (usersRes.ok) { const d = await usersRes.json(); setUsers(d.users || []); }
-      if (propsRes.ok) { const d = await propsRes.json(); setProperties(d.properties || []); }
       if (instRes.ok) { const d = await instRes.json(); setInstitutions(d.institutions || d || []); }
+      // Load first page of properties
+      await fetchProperties(1);
     } catch (e: any) {
       setError("Failed to load dashboard data. Please try again.");
     } finally {
@@ -150,6 +173,11 @@ export default function AdminDashboard() {
     fetchAll();
     fetchIncidents();
   }, [isAuthenticated]);
+
+  // Reload properties when page changes
+  useEffect(() => {
+    if (!loading) fetchProperties(propPage);
+  }, [propPage]);
 
   const students = users.filter(u => u.role === "STUDENT");
   const providers = users.filter(u => u.role === "PROVIDER");
@@ -211,8 +239,8 @@ export default function AdminDashboard() {
             { label: "Students", value: stats?.students || students.length, icon: GraduationCap, color: "#1A9BAD", bg: "rgba(26,155,173,0.08)" },
             { label: "Providers", value: stats?.providers || providers.length, icon: Briefcase, color: "#F5A623", bg: "rgba(245,166,35,0.08)" },
             { label: "Institutions", value: stats?.institutions || instUsers.length, icon: Landmark, color: "#2ECC71", bg: "rgba(46,204,113,0.08)" },
-            { label: "Properties", value: properties.length, icon: Home, color: "#8B5CF6", bg: "rgba(139,92,246,0.08)" },
-            { label: "Active Properties", value: properties.filter(p => p.status === "ACTIVE").length, icon: CheckCircle, color: "#2ECC71", bg: "rgba(46,204,113,0.08)" },
+            { label: "Total Properties", value: stats?.total_properties ?? propTotal, icon: Home, color: "#8B5CF6", bg: "rgba(139,92,246,0.08)" },
+            { label: "Active Properties", value: stats?.active_properties ?? 0, icon: CheckCircle, color: "#2ECC71", bg: "rgba(46,204,113,0.08)" },
             { label: "KYC Verified", value: stats?.kyc_verified || 0, icon: Shield, color: "#1A9BAD", bg: "rgba(26,155,173,0.08)" },
             { label: "New This Week", value: stats?.new_this_week || 0, icon: TrendingUp, color: "#F5A623", bg: "rgba(245,166,35,0.08)" },
           ].map((s, i) => (
@@ -235,7 +263,7 @@ export default function AdminDashboard() {
             { key: "students", label: `Students (${students.length})`, icon: GraduationCap },
             { key: "providers", label: `Providers (${providers.length})`, icon: Briefcase },
             { key: "institutions", label: `Institutions (${institutions.length})`, icon: Landmark },
-            { key: "properties", label: `Properties (${properties.length})`, icon: Home },
+            { key: "properties", label: `Properties (${stats?.total_properties ?? propTotal})`, icon: Home },
             { key: "incidents", label: `Incidents (${incidents.length})`, icon: AlertTriangle },
           ].map(t => (
             <button key={t.key} onClick={() => setActiveTab(t.key as any)} style={tabStyle(activeTab === t.key)} className="flex items-center gap-1.5">
@@ -275,8 +303,11 @@ export default function AdminDashboard() {
             <div style={cardStyle}>
               <h3 className="text-sm font-700 mb-4" style={{ color: "#0F2D4A", fontWeight: 700 }}>Property Status</h3>
               {["ACTIVE", "DRAFT", "INACTIVE"].map(s => {
-                const count = properties.filter(p => p.status === s).length;
-                const pct = properties.length ? Math.round((count / properties.length) * 100) : 0;
+                const total = (stats?.total_properties ?? 1) || 1;
+                const count = s === "ACTIVE" ? (stats?.active_properties ?? 0)
+                            : s === "DRAFT"   ? (stats?.draft_properties ?? 0)
+                            :                   (stats?.inactive_properties ?? 0);
+                const pct = Math.round((count / total) * 100);
                 const colors: Record<string, string> = { ACTIVE: "#2ECC71", DRAFT: "#9CA3AF", INACTIVE: "#EF4444" };
                 return (
                   <div key={s} className="mb-4">
@@ -294,9 +325,9 @@ export default function AdminDashboard() {
                 <h4 className="text-xs font-700 mb-3" style={{ color: "#0F2D4A", fontWeight: 700 }}>NSFAS Accredited</h4>
                 <div className="flex items-center gap-3">
                   <div className="text-2xl font-800" style={{ color: "#1A9BAD", fontWeight: 800 }}>
-                    {properties.filter(p => p.is_nsfas_accredited).length}
+                    {stats?.nsfas_properties ?? 0}
                   </div>
-                  <div className="text-xs" style={{ color: "#9CA3AF" }}>of {properties.length} properties</div>
+                  <div className="text-xs" style={{ color: "#9CA3AF" }}>of {stats?.total_properties ?? propTotal} properties</div>
                 </div>
               </div>
             </div>
@@ -400,7 +431,15 @@ export default function AdminDashboard() {
         {/* Properties Tab */}
         {activeTab === "properties" && (
           <div style={cardStyle}>
-            <h3 className="text-sm font-700 mb-4" style={{ color: "#0F2D4A", fontWeight: 700 }}>All Properties ({properties.length})</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-700" style={{ color: "#0F2D4A", fontWeight: 700 }}>
+                All Properties ({stats?.total_properties ?? propTotal})
+                <span className="ml-2 text-xs font-400" style={{ color: "#9CA3AF", fontWeight: 400 }}>
+                  — showing {((propPage - 1) * PROP_PAGE_SIZE) + 1}–{Math.min(propPage * PROP_PAGE_SIZE, stats?.total_properties ?? propTotal)}
+                </span>
+              </h3>
+              {propLoading && <RefreshCw size={14} className="animate-spin" style={{ color: "#1A9BAD" }} />}
+            </div>
             <div style={{ overflowX: "auto" }}>
               <table className="w-full">
                 <thead>
@@ -429,6 +468,32 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+            {/* Pagination controls */}
+            {propTotal > PROP_PAGE_SIZE && (
+              <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid #F3F4F6" }}>
+                <p className="text-xs" style={{ color: "#9CA3AF" }}>
+                  Page {propPage} of {Math.ceil(propTotal / PROP_PAGE_SIZE)}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPropPage(p => Math.max(1, p - 1))}
+                    disabled={propPage === 1 || propLoading}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-600"
+                    style={{ background: propPage === 1 ? "#F3F4F6" : "rgba(15,45,74,0.08)", color: propPage === 1 ? "#D1D5DB" : "#0F2D4A", fontWeight: 600, border: "none", cursor: propPage === 1 ? "not-allowed" : "pointer" }}
+                  >
+                    <ChevronDown size={12} style={{ transform: "rotate(90deg)" }} /> Prev
+                  </button>
+                  <button
+                    onClick={() => setPropPage(p => Math.min(Math.ceil(propTotal / PROP_PAGE_SIZE), p + 1))}
+                    disabled={propPage >= Math.ceil(propTotal / PROP_PAGE_SIZE) || propLoading}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-600"
+                    style={{ background: propPage >= Math.ceil(propTotal / PROP_PAGE_SIZE) ? "#F3F4F6" : "rgba(15,45,74,0.08)", color: propPage >= Math.ceil(propTotal / PROP_PAGE_SIZE) ? "#D1D5DB" : "#0F2D4A", fontWeight: 600, border: "none", cursor: propPage >= Math.ceil(propTotal / PROP_PAGE_SIZE) ? "not-allowed" : "pointer" }}
+                  >
+                    Next <ChevronDown size={12} style={{ transform: "rotate(-90deg)" }} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {/* Incidents Tab */}

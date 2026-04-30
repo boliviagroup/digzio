@@ -170,19 +170,37 @@ router.get('/stats', async (req, res) => {
 router.get('/admin/stats', async (req, res) => {
   try {
     if (!requireAdmin(req, res)) return;
-    const stats = await db.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE role = 'STUDENT') AS students,
-        COUNT(*) FILTER (WHERE role = 'PROVIDER') AS providers,
-        COUNT(*) FILTER (WHERE role = 'INSTITUTION') AS institutions,
-        COUNT(*) AS total_users,
-        COUNT(*) FILTER (WHERE kyc_status = 'VERIFIED') AS kyc_verified,
-        COUNT(*) FILTER (WHERE kyc_status = 'PENDING') AS kyc_pending,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS new_this_week,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') AS new_this_month
-      FROM users
-    `);
-    res.json(stats.rows[0]);
+    const [userStats, propStats] = await Promise.all([
+      db.query(`
+        SELECT
+          COUNT(*) FILTER (WHERE role = 'STUDENT') AS students,
+          COUNT(*) FILTER (WHERE role = 'PROVIDER') AS providers,
+          COUNT(*) FILTER (WHERE role = 'INSTITUTION') AS institutions,
+          COUNT(*) AS total_users,
+          COUNT(*) FILTER (WHERE kyc_status = 'VERIFIED') AS kyc_verified,
+          COUNT(*) FILTER (WHERE kyc_status = 'PENDING') AS kyc_pending,
+          COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS new_this_week,
+          COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') AS new_this_month
+        FROM users
+      `),
+      db.query(`
+        SELECT
+          COUNT(*) AS total_properties,
+          COUNT(*) FILTER (WHERE status = 'ACTIVE') AS active_properties,
+          COUNT(*) FILTER (WHERE status = 'DRAFT') AS draft_properties,
+          COUNT(*) FILTER (WHERE status = 'INACTIVE') AS inactive_properties,
+          COUNT(*) FILTER (WHERE is_nsfas_accredited = true) AS nsfas_properties
+        FROM properties
+      `).catch(() => ({ rows: [{ total_properties: 0, active_properties: 0, draft_properties: 0, inactive_properties: 0, nsfas_properties: 0 }] }))
+    ]);
+    res.json({
+      ...userStats.rows[0],
+      total_properties:    parseInt(propStats.rows[0].total_properties, 10),
+      active_properties:   parseInt(propStats.rows[0].active_properties, 10),
+      draft_properties:    parseInt(propStats.rows[0].draft_properties, 10),
+      inactive_properties: parseInt(propStats.rows[0].inactive_properties, 10),
+      nsfas_properties:    parseInt(propStats.rows[0].nsfas_properties, 10),
+    });
   } catch (err) {
     console.error('Admin stats error:', err.message);
     res.status(500).json({ error: 'Failed to fetch stats' });
