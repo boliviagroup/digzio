@@ -385,28 +385,7 @@ router.get('/posa/provider-students', authenticate, requireProvider, async (req,
   }
 });
 
-// ─── 3. Get institution by ID (public) ───────────────────────────────────────
-// GET /api/v1/institutions/:id  (MUST be last to avoid swallowing specific routes)
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await pool.query(
-      `SELECT institution_id, name, contact_email, is_active, created_at,
-              ST_X(campus_location::geometry) AS longitude,
-              ST_Y(campus_location::geometry) AS latitude
-       FROM institutions WHERE institution_id = $1`,
-      [req.params.id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Institution not found' });
-    }
-    res.json({ institution: result.rows[0] });
-  } catch (err) {
-    console.error('Get institution error:', err.message);
-    res.status(500).json({ error: 'Server error', detail: err.message });
-  }
-});
-
-// ─── INSTITUTION DASHBOARD ENDPOINTS ─────────────────────────────────────────
+// ─── INSTITUTION DASHBOARD ENDPOINTS (must be before /:id to avoid route conflict) ─
 
 // GET /api/v1/institutions/dashboard/overview
 router.get('/dashboard/overview', authenticate, requireInstitution, async (req, res) => {
@@ -472,13 +451,11 @@ router.get('/dashboard/students', authenticate, requireInstitution, async (req, 
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
-
     const instResult = await pool.query(
       `SELECT institution_id FROM institutions WHERE contact_email = (
          SELECT email FROM users WHERE user_id = $1
        ) LIMIT 1`, [userId]);
     const instId = instResult.rows[0]?.institution_id || null;
-
     let query, countQuery, params, countParams;
     const searchVal = search ? `%${search}%` : null;
     if (instId) {
@@ -554,13 +531,35 @@ router.get('/dashboard/report', authenticate, requireInstitution, async (req, re
     const instId = instResult.rows[0]?.institution_id || null;
     const instName = instResult.rows[0]?.name || 'Institution';
     const studentsQ = instId
-      ? await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address, p.suburb, p.city, p.province, p.posa_code, p.nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC`, [instId])
-      : await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address, p.suburb, p.city, p.province, p.posa_code, p.nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC`);
+      ? await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC`, [instId])
+      : await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address_line_1 AS address, p.suburb, p.city, p.province, p.posa_code, p.is_nsfas_accredited AS nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC`);
     res.json({ institution: instName, generated_at: new Date().toISOString(), report_period: new Date().getFullYear(), total_students: studentsQ.rows.length, students: studentsQ.rows });
   } catch (err) {
     console.error('Dashboard report error:', err.message);
     res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
+
+// ─── 3. Get institution by ID (public) ───────────────────────────────────────
+// GET /api/v1/institutions/:id  (MUST be last to avoid swallowing specific routes)
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT institution_id, name, contact_email, is_active, created_at,
+              ST_X(campus_location::geometry) AS longitude,
+              ST_Y(campus_location::geometry) AS latitude
+       FROM institutions WHERE institution_id = $1`,
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Institution not found' });
+    }
+    res.json({ institution: result.rows[0] });
+  } catch (err) {
+    console.error('Get institution error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
 
 module.exports = router;
