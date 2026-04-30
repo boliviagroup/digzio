@@ -180,7 +180,7 @@ router.get('/', async (req, res) => {
           WHERE pi.property_id = p.property_id
         ) as images,
         (
-          SELECT json_build_object('first_name', u.first_name, 'last_name', u.last_name)
+          SELECT json_build_object('first_name', u.first_name, 'last_name', u.last_name, 'email', u.email)
           FROM users u WHERE u.user_id = p.provider_id
         ) as provider
       FROM properties p
@@ -322,7 +322,7 @@ router.get('/:id', async (req, res) => {
           WHERE pi.property_id = p.property_id
         ) as images,
         (
-          SELECT json_build_object('first_name', u.first_name, 'last_name', u.last_name, 'phone_number', u.phone_number)
+          SELECT json_build_object('first_name', u.first_name, 'last_name', u.last_name, 'phone_number', u.phone_number, 'email', u.email)
           FROM users u WHERE u.user_id = p.provider_id
         ) as provider
       FROM properties p

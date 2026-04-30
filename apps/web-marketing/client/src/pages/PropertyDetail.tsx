@@ -363,6 +363,11 @@ export default function PropertyDetail() {
                       {property.provider.first_name} {property.provider.last_name}
                     </p>
                     <p className="text-xs" style={{ color: "#9CA3AF" }}>Verified Provider</p>
+                    {(property.provider as any).email && (
+                      <p className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "#1A9BAD", fontWeight: 500 }}>
+                        <Mail size={11} />{(property.provider as any).email}
+                      </p>
+                    )}
                   </div>
                   <div className="ml-auto">
                     <BadgeCheck size={20} style={{ color: "#1A9BAD" }} />
@@ -524,9 +529,18 @@ export default function PropertyDetail() {
                     <CheckCircle size={32} style={{ color: "#16A34A" }} />
                   </div>
                   <h3 className="text-lg font-700 mb-2" style={{ color: "#0F2D4A", fontWeight: 700 }}>Application Submitted!</h3>
-                  <p className="text-sm mb-6" style={{ color: "#6B7280" }}>
+                  <p className="text-sm mb-4" style={{ color: "#6B7280" }}>
                     Your application for <strong>{property.title}</strong> has been submitted. The provider will review it and get back to you.
                   </p>
+                  {property.provider && (
+                    <div className="rounded-xl p-3 mb-4 text-left" style={{ background: "#F0FDFE", border: "1px solid rgba(26,155,173,0.2)" }}>
+                      <p className="text-xs font-600 mb-1" style={{ color: "#0F2D4A", fontWeight: 600 }}>To review this application, log in as the provider:</p>
+                      <p className="text-sm font-700" style={{ color: "#0F2D4A", fontWeight: 700 }}>{property.provider.first_name} {property.provider.last_name}</p>
+                      {(property.provider as any).email && (
+                        <p className="text-xs mt-0.5" style={{ color: "#1A9BAD" }}>{(property.provider as any).email} · Password: Provider@2026!</p>
+                      )}
+                    </div>
+                  )}
                   <button onClick={() => setApplyOpen(false)} className="w-full py-3 rounded-lg font-600 text-sm" style={{ background: "linear-gradient(135deg, #0F2D4A, #1A9BAD)", color: "#fff", fontWeight: 600 }}>
                     Done
                   </button>
