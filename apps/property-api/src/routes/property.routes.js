@@ -200,7 +200,7 @@ router.get('/', async (req, res) => {
     });
   } catch (err) {
     console.error('Property list error:', err.message);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', detail: err.message });
   }
 });
 
