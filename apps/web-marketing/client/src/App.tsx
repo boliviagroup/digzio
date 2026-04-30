@@ -18,7 +18,17 @@ import ProviderDashboard from "./pages/ProviderDashboard";
 import ListProperty from "./pages/ListProperty";
 import AdminDashboard from "./pages/AdminDashboard";
 import PropertyDetail from "./pages/PropertyDetail";
+import InstitutionDashboard from "./pages/InstitutionDashboard";
 import CookieConsent from "./components/CookieConsent";
+
+// Guard component: only renders children if user has INSTITUTION or ADMIN role
+function InstitutionRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated, user } = useAuth();
+  const [, navigate] = useLocation();
+  if (!isAuthenticated || !user) { navigate("/"); return null; }
+  if (user.role !== "INSTITUTION" && user.role !== "ADMIN") { navigate("/"); return null; }
+  return <Component />;
+}
 
 // Guard component: only renders children if user has ADMIN role
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
@@ -52,6 +62,7 @@ function Router() {
       <Route path="/dashboard/provider" component={ProviderDashboard} />
       <Route path="/list-property" component={ListProperty} />
       <Route path="/admin">{() => <AdminRoute component={AdminDashboard} />}</Route>
+      <Route path="/dashboard/institution">{() => <InstitutionRoute component={InstitutionDashboard} />}</Route>
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -207,4 +207,118 @@ router.get('/admin/users', async (req, res) => {
   }
 });
 
+// ─── Institution Endpoints ────────────────────────────────────────────────────
+// Helper: verify token and require INSTITUTION or ADMIN role
+function requireInstitution(req, res) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'No token provided' });
+    return null;
+  }
+  try {
+    const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+    if (decoded.role !== 'INSTITUTION' && decoded.role !== 'ADMIN') {
+      res.status(403).json({ error: 'Forbidden: Institution access only' });
+      return null;
+    }
+    return decoded;
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid or expired token' });
+    return null;
+  }
+}
+
+// GET /api/v1/auth/institution/overview — Institution dashboard overview stats
+router.get('/institution/overview', async (req, res) => {
+  try {
+    const decoded = requireInstitution(req, res);
+    if (!decoded) return;
+    const [userStats, propStats] = await Promise.all([
+      db.query(`SELECT
+        COUNT(*) FILTER (WHERE role = 'STUDENT') AS total_students,
+        COUNT(*) FILTER (WHERE role = 'PROVIDER') AS total_providers,
+        COUNT(*) FILTER (WHERE role = 'STUDENT' AND created_at >= NOW() - INTERVAL '30 days') AS new_students_month,
+        COUNT(*) FILTER (WHERE role = 'STUDENT' AND kyc_status = 'VERIFIED') AS kyc_verified_students
+        FROM users`),
+      db.query(`SELECT
+        COUNT(*) FILTER (WHERE status = 'ACTIVE') AS active_properties,
+        COUNT(*) FILTER (WHERE is_nsfas_accredited = true AND status = 'ACTIVE') AS nsfas_properties
+        FROM properties`),
+    ]);
+    res.json({
+      students: parseInt(userStats.rows[0].total_students, 10),
+      providers: parseInt(userStats.rows[0].total_providers, 10),
+      new_students_month: parseInt(userStats.rows[0].new_students_month, 10),
+      kyc_verified_students: parseInt(userStats.rows[0].kyc_verified_students, 10),
+      active_properties: parseInt(propStats.rows[0].active_properties, 10),
+      nsfas_properties: parseInt(propStats.rows[0].nsfas_properties, 10),
+    });
+  } catch (err) {
+    console.error('Institution overview error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch overview' });
+  }
+});
+
+// GET /api/v1/auth/institution/students — Paginated student registry
+router.get('/institution/students', async (req, res) => {
+  try {
+    const decoded = requireInstitution(req, res);
+    if (!decoded) return;
+    const { limit = 50, offset = 0, search = '' } = req.query;
+    const params = [];
+    let whereExtra = '';
+    if (search) {
+      params.push(`%${search}%`);
+      whereExtra = ` AND (u.first_name ILIKE $1 OR u.last_name ILIKE $1 OR u.email ILIKE $1)`;
+    }
+    params.push(parseInt(limit), parseInt(offset));
+    const result = await db.query(`
+      SELECT
+        u.user_id, u.first_name, u.last_name, u.email, u.kyc_status, u.created_at,
+        sp.student_number, sp.institution_name, sp.nsfas_status, sp.id_number,
+        p.title AS property_title, p.city, p.province, l.is_active AS has_lease
+      FROM users u
+      LEFT JOIN student_profiles sp ON sp.user_id = u.user_id
+      LEFT JOIN leases l ON l.student_id = u.user_id AND l.is_active = true
+      LEFT JOIN properties p ON p.property_id = l.property_id
+      WHERE u.role = 'STUDENT'${whereExtra}
+      ORDER BY u.created_at DESC
+      LIMIT $${params.length - 1} OFFSET $${params.length}
+    `, params);
+    const countParams = search ? [`%${search}%`] : [];
+    const countResult = await db.query(
+      `SELECT COUNT(*) FROM users u WHERE u.role = 'STUDENT'${whereExtra}`,
+      countParams
+    );
+    res.json({ students: result.rows, total: parseInt(countResult.rows[0].count, 10) });
+  } catch (err) {
+    console.error('Institution students error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch students' });
+  }
+});
+
+// GET /api/v1/auth/institution/providers — Provider compliance list
+router.get('/institution/providers', async (req, res) => {
+  try {
+    const decoded = requireInstitution(req, res);
+    if (!decoded) return;
+    const result = await db.query(`
+      SELECT
+        u.user_id, u.first_name, u.last_name, u.email, u.kyc_status, u.created_at,
+        COUNT(p.property_id) AS property_count,
+        COUNT(p.property_id) FILTER (WHERE p.is_nsfas_accredited = true) AS nsfas_count,
+        COUNT(p.property_id) FILTER (WHERE p.status = 'ACTIVE') AS active_count
+      FROM users u
+      LEFT JOIN properties p ON p.provider_id = u.user_id
+      WHERE u.role = 'PROVIDER'
+      GROUP BY u.user_id
+      ORDER BY property_count DESC
+    `);
+    res.json({ providers: result.rows });
+  } catch (err) {
+    console.error('Institution providers error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch providers' });
+  }
+});
+
 module.exports = router;
