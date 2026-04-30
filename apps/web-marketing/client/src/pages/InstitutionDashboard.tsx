@@ -29,6 +29,11 @@ interface Overview {
   kyc_verified_students: number;
   active_properties: number;
   nsfas_properties: number;
+  housed_students: number;
+  housing_rate: number;
+  posa_properties: number;
+  pending_applications: number;
+  nsfas_students: number;
 }
 
 interface Student {
@@ -49,12 +54,14 @@ interface Student {
 }
 
 interface Provider {
-  user_id: string;
+  provider_id: string;
+  user_id?: string;
   first_name: string;
   last_name: string;
   email: string;
-  kyc_status: string;
-  created_at: string;
+  kyc_status?: string;
+  created_at?: string;
+  last_property_added?: string;
   property_count: number;
   nsfas_count: number;
   active_count: number;
@@ -129,7 +136,20 @@ export default function InstitutionDashboard() {
       setLoading(true);
       const res = await fetch(`${API}/api/v1/institutions/dashboard/overview`, { headers });
       if (!res.ok) throw new Error("Failed to load overview");
-      setOverview(await res.json());
+      const raw = await res.json();
+      setOverview({
+        students: raw.total_students ?? 0,
+        providers: raw.active_providers ?? 0,
+        new_students_month: raw.new_students_month ?? 0,
+        kyc_verified_students: raw.kyc_verified_students ?? 0,
+        active_properties: raw.total_properties ?? 0,
+        nsfas_properties: raw.nsfas_students ?? 0,
+        housed_students: raw.housed_students ?? 0,
+        housing_rate: raw.housing_rate ?? 0,
+        posa_properties: raw.posa_properties ?? 0,
+        pending_applications: raw.pending_applications ?? 0,
+        nsfas_students: raw.nsfas_students ?? 0,
+      });
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }, []);
@@ -156,7 +176,19 @@ export default function InstitutionDashboard() {
       const res = await fetch(`${API}/api/v1/institutions/dashboard/providers`, { headers });
       if (!res.ok) throw new Error("Failed to load providers");
       const data = await res.json();
-      setProviders(data.providers || []);
+      setProviders((data.providers || []).map((p: any) => ({
+        provider_id: p.provider_id,
+        user_id: p.provider_id,
+        first_name: p.first_name,
+        last_name: p.last_name,
+        email: p.email,
+        kyc_status: p.kyc_status || "UNVERIFIED",
+        created_at: p.last_property_added || new Date().toISOString(),
+        last_property_added: p.last_property_added,
+        property_count: Number(p.total_properties ?? p.property_count ?? 0),
+        nsfas_count: Number(p.nsfas_properties ?? p.nsfas_count ?? 0),
+        active_count: Number(p.active_properties ?? p.active_count ?? 0),
+      })));
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }, []);
@@ -458,7 +490,7 @@ export default function InstitutionDashboard() {
                       const score = total > 0 ? Math.round((active / total) * 100) : 0;
                       const scoreColor = score >= 80 ? GREEN : score >= 50 ? AMBER : RED;
                       return (
-                        <tr key={p.user_id} style={{ borderBottom: "1px solid #F3F4F6", background: i % 2 === 0 ? "#fff" : "#FAFAFA" }}>
+                        <tr key={p.provider_id || p.user_id || i} style={{ borderBottom: "1px solid #F3F4F6", background: i % 2 === 0 ? "#fff" : "#FAFAFA" }}>
                           <td style={{ padding: "12px 16px" }}>
                             <div style={{ fontWeight: 600, color: NAVY }}>{p.first_name} {p.last_name}</div>
                             <div style={{ fontSize: 11, color: "#9CA3AF" }}>{p.email}</div>
