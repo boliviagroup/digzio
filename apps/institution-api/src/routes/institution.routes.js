@@ -406,4 +406,161 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// ─── INSTITUTION DASHBOARD ENDPOINTS ─────────────────────────────────────────
+
+// GET /api/v1/institutions/dashboard/overview
+router.get('/dashboard/overview', authenticate, requireInstitution, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const instResult = await pool.query(
+      `SELECT institution_id, name FROM institutions WHERE contact_email = (
+         SELECT email FROM users WHERE user_id = $1
+       ) LIMIT 1`, [userId]);
+    const instId = instResult.rows[0]?.institution_id || null;
+    const instName = instResult.rows[0]?.name || 'Your Institution';
+
+    const studentsQ = instId
+      ? await pool.query(`SELECT COUNT(*) FROM student_profiles WHERE institution_id = $1`, [instId])
+      : await pool.query(`SELECT COUNT(*) FROM student_profiles`);
+    const totalStudents = parseInt(studentsQ.rows[0].count);
+
+    const housedQ = instId
+      ? await pool.query(`SELECT COUNT(DISTINCT l.tenant_id) FROM leases l JOIN student_profiles sp ON sp.student_id = l.tenant_id WHERE sp.institution_id = $1 AND l.status = 'ACTIVE'`, [instId])
+      : await pool.query(`SELECT COUNT(DISTINCT l.tenant_id) FROM leases l WHERE l.status = 'ACTIVE'`);
+    const housedStudents = parseInt(housedQ.rows[0].count);
+
+    const providersQ = await pool.query(`SELECT COUNT(DISTINCT provider_id) FROM properties WHERE status = 'ACTIVE'`);
+    const activeProviders = parseInt(providersQ.rows[0].count);
+
+    const posaQ = await pool.query(`SELECT COUNT(*) FROM properties WHERE posa_code IS NOT NULL AND status = 'ACTIVE'`);
+    const posaProperties = parseInt(posaQ.rows[0].count);
+
+    const propsQ = await pool.query(`SELECT COUNT(*) FROM properties WHERE status = 'ACTIVE'`);
+    const totalProperties = parseInt(propsQ.rows[0].count);
+
+    const nsfasQ = instId
+      ? await pool.query(`SELECT COUNT(*) FROM student_profiles WHERE institution_id = $1 AND nsfas_status = 'APPROVED'`, [instId])
+      : await pool.query(`SELECT COUNT(*) FROM student_profiles WHERE nsfas_status = 'APPROVED'`);
+    const nsfasStudents = parseInt(nsfasQ.rows[0].count);
+
+    const pendingQ = await pool.query(`SELECT COUNT(*) FROM leases WHERE status = 'PENDING'`);
+    const pendingApplications = parseInt(pendingQ.rows[0].count);
+
+    res.json({
+      institution_id: instId,
+      institution_name: instName,
+      total_students: totalStudents,
+      housed_students: housedStudents,
+      active_providers: activeProviders,
+      posa_properties: posaProperties,
+      total_properties: totalProperties,
+      nsfas_students: nsfasStudents,
+      pending_applications: pendingApplications,
+      housing_rate: totalStudents > 0 ? Math.round((housedStudents / totalStudents) * 100) : 0
+    });
+  } catch (err) {
+    console.error('Dashboard overview error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// GET /api/v1/institutions/dashboard/students?page=1&limit=20&search=
+router.get('/dashboard/students', authenticate, requireInstitution, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    const instResult = await pool.query(
+      `SELECT institution_id FROM institutions WHERE contact_email = (
+         SELECT email FROM users WHERE user_id = $1
+       ) LIMIT 1`, [userId]);
+    const instId = instResult.rows[0]?.institution_id || null;
+
+    let query, countQuery, params, countParams;
+    const searchVal = search ? `%${search}%` : null;
+    if (instId) {
+      if (searchVal) {
+        params = [instId, limit, offset, searchVal];
+        countParams = [instId, searchVal];
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $4 OR u.last_name ILIKE $4 OR sp.student_number ILIKE $4) ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE sp.institution_id = $1 AND (u.first_name ILIKE $2 OR u.last_name ILIKE $2 OR sp.student_number ILIKE $2)`;
+      } else {
+        params = [instId, limit, offset];
+        countParams = [instId];
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC LIMIT $2 OFFSET $3`;
+        countQuery = `SELECT COUNT(*) FROM student_profiles sp WHERE sp.institution_id = $1`;
+      }
+    } else {
+      if (searchVal) {
+        params = [limit, offset, searchVal];
+        countParams = [searchVal];
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id WHERE (u.first_name ILIKE $3 OR u.last_name ILIKE $3 OR sp.student_number ILIKE $3) ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        countQuery = `SELECT COUNT(*) FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id WHERE (u.first_name ILIKE $1 OR u.last_name ILIKE $1 OR sp.student_number ILIKE $1)`;
+      } else {
+        params = [limit, offset];
+        countParams = [];
+        query = `SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, sp.type_of_funding, l.status AS lease_status, l.start_date, l.end_date, p.title AS property_title, p.suburb, p.city FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status = 'ACTIVE' LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC LIMIT $1 OFFSET $2`;
+        countQuery = `SELECT COUNT(*) FROM student_profiles`;
+      }
+    }
+    const [result, countResult] = await Promise.all([pool.query(query, params), pool.query(countQuery, countParams)]);
+    res.json({ students: result.rows, total: parseInt(countResult.rows[0].count), page, limit, pages: Math.ceil(parseInt(countResult.rows[0].count) / limit) });
+  } catch (err) {
+    console.error('Dashboard students error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// GET /api/v1/institutions/dashboard/providers?page=1&limit=20
+router.get('/dashboard/providers', authenticate, requireInstitution, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+    const result = await pool.query(`
+      SELECT u.user_id AS provider_id, u.first_name, u.last_name, u.email, u.phone,
+        COUNT(p.property_id) AS total_properties,
+        COUNT(CASE WHEN p.status = 'ACTIVE' THEN 1 END) AS active_properties,
+        COUNT(CASE WHEN p.posa_code IS NOT NULL THEN 1 END) AS posa_properties,
+        COUNT(CASE WHEN p.nsfas_accredited = true THEN 1 END) AS nsfas_properties,
+        COUNT(CASE WHEN l.status = 'ACTIVE' THEN 1 END) AS active_leases,
+        MAX(p.created_at) AS last_property_added
+      FROM users u
+      JOIN properties p ON p.provider_id = u.user_id
+      LEFT JOIN leases l ON l.property_id = p.property_id AND l.status = 'ACTIVE'
+      WHERE u.role = 'PROVIDER'
+      GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.phone
+      ORDER BY active_properties DESC
+      LIMIT $1 OFFSET $2`, [limit, offset]);
+    const countResult = await pool.query(`SELECT COUNT(DISTINCT u.user_id) FROM users u JOIN properties p ON p.provider_id = u.user_id WHERE u.role = 'PROVIDER'`);
+    res.json({ providers: result.rows, total: parseInt(countResult.rows[0].count), page, limit, pages: Math.ceil(parseInt(countResult.rows[0].count) / limit) });
+  } catch (err) {
+    console.error('Dashboard providers error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
+// GET /api/v1/institutions/dashboard/report
+router.get('/dashboard/report', authenticate, requireInstitution, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const instResult = await pool.query(
+      `SELECT institution_id, name FROM institutions WHERE contact_email = (
+         SELECT email FROM users WHERE user_id = $1
+       ) LIMIT 1`, [userId]);
+    const instId = instResult.rows[0]?.institution_id || null;
+    const instName = instResult.rows[0]?.name || 'Institution';
+    const studentsQ = instId
+      ? await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address, p.suburb, p.city, p.province, p.posa_code, p.nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id WHERE sp.institution_id = $1 ORDER BY u.last_name ASC`, [instId])
+      : await pool.query(`SELECT u.first_name, u.last_name, u.email, sp.student_number, sp.id_number, sp.nsfas_status, sp.year_of_study, sp.qualification, sp.campus, sp.gender, l.status AS lease_status, l.start_date, l.end_date, l.monthly_rent, p.title AS property_title, p.address, p.suburb, p.city, p.province, p.posa_code, p.nsfas_accredited FROM student_profiles sp JOIN users u ON u.user_id = sp.student_id LEFT JOIN leases l ON l.tenant_id = u.user_id AND l.status IN ('ACTIVE','SIGNED') LEFT JOIN properties p ON p.property_id = l.property_id ORDER BY u.last_name ASC`);
+    res.json({ institution: instName, generated_at: new Date().toISOString(), report_period: new Date().getFullYear(), total_students: studentsQ.rows.length, students: studentsQ.rows });
+  } catch (err) {
+    console.error('Dashboard report error:', err.message);
+    res.status(500).json({ error: 'Server error', detail: err.message });
+  }
+});
+
 module.exports = router;

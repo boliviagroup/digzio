@@ -127,7 +127,7 @@ export default function InstitutionDashboard() {
   const fetchOverview = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/v1/auth/institution/overview`, { headers });
+      const res = await fetch(`${API}/api/v1/institutions/dashboard/overview`, { headers });
       if (!res.ok) throw new Error("Failed to load overview");
       setOverview(await res.json());
     } catch (e: any) { setError(e.message); }
@@ -140,7 +140,7 @@ export default function InstitutionDashboard() {
       setLoading(true);
       const offset = (page - 1) * LIMIT;
       const q = new URLSearchParams({ limit: String(LIMIT), offset: String(offset), ...(search ? { search } : {}) });
-      const res = await fetch(`${API}/api/v1/auth/institution/students?${q}`, { headers });
+      const res = await fetch(`${API}/api/v1/institutions/dashboard/students?${q}`, { headers });
       if (!res.ok) throw new Error("Failed to load students");
       const data = await res.json();
       setStudents(data.students || []);
@@ -153,7 +153,7 @@ export default function InstitutionDashboard() {
   const fetchProviders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/api/v1/auth/institution/providers`, { headers });
+      const res = await fetch(`${API}/api/v1/institutions/dashboard/providers`, { headers });
       if (!res.ok) throw new Error("Failed to load providers");
       const data = await res.json();
       setProviders(data.providers || []);
