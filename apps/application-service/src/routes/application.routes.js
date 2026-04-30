@@ -355,20 +355,46 @@ router.get('/provider', authenticate, async (req, res) => {
 // GET /api/v1/applications/:id — Get single application
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly,
+    const caller_id = req.user.user_id;
+    const caller_role = req.user.role;
+    // SECURITY FIX (CRITICAL-02): Enforce object-level authorisation.
+    // Only the owning student, the provider whose property the application is
+    // for, or an ADMIN may read a specific application record.
+    // All unauthorised callers receive 404 to avoid leaking record existence.
+    let query, params;
+    if (caller_role === 'ADMIN') {
+      query = `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly,
               u.first_name, u.last_name, u.email AS student_email, u.kyc_status
        FROM applications a
        JOIN properties p ON a.property_id = p.property_id
        JOIN users u ON a.student_id = u.user_id
-       WHERE a.application_id = $1`,
-      [req.params.id]
-    );
+       WHERE a.application_id = $1`;
+      params = [req.params.id];
+    } else if (caller_role === 'PROVIDER') {
+      // Provider may only read applications for their own properties
+      query = `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly,
+              u.first_name, u.last_name, u.email AS student_email, u.kyc_status
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       JOIN users u ON a.student_id = u.user_id
+       WHERE a.application_id = $1 AND p.provider_id = $2`;
+      params = [req.params.id, caller_id];
+    } else {
+      // STUDENT (and any other role) may only read their own applications
+      query = `SELECT a.*, p.title AS property_title, p.city, p.province, p.base_price_monthly,
+              u.first_name, u.last_name, u.email AS student_email, u.kyc_status
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       JOIN users u ON a.student_id = u.user_id
+       WHERE a.application_id = $1 AND a.student_id = $2`;
+      params = [req.params.id, caller_id];
+    }
+    const result = await pool.query(query, params);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Application not found' });
     res.json(result.rows[0]);
   } catch (err) {
     console.error('Get application error:', err.message);
-    res.status(500).json({ error: 'Failed to fetch application', detail: err.message });
+    res.status(500).json({ error: 'Failed to fetch application' });
   }
 });
 
