@@ -18,6 +18,7 @@ import ProviderDashboard from "./pages/ProviderDashboard";
 import ListProperty from "./pages/ListProperty";
 import AdminDashboard from "./pages/AdminDashboard";
 import PropertyDetail from "./pages/PropertyDetail";
+import CookieConsent from "./components/CookieConsent";
 
 // Guard component: only renders children if user has ADMIN role
 function AdminRoute({ component: Component }: { component: React.ComponentType }) {
@@ -65,6 +66,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            <CookieConsent />
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
