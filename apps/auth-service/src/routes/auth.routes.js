@@ -321,4 +321,42 @@ router.get('/institution/providers', async (req, res) => {
   }
 });
 
+// POST /api/v1/auth/admin/reset-password — ADMIN only
+router.post('/admin/reset-password', async (req, res) => {
+  try {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+    const token = auth.slice(7);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'digzio-super-secret-jwt-key-2024-production');
+    } catch (e) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    if (decoded.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const { email, new_password } = req.body;
+    if (!email || !new_password) {
+      return res.status(400).json({ error: 'email and new_password are required' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(new_password, salt);
+    const result = await db.query(
+      'UPDATE users SET password_hash = $1 WHERE email = $2 RETURNING user_id, email, role',
+      [password_hash, email]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'Password reset successfully', user: result.rows[0] });
+  } catch (err) {
+    console.error('Admin reset password error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
+
