@@ -352,11 +352,60 @@ router.get('/provider', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/v1/applications/all — Admin: get all applications with pagination
+// IMPORTANT: This MUST be defined before /:id to avoid Express matching 'all' as an ID
+router.get('/all', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const limit = parseInt(req.query.limit) || 50;
+    const offset = parseInt(req.query.offset) || 0;
+    const status_filter = req.query.status;
+    let where = '';
+    const params = [limit, offset];
+    if (status_filter) {
+      params.push(status_filter);
+      where = `WHERE a.status = $${params.length}`;
+    }
+    const result = await pool.query(
+      `SELECT a.application_id, a.status, a.applied_at, a.updated_at,
+              p.title AS property_title, p.city, p.base_price_monthly,
+              u.first_name, u.last_name, u.email AS student_email
+       FROM applications a
+       JOIN properties p ON a.property_id = p.property_id
+       JOIN users u ON a.student_id = u.user_id
+       ${where}
+       ORDER BY a.applied_at DESC
+       LIMIT $1 OFFSET $2`,
+      params
+    );
+    const countResult = await pool.query(
+      `SELECT COUNT(*) FROM applications a ${where}`,
+      status_filter ? [status_filter] : []
+    );
+    res.json({
+      applications: result.rows,
+      total: parseInt(countResult.rows[0].count, 10),
+      limit,
+      offset,
+    });
+  } catch (err) {
+    console.error('Admin all applications error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch applications', detail: err.message });
+  }
+});
+
 // GET /api/v1/applications/:id — Get single application
 router.get('/:id', authenticate, async (req, res) => {
   try {
     const caller_id = req.user.user_id;
     const caller_role = req.user.role;
+    // Validate UUID format before hitting DB — prevents 500 on integer IDs like /1
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!UUID_RE.test(req.params.id)) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
     // SECURITY FIX (CRITICAL-02): Enforce object-level authorisation.
     // Only the owning student, the provider whose property the application is
     // for, or an ADMIN may read a specific application record.
@@ -479,6 +528,49 @@ router.patch('/:id/status', authenticate, async (req, res) => {
   } catch (err) {
     console.error('Update status error:', err.message);
     res.status(500).json({ error: 'Failed to update application', detail: err.message });
+  }
+});
+
+// POST /api/v1/applications/:id/status — alias for PATCH (for compatibility)
+router.post('/:id/status', authenticate, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const caller_id = req.user.user_id;
+    const caller_role = req.user.role;
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!UUID_RE.test(req.params.id)) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    const valid = ['SUBMITTED', 'UNDER_REVIEW', 'PENDING_NSFAS', 'APPROVED', 'REJECTED', 'LEASE_SIGNED'];
+    const normalised = status ? status.toUpperCase().replace(' ', '_') : '';
+    if (!valid.includes(normalised)) {
+      return res.status(400).json({ error: `Status must be one of: ${valid.join(', ')}` });
+    }
+    // Verify caller has permission
+    let ownerCheck;
+    if (caller_role === 'ADMIN') {
+      ownerCheck = await pool.query('SELECT application_id FROM applications WHERE application_id = $1', [req.params.id]);
+    } else if (caller_role === 'PROVIDER') {
+      ownerCheck = await pool.query(
+        `SELECT a.application_id FROM applications a
+         JOIN properties p ON a.property_id = p.property_id
+         WHERE a.application_id = $1 AND p.provider_id = $2`,
+        [req.params.id, caller_id]
+      );
+    } else {
+      return res.status(403).json({ error: 'Only providers and admins can update application status' });
+    }
+    if (ownerCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+    const result = await pool.query(
+      'UPDATE applications SET status = $1, updated_at = NOW() WHERE application_id = $2 RETURNING *',
+      [normalised, req.params.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Update status error:', err.message);
+    res.status(500).json({ error: 'Failed to update status', detail: err.message });
   }
 });
 

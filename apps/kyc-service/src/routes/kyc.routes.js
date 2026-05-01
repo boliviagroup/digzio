@@ -94,4 +94,62 @@ router.get('/status', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/v1/kyc/admin/pending — Admin: list users with PENDING kyc_status
+router.get('/admin/pending', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const limit = parseInt(req.query.limit) || 50;
+    const offset = parseInt(req.query.offset) || 0;
+    const result = await pool.query(
+      `SELECT user_id, email, first_name, last_name, kyc_status, updated_at, created_at
+       FROM users
+       WHERE kyc_status = 'PENDING'
+       ORDER BY updated_at ASC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    const countResult = await pool.query(
+      `SELECT COUNT(*) FROM users WHERE kyc_status = 'PENDING'`
+    );
+    res.json({
+      pending: result.rows,
+      total: parseInt(countResult.rows[0].count, 10),
+      limit,
+      offset,
+    });
+  } catch (err) {
+    console.error('KYC admin pending error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch KYC queue', detail: err.message });
+  }
+});
+
+// POST /api/v1/kyc/admin/verify — Admin: approve or reject a user's KYC
+router.post('/admin/verify', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    const { user_id, action } = req.body;
+    if (!user_id || !action) {
+      return res.status(400).json({ error: 'user_id and action (VERIFIED|REJECTED) are required' });
+    }
+    const newStatus = action.toUpperCase() === 'VERIFIED' ? 'VERIFIED' : 'REJECTED';
+    const result = await pool.query(
+      `UPDATE users SET kyc_status = $1, updated_at = NOW()
+       WHERE user_id = $2
+       RETURNING user_id, email, kyc_status, updated_at`,
+      [newStatus, user_id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: `KYC ${newStatus.toLowerCase()} successfully`, user: result.rows[0] });
+  } catch (err) {
+    console.error('KYC admin verify error:', err.message);
+    res.status(500).json({ error: 'Failed to update KYC status', detail: err.message });
+  }
+});
+
 module.exports = router;

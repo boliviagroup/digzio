@@ -188,17 +188,15 @@ router.get('/admin/stats', async (req, res) => {
           COUNT(*) AS total_properties,
           COUNT(*) FILTER (WHERE status = 'ACTIVE') AS active_properties,
           COUNT(*) FILTER (WHERE status = 'DRAFT') AS draft_properties,
-          COUNT(*) FILTER (WHERE status = 'INACTIVE') AS inactive_properties,
           COUNT(*) FILTER (WHERE is_nsfas_accredited = true) AS nsfas_properties
         FROM properties
-      `).catch((e) => { console.error('Properties count error:', e.message); return { rows: [{ total_properties: 0, active_properties: 0, draft_properties: 0, inactive_properties: 0, nsfas_properties: 0 }] }; })
+      `).catch((e) => { console.error('Properties count error:', e.message); return { rows: [{ total_properties: 0, active_properties: 0, draft_properties: 0, nsfas_properties: 0 }] }; })
     ]);
     res.json({
       ...userStats.rows[0],
       total_properties:    parseInt(propStats.rows[0].total_properties, 10),
       active_properties:   parseInt(propStats.rows[0].active_properties, 10),
       draft_properties:    parseInt(propStats.rows[0].draft_properties, 10),
-      inactive_properties: parseInt(propStats.rows[0].inactive_properties, 10),
       nsfas_properties:    parseInt(propStats.rows[0].nsfas_properties, 10),
     });
   } catch (err) {
@@ -218,7 +216,12 @@ router.get('/admin/users', async (req, res) => {
     query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
     params.push(parseInt(limit), parseInt(offset));
     const result = await db.query(query, params);
-    res.json({ users: result.rows, count: result.rows.length });
+    // Also get total count for pagination
+    let countQuery = 'SELECT COUNT(*) AS total FROM users';
+    const countParams = role ? [role.toUpperCase()] : [];
+    if (role) countQuery += ' WHERE role = $1';
+    const countResult = await db.query(countQuery, countParams);
+    res.json({ users: result.rows, count: result.rows.length, total: parseInt(countResult.rows[0].total, 10) });
   } catch (err) {
     console.error('Admin users error:', err.message);
     res.status(500).json({ error: 'Failed to fetch users' });
