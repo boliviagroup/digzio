@@ -6,8 +6,11 @@ interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: "student" | "provider" | "admin";
+  role: "student" | "provider" | "admin" | "institution";
   phone?: string;
+  kyc_status?: "NOT_STARTED" | "PENDING" | "VERIFIED" | "REJECTED";
+  institution_name?: string;
+  student_number?: string;
 }
 
 interface AuthState {

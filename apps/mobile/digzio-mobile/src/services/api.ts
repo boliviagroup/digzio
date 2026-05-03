@@ -15,7 +15,6 @@ export const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     try {
-      // Token will be injected by the auth hook via setAuthToken()
       return config;
     } catch {
       return config;
@@ -118,4 +117,23 @@ export const imageAPI = {
 // ─── Institutions ──────────────────────────────────────────────────────────
 export const institutionAPI = {
   getAll: () => api.get("/institutions"),
+  getOverview: () => api.get("/institutions/overview"),
+  getStudents: (params?: { limit?: number; offset?: number }) =>
+    api.get("/institutions/students", { params }),
+  getProviders: () => api.get("/institutions/providers"),
+  getDHETReport: () => api.get("/institutions/dhet-report"),
+};
+
+// ─── Admin ─────────────────────────────────────────────────────────────────
+export const adminAPI = {
+  getStats: () => api.get("/auth/admin/stats"),
+  getUsers: (params?: { limit?: number; offset?: number; role?: string }) =>
+    api.get("/auth/admin/users", { params }),
+  getAllProperties: (params?: { limit?: number; offset?: number }) =>
+    api.get("/properties", { params }),
+  getAllApplications: (params?: { limit?: number; offset?: number }) =>
+    api.get("/applications/all", { params }),
+  getKYCQueue: () => api.get("/kyc/admin/pending"),
+  updateKYC: (userId: string, status: "VERIFIED" | "REJECTED") =>
+    api.patch(`/kyc/admin/${userId}`, { status }),
 };
